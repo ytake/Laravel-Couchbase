@@ -1,0 +1,47 @@
+{
+  "name": "ytake/laravel-couchbase",
+  "description": "Couchbase providers for Laravel",
+  "keywords": [
+    "laravel",
+    "couchbase",
+    "database",
+    "session",
+    "cache",
+    "lumen"
+  ],
+  "authors": [
+    {
+      "name": "Yuuki Takezawa",
+      "email": "yuuki.takezawa@comnect.jp.net"
+    }
+  ],
+  "license": "MIT",
+  "require": {
+    "php": ">=5.5.9",
+    "ext-couchbase": ">=2.0.7",
+    "illuminate/support": "5.1.*",
+    "illuminate/config": "5.1.*",
+    "illuminate/console": "5.1.*",
+    "illuminate/events": "5.1.*",
+    "illuminate/cache": "5.1.*",
+    "illuminate/session": "5.1.*",
+    "illuminate/encryption": "5.1.*"
+  },
+  "require-dev": {
+    "symfony/framework-bundle": "2.*",
+    "symfony/console": "2.*",
+    "phpunit/phpunit": "4.*",
+    "satooshi/php-coveralls": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Ytake\\LaravelCouchbase\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "classmap": [
+      "tests/TestCase.php"
+    ]
+  },
+  "minimum-stability": "stable"
+}
