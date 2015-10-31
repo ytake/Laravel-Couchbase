@@ -12,23 +12,35 @@
 
 namespace Ytake\LaravelCouchbase;
 
-use Illuminate\Support\ServiceProvider;
+use CouchbaseClusterManager;
 
-class CompileServiceProvider extends ServiceProvider
+class Buckets
 {
+    /** @var CouchbaseClusterManager */
+    protected $manager;
+
     /**
-     * {@inheritdoc}
+     * @param CouchbaseClusterManager $manager
      */
-    public function register()
+    public function __construct(CouchbaseClusterManager $manager)
     {
-        //
+        $this->manager = $manager;
     }
 
     /**
-     * {@inheritdoc}
+     * @param $name
+     *
+     * @return bool
      */
-    public static function compiles()
+    public function bucket($name)
     {
-        return [];
+        $result = $this->manager->listBuckets();
+        foreach ($result as $row) {
+            if ($row['name'] === $name) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

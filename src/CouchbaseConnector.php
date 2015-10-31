@@ -12,23 +12,30 @@
 
 namespace Ytake\LaravelCouchbase;
 
-use Illuminate\Support\ServiceProvider;
-
-class CompileServiceProvider extends ServiceProvider
+/**
+ * Class CouchbaseConnector
+ */
+class CouchbaseConnector
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function register()
-    {
-        //
-    }
+    /** @var array */
+    protected $configure = [
+        'host' => '127.0.0.1',
+        'user' => '',
+        'password' => '',
+    ];
 
     /**
-     * {@inheritdoc}
+     * @param array $servers
+     *
+     * @return \CouchbaseCluster
      */
-    public static function compiles()
+    public function connect(array $servers)
     {
-        return [];
+        $configure = array_merge($this->configure, $servers);
+        return new \CouchbaseCluster(
+            $configure['host'],
+            $configure['user'],
+            $configure['password']
+        );
     }
 }

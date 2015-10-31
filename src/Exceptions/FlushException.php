@@ -10,25 +10,22 @@
  * THE SOFTWARE.
  */
 
-namespace Ytake\LaravelCouchbase;
+namespace Ytake\LaravelCouchbase\Exceptions;
 
-use Illuminate\Support\ServiceProvider;
-
-class CompileServiceProvider extends ServiceProvider
+/**
+ * Class FlushException
+ *
+ * @package Ytake\LaravelCouchbase\Exceptions
+ */
+class FlushException extends \Exception
 {
     /**
-     * {@inheritdoc}
+     * @param array          $message
+     * @param int             $code
+     * @param \Exception|null $previous
      */
-    public function register()
+    public function __construct(array $message, $code = 0, \Exception $previous = null)
     {
-        //
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function compiles()
-    {
-        return [];
+        parent::__construct($message['_'], $code, $previous);
     }
 }
