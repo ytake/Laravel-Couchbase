@@ -4,6 +4,11 @@ cache, session, database extension package
 
 required ext-couchbase
 
+## install
+```bash
+$ composer require ytake/laravel-couchbase
+```
+
 ## usage
 ### database extension
 
