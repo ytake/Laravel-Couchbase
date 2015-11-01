@@ -15,6 +15,7 @@ namespace Ytake\LaravelCouchbase;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Session\CacheBasedSessionHandler;
 use Ytake\LaravelCouchbase\Cache\CouchbaseStore;
+use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
 class CouchbaseServiceProvider extends ServiceProvider
 {
@@ -40,6 +41,12 @@ class CouchbaseServiceProvider extends ServiceProvider
             $minutes = $app['config']['session.lifetime'];
             return new CacheBasedSessionHandler(clone $this->app['cache']->driver('couchbase'), $minutes);
         });
+
+        // add couchbase extension
+        $this->app['db']->extend('couchbase', function ($config) {
+            /** @var \CouchbaseCluster $cluster */
+            return new CouchbaseConnection($config);
+        });
     }
 
     /**
@@ -49,23 +56,12 @@ class CouchbaseServiceProvider extends ServiceProvider
      */
     protected function registerCacheDriver()
     {
-        $this->app['cache']->extend('couchbase', function ($app) {
-            // for cache
-            $configure = $app['config']->get('cache.stores.couchbase');
+        $this->app['cache']->extend('couchbase', function ($app, $config) {
             /** @var \CouchbaseCluster $cluster */
-            $cluster = $app['couchbase.connector']->connect($configure['servers']);
-
+            $cluster = $app['db']->connection($config['driver'])->getCouchbase();
             return new \Illuminate\Cache\Repository(
-                new CouchbaseStore($cluster, $configure['bucket'], $app['config']->get('cache.prefix'))
+                new CouchbaseStore($cluster, $config['bucket'], $app['config']->get('cache.prefix'))
             );
         });
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function provides()
-    {
-        return [];
     }
 }
