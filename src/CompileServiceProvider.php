@@ -14,6 +14,9 @@ namespace Ytake\LaravelCouchbase;
 
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Class CompileServiceProvider
+ */
 class CompileServiceProvider extends ServiceProvider
 {
     /**
@@ -29,6 +32,15 @@ class CompileServiceProvider extends ServiceProvider
      */
     public static function compiles()
     {
-        return [];
+        return [
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Cache/CouchbaseStore.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Database/CouchbaseConnection.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Database/CouchbaseConnector.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Exceptions/FlushException.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Exceptions/NotSupportedException.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Query/Grammer.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Query/Processor.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/CouchbaseServiceProvider.php',
+        ];
     }
 }

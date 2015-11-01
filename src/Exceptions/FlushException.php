@@ -14,8 +14,6 @@ namespace Ytake\LaravelCouchbase\Exceptions;
 
 /**
  * Class FlushException
- *
- * @package Ytake\LaravelCouchbase\Exceptions
  */
 class FlushException extends \Exception
 {

@@ -1,10 +1,23 @@
 <?php
 
+/**
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 namespace Ytake\LaravelCouchbase\Query;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\Grammar as IlluminateGrammar;
 
+/**
+ * Class Grammar
+ */
 class Grammar extends IlluminateGrammar
 {
     /**
@@ -34,10 +47,9 @@ class Grammar extends IlluminateGrammar
 
         $columns = implode(', ', $columns);
 
+        $joins = '';
         if (isset($query->joins)) {
             $joins = ' ' . $this->compileJoins($query, $query->joins);
-        } else {
-            $joins = '';
         }
         $where = $this->compileWheres($query);
 
@@ -51,7 +63,7 @@ class Grammar extends IlluminateGrammar
     {
         $table = $this->wrapTable($query->from);
 
-        if (! is_array(reset($values))) {
+        if (!is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -60,7 +72,7 @@ class Grammar extends IlluminateGrammar
         $parameters = [];
 
         foreach ($values as $record) {
-            $parameters[] = '('.$this->parameterize($record).')';
+            $parameters[] = '(' . $this->parameterize($record) . ')';
         }
 
         $parameters = implode(', ', $parameters);
@@ -82,6 +94,7 @@ class Grammar extends IlluminateGrammar
 
     /**
      * supported N1QL upsert query
+     *
      * @param Builder $query
      * @param array   $values
      *
@@ -91,7 +104,7 @@ class Grammar extends IlluminateGrammar
     {
         $table = $this->wrapTable($query->from);
 
-        if (! is_array(reset($values))) {
+        if (!is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -100,7 +113,7 @@ class Grammar extends IlluminateGrammar
         $parameters = [];
 
         foreach ($values as $record) {
-            $parameters[] = '('.$this->parameterize($record).')';
+            $parameters[] = '(' . $this->parameterize($record) . ')';
         }
 
         $parameters = implode(', ', $parameters);

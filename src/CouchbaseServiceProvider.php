@@ -14,9 +14,14 @@ namespace Ytake\LaravelCouchbase;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Session\CacheBasedSessionHandler;
+use Ytake\LaravelCouchbase\Database\Connectable;
 use Ytake\LaravelCouchbase\Cache\CouchbaseStore;
+use Ytake\LaravelCouchbase\Database\CouchbaseConnector;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
+/**
+ * Class CouchbaseServiceProvider
+ */
 class CouchbaseServiceProvider extends ServiceProvider
 {
     /**
@@ -32,7 +37,7 @@ class CouchbaseServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('couchbase.connector', function () {
+        $this->app->singleton(Connectable::class, function () {
             return new CouchbaseConnector();
         });
 

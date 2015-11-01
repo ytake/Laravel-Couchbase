@@ -10,32 +10,17 @@
  * THE SOFTWARE.
  */
 
-namespace Ytake\LaravelCouchbase;
+namespace Ytake\LaravelCouchbase\Database;
 
 /**
- * Class CouchbaseConnector
+ * Interface Connectable
  */
-class CouchbaseConnector
+interface Connectable
 {
-    /** @var array */
-    protected $configure = [
-        'host' => '127.0.0.1',
-        'user' => '',
-        'password' => '',
-    ];
-
     /**
      * @param array $servers
      *
      * @return \CouchbaseCluster
      */
-    public function connect(array $servers)
-    {
-        $configure = array_merge($this->configure, $servers);
-        return new \CouchbaseCluster(
-            $configure['host'],
-            $configure['user'],
-            $configure['password']
-        );
-    }
+    public function connect(array $servers);
 }

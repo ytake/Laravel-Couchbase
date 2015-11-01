@@ -14,8 +14,6 @@ namespace Ytake\LaravelCouchbase\Exceptions;
 
 /**
  * Class NotSupportedException
- *
- * @package Ytake\LaravelCouchbase\Exceptions
  */
 class NotSupportedException extends \Exception
 {

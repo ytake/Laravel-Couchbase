@@ -15,16 +15,13 @@ namespace Ytake\LaravelCouchbase\Cache;
 use CouchbaseBucket;
 use CouchbaseCluster;
 use CouchbaseException;
-use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\Cache\Store;
 use Ytake\LaravelCouchbase\Exceptions\FlushException;
 
 /**
  * Class CouchbaseStore
- *
- * @package Ytake\LaravelCouchbase\Cache
  */
-class CouchbaseStore extends TaggableStore implements Store
+class CouchbaseStore implements Store
 {
     /** @var string */
     protected $prefix;
@@ -55,7 +52,7 @@ class CouchbaseStore extends TaggableStore implements Store
         try {
             $result = $this->bucket->get($this->resolveKey($key));
             if (count($result)) {
-                return $result->value;
+                return $result;
             }
 
             return null;
@@ -108,7 +105,7 @@ class CouchbaseStore extends TaggableStore implements Store
     public function decrement($key, $value = 1)
     {
         return $this->bucket
-            ->counter($this->resolveKey($key), (0 - $value), ['initial' => (0 - $value)])->value;
+            ->counter($this->resolveKey($key), (0 - abs($value)), ['initial' => (0 - abs($value))])->value;
     }
 
     /**

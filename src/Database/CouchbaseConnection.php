@@ -1,12 +1,27 @@
 <?php
 
+/**
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 namespace Ytake\LaravelCouchbase\Database;
 
 use Closure;
 use CouchbaseBucket;
-use App\Query\Grammar;
+use Ytake\LaravelCouchbase\Query\Grammar;
+use Ytake\LaravelCouchbase\Query\Processor;
 use Illuminate\Database\Connection;
+use Ytake\LaravelCouchbase\Exceptions\NotSupportedException;
 
+/**
+ * Class CouchbaseConnection
+ */
 class CouchbaseConnection extends Connection
 {
     /** @var string */
@@ -51,11 +66,11 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @return Query\Processor
+     * @return Processor
      */
     protected function getDefaultPostProcessor()
     {
-        return new Query\Processor;
+        return new Processor;
     }
 
     /**
