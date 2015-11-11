@@ -15,13 +15,14 @@ namespace Ytake\LaravelCouchbase\Cache;
 use CouchbaseBucket;
 use CouchbaseCluster;
 use CouchbaseException;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\Cache\Store;
 use Ytake\LaravelCouchbase\Exceptions\FlushException;
 
 /**
  * Class CouchbaseStore
  */
-class CouchbaseStore implements Store
+class CouchbaseStore extends TaggableStore implements Store
 {
     /** @var string */
     protected $prefix;
@@ -51,11 +52,8 @@ class CouchbaseStore implements Store
     {
         try {
             $result = $this->bucket->get($this->resolveKey($key));
-            if (count($result)) {
-                return $result;
-            }
 
-            return null;
+            return $this->getMetaDoc($result);
         } catch (CouchbaseException $e) {
             return null;
         }
@@ -187,5 +185,26 @@ class CouchbaseStore implements Store
         }
 
         return $this->prefix . $keys;
+    }
+
+    /**
+     * @param $meta
+     *
+     * @return array|null
+     */
+    protected function getMetaDoc($meta)
+    {
+        if ($meta instanceof \CouchbaseMetaDoc) {
+            return $meta->value;
+        }
+        if (is_array($meta)) {
+            $result = [];
+            foreach ($meta as $row) {
+                $result[] = $this->getMetaDoc($row);
+            }
+
+            return $result;
+        }
+        return null;
     }
 }
