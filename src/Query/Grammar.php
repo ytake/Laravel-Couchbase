@@ -33,11 +33,30 @@ class Grammar extends IlluminateGrammar
     }
 
     /**
+     * @param $value
+     *
+     * @return string
+     */
+    protected function wrapKey($value)
+    {
+        if (is_null($value)) {
+            return null;
+        }
+
+        return '"' . str_replace('"', '""', $value) . '"';
+    }
+
+    /**
      * {@inheritdoc}
+     *
+     * notice: supported set query only
      */
     public function compileUpdate(Builder $query, $values)
     {
+        // keyspace-ref:
         $table = $this->wrapTable($query->from);
+        // use-keys-clause:
+        $keyClause = $this->wrapKey($query->key);
 
         $columns = [];
 
@@ -53,7 +72,7 @@ class Grammar extends IlluminateGrammar
         }
         $where = $this->compileWheres($query);
 
-        return trim("update {$table}{$joins} set $columns $where RETURNING *");
+        return trim("update {$table} USE KEYS {$keyClause} {$joins} set $columns $where RETURNING *");
     }
 
     /**
@@ -61,63 +80,39 @@ class Grammar extends IlluminateGrammar
      */
     public function compileInsert(Builder $query, array $values)
     {
+        // keyspace-ref:
         $table = $this->wrapTable($query->from);
+        // use-keys-clause:
+        $keyClause = $this->wrapKey($query->key);
 
         if (!is_array(reset($values))) {
             $values = [$values];
         }
-
-        $columns = $this->columnize(array_keys(reset($values)));
-
         $parameters = [];
 
         foreach ($values as $record) {
             $parameters[] = '(' . $this->parameterize($record) . ')';
         }
 
-        $parameters = implode(', ', $parameters);
+        $parameters = (!$keyClause) ? implode(', ', $parameters) : '(?, ?)';
+        $keyValue = (!$keyClause) ? null : '(KEY, VALUE)';
 
-        return "insert into $table ($columns) values $parameters RETURNING *";
+        return "insert into {$table} {$keyValue} values $parameters RETURNING *";
     }
 
     /**
      * {@inheritdoc}
+     * @see http://developer.couchbase.com/documentation/server/4.1/n1ql/n1ql-language-reference/delete.html
      */
     public function compileDelete(Builder $query)
     {
+        // keyspace-ref:
         $table = $this->wrapTable($query->from);
+        // use-keys-clause:
+        $keyClause = $this->wrapKey($query->key);
 
         $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
 
-        return trim("delete from {$table} {$where} RETURNING *");
-    }
-
-    /**
-     * supported N1QL upsert query
-     *
-     * @param Builder $query
-     * @param array   $values
-     *
-     * @return string
-     */
-    public function compileUpsert(Builder $query, array $values)
-    {
-        $table = $this->wrapTable($query->from);
-
-        if (!is_array(reset($values))) {
-            $values = [$values];
-        }
-
-        $columns = $this->columnize(array_keys(reset($values)));
-
-        $parameters = [];
-
-        foreach ($values as $record) {
-            $parameters[] = '(' . $this->parameterize($record) . ')';
-        }
-
-        $parameters = implode(', ', $parameters);
-
-        return "UPSERT into $table ($columns) values $parameters RETURNING *";
+        return trim("delete from {$table} USE KEYS {$keyClause} {$where} RETURNING *");
     }
 }

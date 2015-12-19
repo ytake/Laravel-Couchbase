@@ -12,29 +12,31 @@
 namespace Ytake\LaravelCouchbase\Database;
 
 /**
- * Class CouchbaseConnector
+ * Class ViewQuery
  */
-class CouchbaseConnector implements Connectable
+class ViewQuery
 {
-    /** @var array */
-    protected $configure = [
-        'host' => '127.0.0.1',
-        'user' => '',
-        'password' => '',
-    ];
+    /** @var \CouchbaseBucket  */
+    protected $bucket;
 
     /**
-     * @param array $servers
+     * ViewQuery constructor.
      *
-     * @return \CouchbaseCluster
+     * @param \CouchbaseBucket $bucket
      */
-    public function connect(array $servers)
+    public function __construct(\CouchbaseBucket $bucket)
     {
-        $configure = array_merge($this->configure, $servers);
-        return new \CouchbaseCluster(
-            $configure['host'],
-            $configure['user'],
-            $configure['password']
-        );
+        $this->bucket = $bucket;
+    }
+
+    /**
+     * @param $designDoc
+     * @param $name
+     *
+     * @return \_CouchbaseDefaultViewQuery
+     */
+    public function from($designDoc, $name)
+    {
+        return \CouchbaseViewQuery::from($designDoc, $name);
     }
 }
