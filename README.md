@@ -6,8 +6,19 @@ cache, session, database extension package
 required ext-couchbase
 
 ## install
+
 ```bash
 $ composer require ytake/laravel-couchbase
+```
+
+your config/app.php
+
+```php
+'providers' => [
+    // added service provider
+    \Ytake\LaravelCouchbase\CouchbaseServiceProvider::class,
+    //
+]
 ```
 
 ## usage
@@ -107,4 +118,5 @@ example)
 ### session extension
 
 .env etc..
+
 specify couchbase driver
