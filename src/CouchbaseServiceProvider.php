@@ -9,7 +9,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace Ytake\LaravelCouchbase;
 
 use Illuminate\Support\ServiceProvider;
@@ -68,5 +67,23 @@ class CouchbaseServiceProvider extends ServiceProvider
                 new CouchbaseStore($cluster, $config['bucket'], $app['config']->get('cache.prefix'))
             );
         });
+    }
+
+    /**
+     * {@inheritdoc}
+     * @codeCoverageIgnore
+     */
+    public static function compiles()
+    {
+        return [
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Cache/CouchbaseStore.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Database/CouchbaseConnection.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Database/CouchbaseConnector.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Exceptions/FlushException.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Exceptions/NotSupportedException.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Query/Grammer.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Query/Processor.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/CouchbaseServiceProvider.php',
+        ];
     }
 }

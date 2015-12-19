@@ -9,7 +9,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace Ytake\LaravelCouchbase\Cache;
 
 use CouchbaseBucket;
@@ -119,6 +118,7 @@ class CouchbaseStore extends TaggableStore implements Store
      */
     public function forget($key)
     {
+        $this->resolveKey($key);
         $this->bucket->remove($this->resolveKey($key));
     }
 
@@ -126,6 +126,7 @@ class CouchbaseStore extends TaggableStore implements Store
      * flush bucket
      *
      * @throws FlushException
+     * @codeCoverageIgnore
      */
     public function flush()
     {
