@@ -14,9 +14,9 @@ namespace Ytake\LaravelCouchbase\Database;
 
 use Closure;
 use CouchbaseBucket;
+use Illuminate\Database\Connection;
 use Ytake\LaravelCouchbase\Query\Grammar;
 use Ytake\LaravelCouchbase\Query\Processor;
-use Illuminate\Database\Connection;
 use Ytake\LaravelCouchbase\Exceptions\NotSupportedException;
 
 /**
@@ -62,7 +62,7 @@ class CouchbaseConnection extends Connection
      */
     public function openBucket($name)
     {
-        return $this->enableN1ql($this->connection->openBucket($name));
+        return $this->connection->openBucket($name);
     }
 
     /**
@@ -127,7 +127,9 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $table
+     *
+     * @return \Ytake\LaravelCouchbase\Database\QueryBuilder
      */
     public function table($table)
     {
@@ -158,6 +160,7 @@ class CouchbaseConnection extends Connection
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
             $query->options['args'] = $bindings;
+            $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
             $bucket = $this->openBucket($this->bucket);
 
             return $bucket->query($query);
@@ -265,7 +268,7 @@ class CouchbaseConnection extends Connection
         if(!count($this->enableN1qlServers)) {
             return $bucket;
         }
-        // $bucket->enableN1ql($this->enableN1qlServers);
+        $bucket->enableN1ql($this->enableN1qlServers);
         return $bucket;
     }
 
@@ -279,5 +282,17 @@ class CouchbaseConnection extends Connection
     public function upsert($query, $bindings = [])
     {
         return $this->affectingStatement($query, $bindings);
+    }
+
+    /**
+     * Get a new query builder instance.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function query()
+    {
+        return new QueryBuilder(
+            $this, $this->getQueryGrammar(), $this->getPostProcessor()
+        );
     }
 }

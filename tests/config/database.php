@@ -9,6 +9,7 @@ return [
             'host' => 'couchbase://127.0.0.1',
             'user' => 'Administrator',
             'password' => 'Administrator',
+            'enables' => ['http;//127.0.0.1:8093']
         ],
     ],
     'migrations' => 'migrations',
