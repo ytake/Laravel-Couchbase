@@ -9,16 +9,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace Ytake\LaravelCouchbase\Exceptions;
 
 /**
- * Class NotSupportedException
+ * Class NotSupportedException.
  */
 class NotSupportedException extends \Exception
 {
     /**
-     * @param array          $message
+     * @param array           $message
      * @param int             $code
      * @param \Exception|null $previous
      */

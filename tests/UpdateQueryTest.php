@@ -23,12 +23,12 @@ class UpdateQueryTest extends TestCase
         /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
         $result = $connection->table('testing')->key($key)->insert($value);
-        $this->assertInstanceOf('CouchbaseMetaDoc', $result);
-        $this->assertSame(1, $connection->table('testing')->key($key)
+        $this->assertInstanceOf('stdClass', $result);
+        $result = $connection->table('testing')->key($key)
             ->where('click', 'to edit')->update(
                 ['click' => 'testing edit']
-            )
-        );
+            );
+        $this->assertInstanceOf('stdClass', $result->testing);
         $result = $connection->table('testing')->where('click', 'testing edit')->first();
         $this->assertSame('testing edit', $result->testing->click);
         $connection->table('testing')->key($key)->delete();
@@ -44,7 +44,7 @@ class UpdateQueryTest extends TestCase
         /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
         $result = $connection->table('testing')->key($key)->insert($value);
-        $this->assertInstanceOf('CouchbaseMetaDoc', $result);
+        $this->assertInstanceOf('stdClass', $result);
         $this->assertSame(null, $connection->table('testing')->key($key)->where('clicking', 'to edit')->first());
         $connection->table('testing')->key($key)->delete();
     }
@@ -59,7 +59,7 @@ class UpdateQueryTest extends TestCase
         /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
         $result = $connection->table('testing')->key($key)->upsert($value);
-        $this->assertInstanceOf('CouchbaseMetaDoc', $result);
+        $this->assertInstanceOf('stdClass', $result);
         $connection->table('testing')->key($key)->upsert([
             'click'   => 'to edit',
             'content' => 'testing for upsert',

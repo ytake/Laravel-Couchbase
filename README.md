@@ -1,13 +1,32 @@
 # Laravel-Couchbase
 for Laravel 5.1.*(higher)
 
-cache, session, database extension package
+cache, session, database extension package  
+*required ext-couchbase*  
 
-required ext-couchbase
+[![Build Status](https://img.shields.io/scrutinizer/build/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/build-status/develop)
+[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/?branch=develop)
+[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/?branch=develop)
+[![StyleCI](https://styleci.io/repos/45177780/shield)](https://styleci.io/repos/45177780)
+
+[![Packagist](https://img.shields.io/packagist/dt/ytake/laravel-couchbase.svg?style=flat-square)](https://packagist.org/packages/ytake/laravel-couchbase)
+[![Packagist](https://img.shields.io/packagist/v/ytake/laravel-couchbase.svg?style=flat-square)](https://packagist.org/packages/ytake/laravel-couchbase)
+[![Packagist](https://img.shields.io/packagist/l/ytake/laravel-couchbase.svg?style=flat-square)](https://packagist.org/packages/ytake/laravel-couchbase)
 
 ## install
+
 ```bash
 $ composer require ytake/laravel-couchbase
+```
+
+your config/app.php
+
+```php
+'providers' => [
+    // added service provider
+    \Ytake\LaravelCouchbase\CouchbaseServiceProvider::class,
+    //
+]
 ```
 
 ## usage
@@ -107,4 +126,5 @@ example)
 ### session extension
 
 .env etc..
+
 specify couchbase driver

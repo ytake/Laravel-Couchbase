@@ -9,7 +9,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace Ytake\LaravelCouchbase\Database;
 
 use Closure;
@@ -20,7 +19,7 @@ use Ytake\LaravelCouchbase\Query\Processor;
 use Ytake\LaravelCouchbase\Exceptions\NotSupportedException;
 
 /**
- * Class CouchbaseConnection
+ * Class CouchbaseConnection.
  */
 class CouchbaseConnection extends Connection
 {
@@ -36,10 +35,10 @@ class CouchbaseConnection extends Connection
     /** @var */
     protected $managerPassword;
 
-    /** @var int  */
+    /** @var int */
     protected $fetchMode = 0;
 
-    /** @var array  */
+    /** @var array */
     protected $enableN1qlServers = [];
 
     /**
@@ -70,7 +69,7 @@ class CouchbaseConnection extends Connection
      */
     protected function getDefaultPostProcessor()
     {
-        return new Processor;
+        return new Processor();
     }
 
     /**
@@ -78,13 +77,11 @@ class CouchbaseConnection extends Connection
      */
     protected function getDefaultQueryGrammar()
     {
-        return new Grammar;
+        return new Grammar();
     }
 
     /**
      * @param array $config
-     *
-     * @return void
      */
     protected function getManagedConfigure(array $config)
     {
@@ -146,6 +143,7 @@ class CouchbaseConnection extends Connection
     public function bucket($bucket)
     {
         $this->bucket = $bucket;
+
         return $this;
     }
 
@@ -154,7 +152,7 @@ class CouchbaseConnection extends Connection
      */
     public function select($query, $bindings = [], $useReadPdo = true)
     {
-        return $this->run($query, $bindings, function ( $me, $query, $bindings) {
+        return $this->run($query, $bindings, function ($me, $query, $bindings) {
             if ($me->pretending()) {
                 return [];
             }
@@ -168,20 +166,14 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $query
+     * @param array  $bindings
+     *
+     * @return int|mixed
      */
-    public function statement($query, $bindings = [])
+    public function insert($query, $bindings = [])
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) {
-            if ($me->pretending()) {
-                return true;
-            }
-            $query = \CouchbaseN1qlQuery::fromString($query);
-            $query->options['args'] = $bindings;
-            $bucket = $this->openBucket($this->bucket);
-
-            return (count($bucket->query($query))) ? true : false;
-        });
+        return $this->affectingStatement($query, $bindings);
     }
 
     /**
@@ -194,9 +186,33 @@ class CouchbaseConnection extends Connection
                 return 0;
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
+            $query->consistency(\CouchbaseN1qlQuery::STATEMENT_PLUS);
+            $bucket = $this->openBucket($this->bucket);
+            $result = $bucket->query($query, ['parameters' => $bindings]);
+
+            return (isset($result[0])) ? $result[0] : false;
+        });
+    }
+
+    /**
+     * @param       $query
+     * @param array $bindings
+     *
+     * @return mixed
+     */
+    public function positionalStatement($query, array $bindings = [])
+    {
+        return $this->run($query, $bindings, function ($me, $query, $bindings) {
+            if ($me->pretending()) {
+                return 0;
+            }
+            $query = \CouchbaseN1qlQuery::fromString($query);
+            $query->consistency(\CouchbaseN1qlQuery::STATEMENT_PLUS);
             $query->options['args'] = $bindings;
             $bucket = $this->openBucket($this->bucket);
-            return count($bucket->query($query));
+            $result = $bucket->query($query);
+
+            return (isset($result[0])) ? $result[0] : false;
         });
     }
 
@@ -265,18 +281,20 @@ class CouchbaseConnection extends Connection
      */
     protected function enableN1ql(CouchbaseBucket $bucket)
     {
-        if(!count($this->enableN1qlServers)) {
+        if (!count($this->enableN1qlServers)) {
             return $bucket;
         }
         $bucket->enableN1ql($this->enableN1qlServers);
+
         return $bucket;
     }
 
     /**
-     * N1QL upsert query
+     * N1QL upsert query.
      *
-     * @param  string  $query
-     * @param  array   $bindings
+     * @param string $query
+     * @param array  $bindings
+     *
      * @return int
      */
     public function upsert($query, $bindings = [])
@@ -294,5 +312,31 @@ class CouchbaseConnection extends Connection
         return new QueryBuilder(
             $this, $this->getQueryGrammar(), $this->getPostProcessor()
         );
+    }
+
+    /**
+     * Run an update statement against the database.
+     *
+     * @param string $query
+     * @param array  $bindings
+     *
+     * @return int|\stdClass
+     */
+    public function update($query, $bindings = [])
+    {
+        return $this->positionalStatement($query, $bindings);
+    }
+
+    /**
+     * Run a delete statement against the database.
+     *
+     * @param string $query
+     * @param array  $bindings
+     *
+     * @return int|\stdClass
+     */
+    public function delete($query, $bindings = [])
+    {
+        return $this->positionalStatement($query, $bindings);
     }
 }

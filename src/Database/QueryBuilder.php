@@ -15,7 +15,7 @@ use Illuminate\Database\Query\Builder;
 
 /**
  * Class QueryBuilder
- * supported N1QL
+ * supported N1QL.
  *
  * @see http://developer.couchbase.com/documentation/server/4.1/n1ql/n1ql-language-reference/index.html
  */
@@ -28,11 +28,18 @@ class QueryBuilder extends Builder
      */
     protected $connection;
 
+    /**
+     * The database query grammar instance.
+     *
+     * @var \Ytake\LaravelCouchbase\Query\Grammar
+     */
+    protected $grammar;
+
     /** @var string  use-keys-clause */
     public $key;
 
-    /** @var string */
-    public $returning;
+    /** @var string[]  returning-clause */
+    public $returning = ['*'];
 
     /**
      * @param $key
@@ -47,11 +54,11 @@ class QueryBuilder extends Builder
     }
 
     /**
-     * @param string $column
+     * @param array $column
      *
      * @return $this
      */
-    public function returning($column = '*')
+    public function returning(array $column = ['*'])
     {
         $this->returning = $column;
 
@@ -59,7 +66,11 @@ class QueryBuilder extends Builder
     }
 
     /**
-     * {@inheritdoc}
+     * Insert a new record into the database.
+     *
+     * @param array $values
+     *
+     * @return bool
      */
     public function insert(array $values)
     {
@@ -67,11 +78,31 @@ class QueryBuilder extends Builder
             return true;
         }
 
-        return $this->connection->openBucket($this->from)->insert($this->key, $values);
+        if (!is_array(reset($values))) {
+            $values = [$values];
+        } else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+                $values[$key] = $value;
+            }
+        }
+
+        $bindings = [];
+
+        foreach ($values as $record) {
+            foreach ($record as $key => $value) {
+                $bindings[$key] = $value;
+            }
+        }
+
+        $sql = $this->grammar->compileInsert($this, $values);
+
+        return $this->connection->insert($sql, $bindings);
     }
 
     /**
-     * supported N1QL upsert query
+     * supported N1QL upsert query.
+     *
      * @param array $values
      *
      * @return bool|mixed
@@ -82,6 +113,25 @@ class QueryBuilder extends Builder
             return true;
         }
 
-        return $this->connection->openBucket($this->from)->upsert($this->key, $values);
+        if (!is_array(reset($values))) {
+            $values = [$values];
+        } else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+                $values[$key] = $value;
+            }
+        }
+
+        $bindings = [];
+
+        foreach ($values as $record) {
+            foreach ($record as $key => $value) {
+                $bindings[$key] = $value;
+            }
+        }
+
+        $sql = $this->grammar->compileUpsert($this, $values);
+
+        return $this->connection->upsert($sql, $bindings);
     }
 }

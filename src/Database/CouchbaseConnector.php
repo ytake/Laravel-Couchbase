@@ -12,7 +12,7 @@
 namespace Ytake\LaravelCouchbase\Database;
 
 /**
- * Class CouchbaseConnector
+ * Class CouchbaseConnector.
  */
 class CouchbaseConnector implements Connectable
 {
@@ -31,6 +31,7 @@ class CouchbaseConnector implements Connectable
     public function connect(array $servers)
     {
         $configure = array_merge($this->configure, $servers);
+
         return new \CouchbaseCluster(
             $configure['host'],
             $configure['user'],

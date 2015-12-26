@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ytake/laravel-couchbase" default="unittest">
+    <property name="outputDir" value="./tests/logs/" override="false" />
+    <target name="unittest" description="==>test AdhocTask ">
+        <exec command="./vendor/bin/phpunit" passthru="true" />
+    </target>
+    <target name="cs" description="==> check style and auto refactoring">
+        <exec command="./vendor/bin/php-cs-fixer fix src" passthru="true" />
+    </target>
+    <target name="scrutinizer" description="==> send to scrutinizer">
+        <exec command="wget https://scrutinizer-ci.com/ocular.phar" passthru="true" />
+        <exec command="php ocular.phar code-coverage:upload --format=php-clover tests/logs/clover.xml;" passthru="true" />
+        <exec command="rm -rf ocular.phar;" passthru="true" />
+    </target>
+    <target name="build" depends="cs, unittest, scrutinizer" />
+</project>
