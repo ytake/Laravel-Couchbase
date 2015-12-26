@@ -16,13 +16,16 @@ use CouchbaseCluster;
 use CouchbaseException;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Cache\RetrievesMultipleKeys;
 use Ytake\LaravelCouchbase\Exceptions\FlushException;
 
 /**
- * Class CouchbaseStore
+ * Class CouchbaseStore.
  */
 class CouchbaseStore extends TaggableStore implements Store
 {
+    use RetrievesMultipleKeys;
+
     /** @var string */
     protected $prefix;
 
@@ -45,7 +48,7 @@ class CouchbaseStore extends TaggableStore implements Store
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function get($key)
     {
@@ -54,16 +57,16 @@ class CouchbaseStore extends TaggableStore implements Store
 
             return $this->getMetaDoc($result);
         } catch (CouchbaseException $e) {
-            return null;
+            return;
         }
     }
 
     /**
      * Store an item in the cache if the key doesn't exist.
      *
-     * @param  string|array $key
-     * @param  mixed        $value
-     * @param  int          $minutes
+     * @param string|array $key
+     * @param mixed        $value
+     * @param int          $minutes
      *
      * @return bool
      */
@@ -123,7 +126,7 @@ class CouchbaseStore extends TaggableStore implements Store
     }
 
     /**
-     * flush bucket
+     * flush bucket.
      *
      * @throws FlushException
      * @codeCoverageIgnore
@@ -147,13 +150,11 @@ class CouchbaseStore extends TaggableStore implements Store
     /**
      * Set the cache key prefix.
      *
-     * @param  string $prefix
-     *
-     * @return void
+     * @param string $prefix
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = !empty($prefix) ? $prefix . ':' : '';
+        $this->prefix = !empty($prefix) ? $prefix.':' : '';
     }
 
     /**
@@ -179,13 +180,13 @@ class CouchbaseStore extends TaggableStore implements Store
         if (is_array($keys)) {
             $result = [];
             foreach ($keys as $key) {
-                $result[] = $this->prefix . $key;
+                $result[] = $this->prefix.$key;
             }
 
             return $result;
         }
 
-        return $this->prefix . $keys;
+        return $this->prefix.$keys;
     }
 
     /**
@@ -206,6 +207,7 @@ class CouchbaseStore extends TaggableStore implements Store
 
             return $result;
         }
-        return null;
+
+        return;
     }
 }
