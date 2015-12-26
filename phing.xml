@@ -10,6 +10,7 @@
     <target name="scrutinizer" description="==> send to scrutinizer">
         <exec command="wget https://scrutinizer-ci.com/ocular.phar" passthru="true" />
         <exec command="php ocular.phar code-coverage:upload --format=php-clover tests/logs/clover.xml;" passthru="true" />
+        <exec command="rm -rf ocular.phar;" passthru="true" />
     </target>
     <target name="build" depends="cs, unittest, scrutinizer" />
 </project>
