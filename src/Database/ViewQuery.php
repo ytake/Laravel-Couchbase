@@ -12,7 +12,7 @@
 namespace Ytake\LaravelCouchbase\Database;
 
 /**
- * Class ViewQuery
+ * Class ViewQuery.
  */
 class ViewQuery
 {

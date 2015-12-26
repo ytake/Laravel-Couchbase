@@ -19,7 +19,7 @@
         <whitelist>
             <directory>./src</directory>
             <exclude>
-                <file>./src/CompileServiceProvider.php</file>
+                <file>./src/CouchbaseServiceProvider.php</file>
             </exclude>
         </whitelist>
     </filter>

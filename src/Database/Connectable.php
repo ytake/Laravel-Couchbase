@@ -12,7 +12,7 @@
 namespace Ytake\LaravelCouchbase\Database;
 
 /**
- * Interface Connectable
+ * Interface Connectable.
  */
 interface Connectable
 {

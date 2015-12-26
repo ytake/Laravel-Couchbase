@@ -9,14 +9,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace Ytake\LaravelCouchbase\Query;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Grammars\Grammar as IlluminateGrammar;
+use Ytake\LaravelCouchbase\Database\QueryBuilder;
 
 /**
- * Class Grammar
+ * Class Grammar.
  */
 class Grammar extends IlluminateGrammar
 {
@@ -40,10 +40,10 @@ class Grammar extends IlluminateGrammar
     protected function wrapKey($value)
     {
         if (is_null($value)) {
-            return null;
+            return;
         }
 
-        return '"' . str_replace('"', '""', $value) . '"';
+        return '"'.str_replace('"', '""', $value).'"';
     }
 
     /**
@@ -57,22 +57,24 @@ class Grammar extends IlluminateGrammar
         $table = $this->wrapTable($query->from);
         // use-keys-clause:
         $keyClause = $this->wrapKey($query->key);
+        // returning-clause
+        $returning = implode(', ', $query->returning);
 
         $columns = [];
 
         foreach ($values as $key => $value) {
-            $columns[] = $this->wrap($key) . ' = ' . $this->parameter($value);
+            $columns[] = $this->wrap($key).' = '.$this->parameter($value);
         }
 
         $columns = implode(', ', $columns);
 
         $joins = '';
         if (isset($query->joins)) {
-            $joins = ' ' . $this->compileJoins($query, $query->joins);
+            $joins = ' '.$this->compileJoins($query, $query->joins);
         }
         $where = $this->compileWheres($query);
 
-        return trim("update {$table} USE KEYS {$keyClause} {$joins} set $columns $where RETURNING *");
+        return trim("update {$table} USE KEYS {$keyClause} {$joins} set $columns $where RETURNING {$returning}");
     }
 
     /**
@@ -84,6 +86,8 @@ class Grammar extends IlluminateGrammar
         $table = $this->wrapTable($query->from);
         // use-keys-clause:
         $keyClause = $this->wrapKey($query->key);
+        // returning-clause
+        $returning = implode(', ', $query->returning);
 
         if (!is_array(reset($values))) {
             $values = [$values];
@@ -91,17 +95,17 @@ class Grammar extends IlluminateGrammar
         $parameters = [];
 
         foreach ($values as $record) {
-            $parameters[] = '(' . $this->parameterize($record) . ')';
+            $parameters[] = '('.$this->parameterize($record).')';
         }
-
-        $parameters = (!$keyClause) ? implode(', ', $parameters) : '(?, ?)';
+        $parameters = (!$keyClause) ? implode(', ', $parameters) : "({$keyClause}, \$parameters)";
         $keyValue = (!$keyClause) ? null : '(KEY, VALUE)';
 
-        return "insert into {$table} {$keyValue} values $parameters RETURNING *";
+        return "insert into {$table} {$keyValue} values $parameters RETURNING {$returning}";
     }
 
     /**
      * {@inheritdoc}
+     *
      * @see http://developer.couchbase.com/documentation/server/4.1/n1ql/n1ql-language-reference/delete.html
      */
     public function compileDelete(Builder $query)
@@ -110,9 +114,39 @@ class Grammar extends IlluminateGrammar
         $table = $this->wrapTable($query->from);
         // use-keys-clause:
         $keyClause = $this->wrapKey($query->key);
-
+        // returning-clause
+        $returning = implode(', ', $query->returning);
         $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
 
-        return trim("delete from {$table} USE KEYS {$keyClause} {$where} RETURNING *");
+        return trim("delete from {$table} USE KEYS {$keyClause} {$where} RETURNING {$returning}");
+    }
+
+    /**
+     * @param QueryBuilder $query
+     * @param array        $values
+     *
+     * @return string
+     */
+    public function compileUpsert(QueryBuilder $query, array $values)
+    {
+        // keyspace-ref:
+        $table = $this->wrapTable($query->from);
+        // use-keys-clause:
+        $keyClause = $this->wrapKey($query->key);
+        // returning-clause
+        $returning = implode(', ', $query->returning);
+
+        if (!is_array(reset($values))) {
+            $values = [$values];
+        }
+        $parameters = [];
+
+        foreach ($values as $record) {
+            $parameters[] = '('.$this->parameterize($record).')';
+        }
+        $parameters = (!$keyClause) ? implode(', ', $parameters) : "({$keyClause}, \$parameters)";
+        $keyValue = (!$keyClause) ? null : '(KEY, VALUE)';
+
+        return "UPSERT INTO {$table} {$keyValue} VALUES $parameters RETURNING {$returning}";
     }
 }
