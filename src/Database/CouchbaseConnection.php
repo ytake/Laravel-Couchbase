@@ -41,6 +41,9 @@ class CouchbaseConnection extends Connection
     /** @var array */
     protected $enableN1qlServers = [];
 
+    /** @var string  */
+    protected $bucketPassword = '';
+
     /**
      * @param array $config
      */
@@ -55,13 +58,24 @@ class CouchbaseConnection extends Connection
     }
 
     /**
+     * @param $password
+     *
+     * @return $this
+     */
+    public function setBucketPassword($password)
+    {
+        $this->bucketPassword = $password;
+        return $this;
+    }
+
+    /**
      * @param $name
      *
      * @return \CouchbaseBucket
      */
     public function openBucket($name)
     {
-        return $this->connection->openBucket($name);
+        return $this->connection->openBucket($name, $this->bucketPassword);
     }
 
     /**
@@ -136,7 +150,7 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @param $bucket
+     * @param string $bucket
      *
      * @return $this
      */
@@ -186,7 +200,8 @@ class CouchbaseConnection extends Connection
                 return 0;
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
-            $query->consistency(\CouchbaseN1qlQuery::STATEMENT_PLUS);
+            $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
+
             $bucket = $this->openBucket($this->bucket);
             $result = $bucket->query($query, ['parameters' => $bindings]);
 
