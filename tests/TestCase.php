@@ -55,7 +55,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
 
     protected function createApplicationContainer()
     {
-        $this->app = new \Illuminate\Container\Container;
+        $this->app = new \TestContainer();
 
         $this->app->singleton('config', function () {
             return new \Illuminate\Config\Repository;
@@ -80,5 +80,13 @@ class TestCase extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         $this->app = null;
+    }
+}
+
+class TestContainer extends \Illuminate\Container\Container
+{
+    public function version()
+    {
+        return '5.2.1';
     }
 }
