@@ -10,7 +10,7 @@ class CouchbaseStoreTest extends \TestCase
         parent::setUp();
         $cluster = $this->app['db']->connection('couchbase')->getCouchbase();
         $this->store = new \Ytake\LaravelCouchbase\Cache\CouchbaseStore(
-            $cluster, 'testing', 'testing'
+            $cluster, 'testing', '1234', 'testing'
         );
     }
 
