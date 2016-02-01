@@ -20,6 +20,7 @@ use Ytake\LaravelCouchbase\Exceptions\FlushException;
 
 /**
  * Class LegacyCouchbaseStore.
+ *
  * @codeCoverageIgnore
  */
 class LegacyCouchbaseStore extends TaggableStore implements Store
@@ -34,15 +35,18 @@ class LegacyCouchbaseStore extends TaggableStore implements Store
     protected $cluster;
 
     /**
+     * LegacyCouchbaseStore constructor.
+     *
      * @param CouchbaseCluster $cluster
-     * @param string           $bucket
+     * @param                  $bucket
      * @param string           $password
      * @param null             $prefix
+     * @param string           $serialize
      */
-    public function __construct(CouchbaseCluster $cluster, $bucket, $password = '', $prefix = null)
+    public function __construct(CouchbaseCluster $cluster, $bucket, $password = '', $prefix = null, $serialize = 'php')
     {
         $this->cluster = $cluster;
-        $this->setBucket($bucket, $password);
+        $this->setBucket($bucket, $password, $serialize);
         $this->setPrefix($prefix);
     }
 
@@ -153,18 +157,22 @@ class LegacyCouchbaseStore extends TaggableStore implements Store
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = !empty($prefix) ? $prefix.':' : '';
+        $this->prefix = !empty($prefix) ? $prefix . ':' : '';
     }
 
     /**
      * @param        $bucket
      * @param string $password
+     * @param string $serialize
      *
      * @return $this
      */
-    public function setBucket($bucket, $password = '')
+    public function setBucket($bucket, $password = '', $serialize = 'php')
     {
         $this->bucket = $this->cluster->openBucket($bucket, $password);
+        if ($serialize === 'php') {
+            $this->bucket->setTranscoder('couchbase_php_serialize_encoder', 'couchbase_default_decoder');
+        }
 
         return $this;
     }
@@ -179,13 +187,13 @@ class LegacyCouchbaseStore extends TaggableStore implements Store
         if (is_array($keys)) {
             $result = [];
             foreach ($keys as $key) {
-                $result[] = $this->prefix.$key;
+                $result[] = $this->prefix . $key;
             }
 
             return $result;
         }
 
-        return $this->prefix.$keys;
+        return $this->prefix . $keys;
     }
 
     /**
