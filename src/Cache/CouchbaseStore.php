@@ -36,15 +36,18 @@ class CouchbaseStore extends TaggableStore implements Store
     protected $cluster;
 
     /**
+     * CouchbaseStore constructor.
+     *
      * @param CouchbaseCluster $cluster
-     * @param string           $bucket
+     * @param                  $bucket
      * @param string           $password
      * @param null             $prefix
+     * @param string           $serialize
      */
-    public function __construct(CouchbaseCluster $cluster, $bucket, $password = '', $prefix = null)
+    public function __construct(CouchbaseCluster $cluster, $bucket, $password = '', $prefix = null, $serialize = 'php')
     {
         $this->cluster = $cluster;
-        $this->setBucket($bucket, $password);
+        $this->setBucket($bucket, $password, $serialize);
         $this->setPrefix($prefix);
     }
 
@@ -161,13 +164,16 @@ class CouchbaseStore extends TaggableStore implements Store
     /**
      * @param        $bucket
      * @param string $password
+     * @param string $serialize
      *
      * @return $this
      */
-    public function setBucket($bucket, $password = '')
+    public function setBucket($bucket, $password = '', $serialize = 'php')
     {
         $this->bucket = $this->cluster->openBucket($bucket, $password);
-
+        if($serialize === 'php') {
+            $this->bucket->setTranscoder('couchbase_php_serialize_encoder', 'couchbase_default_decoder');
+        }
         return $this;
     }
 

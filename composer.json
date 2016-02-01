@@ -38,7 +38,10 @@
   "autoload": {
     "psr-4": {
       "Ytake\\LaravelCouchbase\\": "src"
-    }
+    },
+    "files": [
+      "src/transfer.php"
+    ]
   },
   "autoload-dev": {
     "classmap": [
