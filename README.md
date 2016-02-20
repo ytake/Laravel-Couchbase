@@ -115,11 +115,27 @@ example)
 ````
 
 ### cache extension
+#### for bucket type couchbase
 
 ```php
 'couchbase' => [
    'driver' => 'couchbase',
    'bucket' => 'session'
+],
+```
+
+#### for bucket type memcached
+
+```php
+'couchbase-memcached' => [
+    'driver'  => 'couchbase-memcached',
+    'servers' => [
+        [
+            'host' => '127.0.0.1',
+            'port' => 11255,
+            'weight' => 100,
+        ],
+    ],
 ],
 ```
 
