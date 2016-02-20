@@ -102,8 +102,8 @@ class CouchbaseConnection extends Connection
         $this->enableN1qlServers = (isset($config['enables'])) ? $config['enables'] : [];
         $manager = (isset($config['manager'])) ? $config['manager'] : null;
         if (is_null($manager)) {
-            $this->managerUser = $config['user'];
-            $this->managerPassword = $config['password'];
+            $this->managerUser = (isset($config['user'])) ? $config['user'] : null;
+            $this->managerPassword = (isset($config['password'])) ? $config['password'] : null;
 
             return;
         }
@@ -261,14 +261,6 @@ class CouchbaseConnection extends Connection
     public function rollBack()
     {
         throw new NotSupportedException(__METHOD__);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFetchMode($fetchMode)
-    {
-        $this->fetchMode = null;
     }
 
     /**

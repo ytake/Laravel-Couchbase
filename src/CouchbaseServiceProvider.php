@@ -11,6 +11,7 @@
  */
 namespace Ytake\LaravelCouchbase;
 
+use Illuminate\Cache\MemcachedStore;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Session\CacheBasedSessionHandler;
 use Ytake\LaravelCouchbase\Database\Connectable;
@@ -29,7 +30,8 @@ class CouchbaseServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerCacheDriver();
+        $this->registerCouchbaseBucketCacheDriver();
+        $this->registerMemcachedBucketCacheDriver();
     }
 
     /**
@@ -41,11 +43,22 @@ class CouchbaseServiceProvider extends ServiceProvider
             return new CouchbaseConnector();
         });
 
+        $this->app->singleton('couchbase.memcached.connector', function () {
+            return new MemcachedConnector;
+        });
+
         // add couchbase session driver
         $this->app['session']->extend('couchbase', function ($app) {
             $minutes = $app['config']['session.lifetime'];
 
             return new CacheBasedSessionHandler(clone $this->app['cache']->driver('couchbase'), $minutes);
+        });
+
+        // add couchbase session driver
+        $this->app['session']->extend('couchbase-memcached', function ($app) {
+            $minutes = $app['config']['session.lifetime'];
+
+            return new CacheBasedSessionHandler(clone $this->app['cache']->driver('couchbase-memcached'), $minutes);
         });
 
         // add couchbase extension
@@ -57,13 +70,14 @@ class CouchbaseServiceProvider extends ServiceProvider
 
     /**
      * register 'couchbase' cache driver.
+     * for bucket type couchbase
      */
-    protected function registerCacheDriver()
+    protected function registerCouchbaseBucketCacheDriver()
     {
         $this->app['cache']->extend('couchbase', function ($app, $config) {
             /** @var \CouchbaseCluster $cluster */
             $cluster = $app['db']->connection($config['driver'])->getCouchbase();
-            $password = ($config['bucket_password']) ? $config['bucket_password'] : '';
+            $password = (isset($config['bucket_password'])) ? $config['bucket_password'] : '';
             if (floatval($this->app->version()) <= 5.1) {
                 return new \Illuminate\Cache\Repository(
                     new LegacyCouchbaseStore(
@@ -81,6 +95,22 @@ class CouchbaseServiceProvider extends ServiceProvider
                     $password,
                     $app['config']->get('cache.prefix')
                 )
+            );
+        });
+    }
+
+    /**
+     * register 'couchbase' cache driver.
+     * for bucket type memcached
+     */
+    protected function registerMemcachedBucketCacheDriver()
+    {
+        $this->app['cache']->extend('couchbase-memcached', function ($app, $config) {
+            $prefix = $app['config']['cache.prefix'];
+            $memcachedBucket = $this->app['couchbase.memcached.connector']->connect($config['servers']);
+
+            return new \Illuminate\Cache\Repository(
+                new MemcachedStore($memcachedBucket, $prefix)
             );
         });
     }

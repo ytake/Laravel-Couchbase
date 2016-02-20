@@ -51,6 +51,10 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $this->app->singleton('cache.store', function ($app) {
             return $app['cache']->driver();
         });
+
+        $this->app->singleton('memcached.connector', function () {
+            return new \Illuminate\Cache\MemcachedConnector();
+        });
     }
 
     protected function createApplicationContainer()
