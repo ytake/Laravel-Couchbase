@@ -266,14 +266,6 @@ class CouchbaseConnection extends Connection
     /**
      * {@inheritdoc}
      */
-    public function setFetchMode($fetchMode)
-    {
-        $this->fetchMode = null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function reconnectIfMissingConnection()
     {
         if (is_null($this->connection)) {
