@@ -13,7 +13,7 @@ namespace Ytake\LaravelCouchbase;
 
 /**
  * Class MemcachedConnector
- * for couchbase memcached bucket
+ * for bucket type memcached
  */
 class MemcachedConnector extends \Illuminate\Cache\MemcachedConnector
 {
@@ -28,6 +28,10 @@ class MemcachedConnector extends \Illuminate\Cache\MemcachedConnector
             $memcached->addServer(
                 $server['host'], $server['port'], $server['weight']
             );
+        }
+
+        if ($memcached->getVersion() === false) {
+            throw new \RuntimeException("Could not establish Memcached connection.");
         }
 
         return $memcached;

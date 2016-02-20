@@ -1,10 +1,9 @@
 {
   "name": "ytake/laravel-couchbase",
-  "description": "Couchbase providers for Laravel",
+  "description": "Couchbase providers for Laravel4(supported only memcached bucket)",
   "keywords": [
     "laravel",
     "couchbase",
-    "database",
     "session",
     "cache"
   ],
@@ -17,14 +16,13 @@
   "license": "MIT",
   "require": {
     "php": ">=5.5.9",
-    "illuminate/support": "~5.0",
-    "illuminate/config": "~5.0",
-    "illuminate/console": "~5.0",
-    "illuminate/events": "~5.0",
-    "illuminate/cache": "~5.0",
-    "illuminate/session": "~5.0",
-    "illuminate/database": "~5.0",
-    "illuminate/encryption": "~5.0"
+    "illuminate/support": "~4.0",
+    "illuminate/config": "~4.0",
+    "illuminate/console": "~4.0",
+    "illuminate/events": "~4.0",
+    "illuminate/cache": "~4.0",
+    "illuminate/session": "~4.0",
+    "illuminate/encryption": "~4.0"
   },
   "require-dev": {
     "symfony/framework-bundle": "2.*",
@@ -37,18 +35,12 @@
   "autoload": {
     "psr-4": {
       "Ytake\\LaravelCouchbase\\": "src"
-    },
-    "files": [
-      "src/transfer.php"
-    ]
+    }
   },
   "autoload-dev": {
     "classmap": [
-      "tests/TestCase.php"
+      "tests/CouchbaseTestCase.php"
     ]
-  },
-  "suggest": {
-    "ext-couchbase": "for n1ql query builder, use bucket type couchbase require"
   },
   "minimum-stability": "stable"
 }

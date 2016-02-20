@@ -1,6 +1,6 @@
 <?php
 
-class MemcachedConnectorTest extends \TestCase
+class MemcachedConnectorTest extends \CouchbaseTestCase
 {
     public function testShouldReturnMemcachedInstance()
     {

@@ -1,10 +1,6 @@
 <?php
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\DatabaseManager;
-use Illuminate\Database\Connectors\ConnectionFactory;
-
-class TestCase extends \PHPUnit_Framework_TestCase
+class CouchbaseTestCase extends \PHPUnit_Framework_TestCase
 {
     /** @var \Illuminate\Container\Container $app */
     protected $app;
@@ -14,17 +10,10 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $this->createApplicationContainer();
     }
 
-    /**
-     * @return \Illuminate\Config\Repository
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
+
     protected function registerConfigure()
     {
         $filesystem = new \Illuminate\Filesystem\Filesystem;
-        $this->app['config']->set(
-            "database",
-            $filesystem->getRequire(__DIR__ . '/config/database.php')
-        );
         $this->app['config']->set(
             "cache",
             $filesystem->getRequire(__DIR__ . '/config/cache.php')
@@ -32,16 +21,6 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $this->app['files'] = $filesystem;
     }
 
-    protected function registerDatabase()
-    {
-        Model::clearBootedModels();
-        $this->app->singleton('db.factory', function ($app) {
-            return new ConnectionFactory($app);
-        });
-        $this->app->singleton('db', function ($app) {
-            return new DatabaseManager($app, $app['db.factory']);
-        });
-    }
 
     protected function registerCache()
     {
@@ -60,25 +39,23 @@ class TestCase extends \PHPUnit_Framework_TestCase
     protected function createApplicationContainer()
     {
         $this->app = new \TestContainer();
-
-        $this->app->singleton('config', function () {
-            return new \Illuminate\Config\Repository;
+        $this->app['files'] = new \Illuminate\Filesystem\Filesystem;
+        $this->app->singleton('config', function ($app) {
+            return new \Illuminate\Config\Repository(
+                new \Illuminate\Config\FileLoader(
+                    $app['files'],
+                    __DIR__
+                ),
+                'testing'
+            );
         });
         $this->registerConfigure();
         $sessionProvider = new \Illuminate\Session\SessionServiceProvider($this->app);
         $sessionProvider->register();
-        $this->registerDatabase();
         $this->registerCache();
         $couchbaseProvider = new \Ytake\LaravelCouchbase\CouchbaseServiceProvider($this->app);
         $couchbaseProvider->register();
         $couchbaseProvider->boot();
-        $this->app->bind(
-            \Illuminate\Container\Container::class,
-            function () {
-                return $this->app;
-            }
-        );
-        \Illuminate\Container\Container::setInstance($this->app);
     }
 
     protected function tearDown()
@@ -91,6 +68,11 @@ class TestContainer extends \Illuminate\Container\Container
 {
     public function version()
     {
-        return '5.2.1';
+        return '4.2';
+    }
+
+    public function runningInConsole()
+    {
+        return true;
     }
 }

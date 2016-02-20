@@ -1,8 +1,7 @@
 <?php
 
 $finder = \Symfony\CS\Finder\DefaultFinder::create()
-    ->exclude(['tests', 'vendor', 'storage', 'resources', 'public', 'bootstrap/cache'])
-    ->in(__DIR__);
+    ->in(__DIR__ . '/src');
 
 return Symfony\CS\Config\Config::create()
     ->setUsingLinter(false)

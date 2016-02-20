@@ -2,7 +2,7 @@
 
 return [
 
-    'driver' => 'couchbase',
+    'driver' => 'couchbase-memcached',
 
     'lifetime' => 120,
 
