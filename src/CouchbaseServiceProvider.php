@@ -38,10 +38,16 @@ class CouchbaseServiceProvider extends ServiceProvider
         });
 
         // add couchbase session driver
-        $this->app['session']->extend('couchbase-memcached', function ($app) {
-            $minutes = $app['config']['session.lifetime'];
-
-            return new CacheBasedSessionHandler(clone $this->app['cache']->driver('couchbase-memcached'), $minutes);
+        $this->app['session']->extend('couchbase-memcached', function () {
+            $minutes = $this->app['config']['session.lifetime'];
+            $memcachedBucket = $this->app['couchbase.memcached.connector']->connect(
+                $this->app['config']['cache.couchbase-memcached']
+            );
+            return new CacheBasedSessionHandler(
+                new \Illuminate\Cache\Repository(
+                    new MemcachedStore($memcachedBucket, $this->app['config']['cache.prefix'])
+                ), $minutes
+            );
         });
     }
 
@@ -51,10 +57,12 @@ class CouchbaseServiceProvider extends ServiceProvider
      */
     protected function registerMemcachedBucketCacheDriver()
     {
-        $this->app['cache']->extend('couchbase-memcached', function ($app) {
-            $servers = $this->app['config']['cache.couchbase-memcached'];
+        /** @var  \Illuminate\Cache\CacheManager# $cache */
+        $cache = $this->app['cache'];
+        $cache->extend('couchbase-memcached', function ($app) {
+            $servers = $app['config']['cache.couchbase-memcached'];
             $prefix = $app['config']['cache.prefix'];
-            $memcachedBucket = $this->app['couchbase.memcached.connector']->connect($servers);
+            $memcachedBucket = $app['couchbase.memcached.connector']->connect($servers);
 
             return new \Illuminate\Cache\Repository(
                 new MemcachedStore($memcachedBucket, $prefix)

@@ -36,6 +36,20 @@ append app/config/cache.php
 
 ### session extension
 
-.env etc..
-
 specify couchbase-memcached driver
+
+app/config/session.php
+
+```php
+'driver' => 'couchbase-memcached',
+```
+
+or
+
+```php
+\Session::driver('couchbase-memcached')->put('key', 'value');
+
+```
+
+and more
+
