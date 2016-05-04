@@ -116,7 +116,11 @@ class LegacyCouchbaseStore extends TaggableStore implements Store
      */
     public function forever($key, $value)
     {
-        $this->bucket->insert($this->resolveKey($key), $value);
+        try {
+            $this->bucket->insert($this->resolveKey($key), $value);
+        } catch (CouchbaseException $e) {
+            // bucket->insert when called from resetTag in TagSet can throw CAS exceptions, ignore.
+        }
     }
 
     /**
@@ -124,8 +128,12 @@ class LegacyCouchbaseStore extends TaggableStore implements Store
      */
     public function forget($key)
     {
-        $this->resolveKey($key);
-        $this->bucket->remove($this->resolveKey($key));
+        try {
+            $this->resolveKey($key);
+            $this->bucket->remove($this->resolveKey($key));
+        } catch (\Exception $e) {
+            // Ignore exceptions from remove
+        }
     }
 
     /**

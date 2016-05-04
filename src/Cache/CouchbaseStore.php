@@ -125,8 +125,12 @@ class CouchbaseStore extends TaggableStore implements Store
      */
     public function forget($key)
     {
-        $this->resolveKey($key);
-        $this->bucket->remove($this->resolveKey($key));
+        try {
+            $this->resolveKey($key);
+            $this->bucket->remove($this->resolveKey($key));
+        } catch (\Exception $e) {
+            // Ignore exceptions from remove
+        }
     }
 
     /**
