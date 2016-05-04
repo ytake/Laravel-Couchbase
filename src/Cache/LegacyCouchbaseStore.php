@@ -116,7 +116,11 @@ class LegacyCouchbaseStore extends TaggableStore implements Store
      */
     public function forever($key, $value)
     {
-        $this->bucket->insert($this->resolveKey($key), $value);
+        try {
+            $this->bucket->insert($this->resolveKey($key), $value);
+        } catch (CouchbaseException $e) {
+            // bucket->insert when called from resetTag in TagSet can throw CAS exceptions, ignore.
+        }
     }
 
     /**
