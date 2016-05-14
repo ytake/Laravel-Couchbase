@@ -9,6 +9,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 namespace Ytake\LaravelCouchbase;
 
 use Illuminate\Cache\MemcachedStore;
@@ -44,7 +45,7 @@ class CouchbaseServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('couchbase.memcached.connector', function () {
-            return new MemcachedConnector;
+            return new MemcachedConnector();
         });
 
         // add couchbase session driver
@@ -70,7 +71,7 @@ class CouchbaseServiceProvider extends ServiceProvider
 
     /**
      * register 'couchbase' cache driver.
-     * for bucket type couchbase
+     * for bucket type couchbase.
      */
     protected function registerCouchbaseBucketCacheDriver()
     {
@@ -101,7 +102,7 @@ class CouchbaseServiceProvider extends ServiceProvider
 
     /**
      * register 'couchbase' cache driver.
-     * for bucket type memcached
+     * for bucket type memcached.
      */
     protected function registerMemcachedBucketCacheDriver()
     {
@@ -123,14 +124,14 @@ class CouchbaseServiceProvider extends ServiceProvider
     public static function compiles()
     {
         return [
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Cache/CouchbaseStore.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Database/CouchbaseConnection.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Database/CouchbaseConnector.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Exceptions/FlushException.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Exceptions/NotSupportedException.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Query/Grammer.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Query/Processor.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/CouchbaseServiceProvider.php',
+            base_path().'/vendor/ytake/laravel-couchbase/src/Cache/CouchbaseStore.php',
+            base_path().'/vendor/ytake/laravel-couchbase/src/Database/CouchbaseConnection.php',
+            base_path().'/vendor/ytake/laravel-couchbase/src/Database/CouchbaseConnector.php',
+            base_path().'/vendor/ytake/laravel-couchbase/src/Exceptions/FlushException.php',
+            base_path().'/vendor/ytake/laravel-couchbase/src/Exceptions/NotSupportedException.php',
+            base_path().'/vendor/ytake/laravel-couchbase/src/Query/Grammer.php',
+            base_path().'/vendor/ytake/laravel-couchbase/src/Query/Processor.php',
+            base_path().'/vendor/ytake/laravel-couchbase/src/CouchbaseServiceProvider.php',
         ];
     }
 }

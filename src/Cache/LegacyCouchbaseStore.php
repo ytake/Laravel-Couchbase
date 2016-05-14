@@ -9,6 +9,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 namespace Ytake\LaravelCouchbase\Cache;
 
 use CouchbaseBucket;
@@ -129,7 +130,6 @@ class LegacyCouchbaseStore extends TaggableStore implements Store
     public function forget($key)
     {
         try {
-            $this->resolveKey($key);
             $this->bucket->remove($this->resolveKey($key));
         } catch (\Exception $e) {
             // Ignore exceptions from remove
@@ -165,7 +165,7 @@ class LegacyCouchbaseStore extends TaggableStore implements Store
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = !empty($prefix) ? $prefix . ':' : '';
+        $this->prefix = !empty($prefix) ? $prefix.':' : '';
     }
 
     /**
@@ -195,13 +195,13 @@ class LegacyCouchbaseStore extends TaggableStore implements Store
         if (is_array($keys)) {
             $result = [];
             foreach ($keys as $key) {
-                $result[] = $this->prefix . $key;
+                $result[] = $this->prefix.$key;
             }
 
             return $result;
         }
 
-        return $this->prefix . $keys;
+        return $this->prefix.$keys;
     }
 
     /**

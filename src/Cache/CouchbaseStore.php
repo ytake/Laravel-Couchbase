@@ -9,6 +9,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 namespace Ytake\LaravelCouchbase\Cache;
 
 use CouchbaseBucket;
@@ -117,7 +118,12 @@ class CouchbaseStore extends TaggableStore implements Store
      */
     public function forever($key, $value)
     {
-        $this->bucket->insert($this->resolveKey($key), $value);
+        try {
+            $this->bucket->insert($this->resolveKey($key), $value);
+        } catch (CouchbaseException $e) {
+            // bucket->insert when called from resetTag in TagSet can throw CAS exceptions, ignore.\
+            $this->bucket->upsert($this->resolveKey($key), $value);
+        }
     }
 
     /**
@@ -126,7 +132,6 @@ class CouchbaseStore extends TaggableStore implements Store
     public function forget($key)
     {
         try {
-            $this->resolveKey($key);
             $this->bucket->remove($this->resolveKey($key));
         } catch (\Exception $e) {
             // Ignore exceptions from remove
@@ -162,7 +167,7 @@ class CouchbaseStore extends TaggableStore implements Store
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = !empty($prefix) ? $prefix . ':' : '';
+        $this->prefix = !empty($prefix) ? $prefix.':' : '';
     }
 
     /**
@@ -192,13 +197,13 @@ class CouchbaseStore extends TaggableStore implements Store
         if (is_array($keys)) {
             $result = [];
             foreach ($keys as $key) {
-                $result[] = $this->prefix . $key;
+                $result[] = $this->prefix.$key;
             }
 
             return $result;
         }
 
-        return $this->prefix . $keys;
+        return $this->prefix.$keys;
     }
 
     /**

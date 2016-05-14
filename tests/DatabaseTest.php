@@ -1,6 +1,6 @@
 <?php
 
-class DatabaseTest extends TestCase
+class DatabaseTest extends CouchbaseTestCase
 {
     /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection */
     protected $connection;

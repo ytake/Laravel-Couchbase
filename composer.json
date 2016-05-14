@@ -44,7 +44,7 @@
   },
   "autoload-dev": {
     "classmap": [
-      "tests/TestCase.php"
+      "tests/CouchbaseTestCase.php"
     ]
   },
   "suggest": {

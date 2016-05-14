@@ -6,12 +6,12 @@ return [
         'couchbase' => [
             'driver' => 'couchbase',
             'bucket' => 'testing',
-            'bucket_password' => '1234'
+            'bucket_password' => ''
         ],
         'couchbase2' => [
             'driver' => 'couchbase',
             'bucket' => 'testing',
-            'bucket_password' => '1234'
+            'bucket_password' => ''
         ],
         'couchbase-memcached' => [
             'driver'  => 'couchbase-memcached',

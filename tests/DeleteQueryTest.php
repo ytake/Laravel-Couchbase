@@ -1,6 +1,6 @@
 <?php
 
-class DeleteQueryTest extends TestCase
+class DeleteQueryTest extends CouchbaseTestCase
 {
     /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection */
     protected $connection;
@@ -22,7 +22,6 @@ class DeleteQueryTest extends TestCase
         $key = 'insert:and:delete';
         /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
-        $connection->setBucketPassword('1234');
         $result = $connection->table('testing')->key($key)->insert($value);
         $this->assertInstanceOf('stdClass', $result);
         $deleteReturning = $connection->table('testing')->key($key)->where('click', 'to edit')->returning(['click'])->delete();
@@ -38,7 +37,6 @@ class DeleteQueryTest extends TestCase
         $key = 'insert:and:delete';
         /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
-        $connection->setBucketPassword('1234');
         $connection->table('testing')->key($key)->insert($value);
         $deleteReturning = $connection->table('testing')->key($key)->returning()->delete();
         $this->assertInstanceOf('stdClass', $deleteReturning->testing);

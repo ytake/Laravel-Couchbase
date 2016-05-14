@@ -4,7 +4,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
-class TestCase extends \PHPUnit_Framework_TestCase
+/**
+ * Class CouchbaseTestCase
+ */
+class CouchbaseTestCase extends \PHPUnit_Framework_TestCase
 {
     /** @var \Illuminate\Container\Container $app */
     protected $app;
