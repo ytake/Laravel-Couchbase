@@ -1,6 +1,6 @@
 <?php
 
-class ProviderTest extends TestCase
+class ProviderTest extends CouchbaseTestCase
 {
     public function testSessionDriver()
     {

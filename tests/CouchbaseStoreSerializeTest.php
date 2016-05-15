@@ -1,6 +1,6 @@
 <?php
 
-class CouchbaseStoreSerializeTest extends \TestCase
+class CouchbaseStoreSerializeTest extends \CouchbaseTestCase
 {
     /** @var \Ytake\LaravelCouchbase\Cache\CouchbaseStore */
     protected $store;
@@ -10,7 +10,7 @@ class CouchbaseStoreSerializeTest extends \TestCase
         parent::setUp();
         $cluster = $this->app['db']->connection('couchbase')->getCouchbase();
         $this->store = new \Ytake\LaravelCouchbase\Cache\CouchbaseStore(
-            $cluster, 'testing', '1234', 'testing', 'php'
+            $cluster, 'testing', '', 'testing', 'php'
         );
     }
 

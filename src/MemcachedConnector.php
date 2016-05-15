@@ -9,11 +9,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 namespace Ytake\LaravelCouchbase;
 
 /**
  * Class MemcachedConnector
- * for couchbase memcached bucket
+ * for couchbase memcached bucket.
  */
 class MemcachedConnector extends \Illuminate\Cache\MemcachedConnector
 {

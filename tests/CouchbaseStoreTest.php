@@ -1,6 +1,6 @@
 <?php
 
-class CouchbaseStoreTest extends \TestCase
+class CouchbaseStoreTest extends \CouchbaseTestCase
 {
     /** @var \Ytake\LaravelCouchbase\Cache\CouchbaseStore */
     protected $store;
@@ -10,7 +10,7 @@ class CouchbaseStoreTest extends \TestCase
         parent::setUp();
         $cluster = $this->app['db']->connection('couchbase')->getCouchbase();
         $this->store = new \Ytake\LaravelCouchbase\Cache\CouchbaseStore(
-            $cluster, 'testing', '1234', 'testing'
+            $cluster, 'testing', '', 'testing'
         );
     }
 
@@ -42,12 +42,11 @@ class CouchbaseStoreTest extends \TestCase
         $this->assertNull($this->store->get('notFoundTest'));
     }
 
-    /**
-     * @expectedException \Ytake\LaravelCouchbase\Exceptions\FlushException
-     */
-    public function testDisableFleshException()
+    public function testFlushException()
     {
+        $this->store->add('test1234', 'test', 120);
         $this->store->flush();
+        $this->assertNull($this->store->get('test1234'));
     }
 
     public function testIncrement()

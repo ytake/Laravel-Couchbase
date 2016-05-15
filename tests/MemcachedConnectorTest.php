@@ -1,6 +1,6 @@
 <?php
 
-class MemcachedConnectorTest extends \TestCase
+class MemcachedConnectorTest extends \CouchbaseTestCase
 {
     public function testShouldReturnMemcachedInstance()
     {
@@ -26,5 +26,7 @@ class MemcachedConnectorTest extends \TestCase
         $this->assertInternalType('array', $cache->get('testing-array'));
         $cache = $this->app['cache']->driver('memcached');
         $this->assertInstanceOf('Illuminate\Cache\Repository', $cache);
+        $cache->flush();
+        $this->assertNull($cache->get('testing-array'));
     }
 }

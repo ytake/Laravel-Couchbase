@@ -1,6 +1,6 @@
 <?php
 
-class UpdateQueryTest extends TestCase
+class UpdateQueryTest extends CouchbaseTestCase
 {
     /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection */
     protected $connection;
@@ -22,7 +22,6 @@ class UpdateQueryTest extends TestCase
         $key = 'insert';
         /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
-        $connection->setBucketPassword('1234');
         $result = $connection->table('testing')->key($key)->insert($value);
         $this->assertInstanceOf('stdClass', $result);
         $result = $connection->table('testing')->key($key)
@@ -44,7 +43,6 @@ class UpdateQueryTest extends TestCase
         $key = 'insert:no';
         /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
-        $connection->setBucketPassword('1234');
         $result = $connection->table('testing')->key($key)->insert($value);
         $this->assertInstanceOf('stdClass', $result);
         $this->assertSame(null, $connection->table('testing')->key($key)->where('clicking', 'to edit')->first());
@@ -60,7 +58,6 @@ class UpdateQueryTest extends TestCase
         $key = 'upsert:click:content';
         /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
-        $connection->setBucketPassword('1234');
         $result = $connection->table('testing')->key($key)->upsert($value);
         $this->assertInstanceOf('stdClass', $result);
         $connection->table('testing')->key($key)->upsert([
