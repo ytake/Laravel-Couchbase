@@ -38,8 +38,8 @@ add database driver(config/database.php)
 'couchbase' => [
     'driver' => 'couchbase',
     'host' => 'couchbase://127.0.0.1',
-    'user' => 'userName',
-    'password' => 'password',
+    'user' => 'userName', // optional administrator
+    'password' => 'password', // optional administrator
 ],
 ```
 
@@ -49,8 +49,8 @@ case cluster
 'couchbase' => [
     'driver' => 'couchbase',
     'host' => 'couchbase://127.0.0.1,192.168.1.2',
-    'user' => 'userName',
-    'password' => 'password',
+    'user' => 'userName', // optional administrator
+    'password' => 'password', // optional administrator
 ],
 ```
 
@@ -114,9 +114,22 @@ example)
 "update testing USE KEYS "insert" set click = ? where click = ? RETURNING *"
 ````
 
+#### returning
+
+default *
+```php
+$this->app['db']->connection('couchbase')
+    ->table('testing')
+    ->where('id', 1)
+    ->offset($from)->limit($perPage)
+    ->orderBy('created_at', $sort)
+    ->returning(['id', 'name'])->get();
+```
+
 ### cache extension
 #### for bucket type couchbase
 
+*config/cache.php*
 ```php
 'couchbase' => [
    'driver' => 'couchbase',
@@ -134,9 +147,25 @@ example)
             'host' => '127.0.0.1',
             'port' => 11255,
             'weight' => 100,
+            'bucket' => 'memcached-bucket-name',
+            'option' => [
+                // curl option
+            ],
         ],
     ],
 ],
+```
+
+### couchbase bucket, use bucket password
+
+*config/cache.php*
+```php
+'couchbase' => [
+   'driver' => 'couchbase',
+   'bucket' => 'session',
+   'bucket_password' => 'your bucket password'
+],
+
 ```
 
 ### session extension

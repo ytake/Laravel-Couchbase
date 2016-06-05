@@ -14,6 +14,8 @@ namespace Ytake\LaravelCouchbase\Database;
 
 /**
  * Class ViewQuery.
+ *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 class ViewQuery
 {

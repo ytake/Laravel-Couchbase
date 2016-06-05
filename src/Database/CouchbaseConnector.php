@@ -14,6 +14,8 @@ namespace Ytake\LaravelCouchbase\Database;
 
 /**
  * Class CouchbaseConnector.
+ *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 class CouchbaseConnector implements Connectable
 {

@@ -13,8 +13,10 @@
 namespace Ytake\LaravelCouchbase;
 
 /**
- * Class MemcachedConnector
+ * Class MemcachedConnector.
  * for couchbase memcached bucket.
+ *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 class MemcachedConnector extends \Illuminate\Cache\MemcachedConnector
 {

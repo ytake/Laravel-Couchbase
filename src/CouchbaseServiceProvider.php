@@ -12,17 +12,20 @@
 
 namespace Ytake\LaravelCouchbase;
 
-use Illuminate\Cache\MemcachedStore;
+use Illuminate\Cache\Repository;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Session\CacheBasedSessionHandler;
 use Ytake\LaravelCouchbase\Database\Connectable;
 use Ytake\LaravelCouchbase\Cache\CouchbaseStore;
 use Ytake\LaravelCouchbase\Cache\LegacyCouchbaseStore;
+use Ytake\LaravelCouchbase\Cache\MemcachedBucketStore;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnector;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
 /**
  * Class CouchbaseServiceProvider.
+ *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 class CouchbaseServiceProvider extends ServiceProvider
 {
@@ -80,7 +83,7 @@ class CouchbaseServiceProvider extends ServiceProvider
             $cluster = $app['db']->connection($config['driver'])->getCouchbase();
             $password = (isset($config['bucket_password'])) ? $config['bucket_password'] : '';
             if (floatval($this->app->version()) <= 5.1) {
-                return new \Illuminate\Cache\Repository(
+                return new Repository(
                     new LegacyCouchbaseStore(
                         $cluster,
                         $config['bucket'],
@@ -89,7 +92,7 @@ class CouchbaseServiceProvider extends ServiceProvider
                 );
             }
 
-            return new \Illuminate\Cache\Repository(
+            return new Repository(
                 new CouchbaseStore(
                     $cluster,
                     $config['bucket'],
@@ -110,8 +113,8 @@ class CouchbaseServiceProvider extends ServiceProvider
             $prefix = $app['config']['cache.prefix'];
             $memcachedBucket = $this->app['couchbase.memcached.connector']->connect($config['servers']);
 
-            return new \Illuminate\Cache\Repository(
-                new MemcachedStore($memcachedBucket, $prefix)
+            return new Repository(
+                new MemcachedBucketStore($memcachedBucket, $prefix, $config['servers'])
             );
         });
     }
@@ -125,6 +128,7 @@ class CouchbaseServiceProvider extends ServiceProvider
     {
         return [
             base_path().'/vendor/ytake/laravel-couchbase/src/Cache/CouchbaseStore.php',
+            base_path().'/vendor/ytake/laravel-couchbase/src/Cache/MemcachedBucketStore.php',
             base_path().'/vendor/ytake/laravel-couchbase/src/Database/CouchbaseConnection.php',
             base_path().'/vendor/ytake/laravel-couchbase/src/Database/CouchbaseConnector.php',
             base_path().'/vendor/ytake/laravel-couchbase/src/Exceptions/FlushException.php',

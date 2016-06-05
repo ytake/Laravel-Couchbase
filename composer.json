@@ -50,5 +50,13 @@
   "suggest": {
     "ext-couchbase": "for n1ql query builder, use bucket type couchbase require"
   },
+  "scripts": {
+    "test": [
+      "php vendor/bin/phpunit"
+    ],
+    "cs": [
+      "php vendor/fabpot/php-cs-fixer/php-cs-fixer fix"
+    ]
+  },
   "minimum-stability": "stable"
 }

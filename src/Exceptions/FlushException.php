@@ -14,6 +14,8 @@ namespace Ytake\LaravelCouchbase\Exceptions;
 
 /**
  * Class FlushException.
+ *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 class FlushException extends \Exception
 {

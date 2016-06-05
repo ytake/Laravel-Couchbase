@@ -10,22 +10,23 @@
  * THE SOFTWARE.
  */
 
-namespace Ytake\LaravelCouchbase\Exceptions;
+namespace Ytake\LaravelCouchbase\Cache\Legacy;
+
+use Illuminate\Cache\TagSet;
+use Illuminate\Cache\TaggableStore;
 
 /**
- * Class NotSupportedException.
+ * Class CouchbaseTaggableStore.
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
-class NotSupportedException extends \Exception
+class CouchbaseTaggableStore extends TaggableStore
 {
     /**
-     * @param array           $message
-     * @param int             $code
-     * @param \Exception|null $previous
+     * {@inheritdoc}
      */
-    public function __construct($message, $code = 0, \Exception $previous = null)
+    public function tags($names)
     {
-        parent::__construct("$message method is not supported", $code, $previous);
+        return new CouchbaseTaggedCache($this, new TagSet($this, is_array($names) ? $names : func_get_args()));
     }
 }
