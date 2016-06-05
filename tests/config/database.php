@@ -7,7 +7,7 @@ return [
         'couchbase' => [
             'driver' => 'couchbase',
             'host' => 'couchbase://127.0.0.1',
-            'enables' => ['http;//127.0.0.1:8093']
+            'enables' => ['http://127.0.0.1:8093']
         ],
     ],
     'migrations' => 'migrations',

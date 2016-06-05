@@ -176,7 +176,7 @@ class CouchbaseConnection extends Connection
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
             $query->options['args'] = $bindings;
-            $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
+            $query->consistency(\CouchbaseN1qlQuery::NOT_BOUNDED);
             $bucket = $this->openBucket($this->bucket);
 
             return $bucket->query($query);
@@ -205,7 +205,6 @@ class CouchbaseConnection extends Connection
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
             $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
-
             $bucket = $this->openBucket($this->bucket);
             $result = $bucket->query($query, ['parameters' => $bindings]);
 
@@ -226,7 +225,7 @@ class CouchbaseConnection extends Connection
                 return 0;
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
-            $query->consistency(\CouchbaseN1qlQuery::STATEMENT_PLUS);
+            $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
             $query->options['args'] = $bindings;
             $bucket = $this->openBucket($this->bucket);
             $result = $bucket->query($query);

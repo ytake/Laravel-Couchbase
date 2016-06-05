@@ -22,6 +22,12 @@ class UpdateQueryTest extends CouchbaseTestCase
         $key = 'insert';
         /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
+        $cluster = $connection->getCouchbase();
+        $store = new \Ytake\LaravelCouchbase\Cache\CouchbaseStore(
+            $cluster, 'testing', '', 'testing'
+        );
+        $store->flush();
+
         $result = $connection->table('testing')->key($key)->insert($value);
         $this->assertInstanceOf('stdClass', $result);
         $result = $connection->table('testing')->key($key)
@@ -29,6 +35,7 @@ class UpdateQueryTest extends CouchbaseTestCase
                 ['click' => 'testing edit']
             );
         $this->assertInstanceOf('stdClass', $result->testing);
+
         $result = $connection->table('testing')->where('click', 'testing edit')->first();
         $this->assertSame('testing edit', $result->testing->click);
         $connection->table('testing')->key($key)->delete();
@@ -46,7 +53,7 @@ class UpdateQueryTest extends CouchbaseTestCase
         $result = $connection->table('testing')->key($key)->insert($value);
         $this->assertInstanceOf('stdClass', $result);
         $this->assertSame(null, $connection->table('testing')->key($key)->where('clicking', 'to edit')->first());
-        $connection->table('testing')->key($key)->delete();
+        $connection->table('testing')->key($key)->where('content', 'testing')->delete();
     }
 
     public function testUpsertQuery()
@@ -60,11 +67,10 @@ class UpdateQueryTest extends CouchbaseTestCase
         $connection = $this->app['db']->connection('couchbase');
         $result = $connection->table('testing')->key($key)->upsert($value);
         $this->assertInstanceOf('stdClass', $result);
-        $connection->table('testing')->key($key)->upsert([
-            'click'   => 'to edit',
+        $result = $connection->table('testing')->key($key)->upsert([
+            'click'   => 'to',
             'content' => 'testing for upsert',
         ]);
-        $result = $connection->table('testing')->where('click', 'to edit')->first();
         $this->assertSame('testing for upsert', $result->testing->content);
         $connection->table('testing')->key($key)->delete();
     }
