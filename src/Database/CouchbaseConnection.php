@@ -21,6 +21,8 @@ use Ytake\LaravelCouchbase\Exceptions\NotSupportedException;
 
 /**
  * Class CouchbaseConnection.
+ *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 class CouchbaseConnection extends Connection
 {

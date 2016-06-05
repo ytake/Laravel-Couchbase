@@ -15,16 +15,17 @@ namespace Ytake\LaravelCouchbase\Cache;
 use CouchbaseBucket;
 use CouchbaseCluster;
 use CouchbaseException;
-use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\Cache\Store;
 use Ytake\LaravelCouchbase\Exceptions\FlushException;
+use Ytake\LaravelCouchbase\Cache\Legacy\CouchbaseTaggableStore;
 
 /**
  * Class LegacyCouchbaseStore.
  *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  * @codeCoverageIgnore
  */
-class LegacyCouchbaseStore extends TaggableStore implements Store
+class LegacyCouchbaseStore extends CouchbaseTaggableStore implements Store
 {
     /** @var string */
     protected $prefix;

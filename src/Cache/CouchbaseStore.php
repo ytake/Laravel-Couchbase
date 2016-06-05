@@ -22,6 +22,8 @@ use Ytake\LaravelCouchbase\Exceptions\FlushException;
 
 /**
  * Class CouchbaseStore.
+ *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 class CouchbaseStore extends TaggableStore implements Store
 {

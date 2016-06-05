@@ -16,6 +16,8 @@ use Illuminate\Database\Query\Processors\Processor as IlluminateProcessor;
 
 /**
  * Class Processor.
+ *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 class Processor extends IlluminateProcessor
 {

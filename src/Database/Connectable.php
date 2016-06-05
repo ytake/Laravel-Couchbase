@@ -14,6 +14,8 @@ namespace Ytake\LaravelCouchbase\Database;
 
 /**
  * Interface Connectable.
+ *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 interface Connectable
 {

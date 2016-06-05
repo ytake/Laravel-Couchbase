@@ -18,6 +18,8 @@ use Illuminate\Database\Query\Builder;
  * Class QueryBuilder
  * supported N1QL.
  *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
+ *
  * @see http://developer.couchbase.com/documentation/server/4.1/n1ql/n1ql-language-reference/index.html
  */
 class QueryBuilder extends Builder

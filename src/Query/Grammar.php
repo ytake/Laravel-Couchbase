@@ -18,6 +18,8 @@ use Ytake\LaravelCouchbase\Database\QueryBuilder;
 
 /**
  * Class Grammar.
+ *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 class Grammar extends IlluminateGrammar
 {
