@@ -46,7 +46,7 @@ class Grammar extends IlluminateGrammar
             return;
         }
 
-        return '"'.str_replace('"', '""', $value).'"';
+        return '"' . str_replace('"', '""', $value) . '"';
     }
 
     /**
@@ -66,14 +66,14 @@ class Grammar extends IlluminateGrammar
         $columns = [];
 
         foreach ($values as $key => $value) {
-            $columns[] = $this->wrap($key).' = '.$this->parameter($value);
+            $columns[] = $this->wrap($key) . ' = ' . $this->parameter($value);
         }
 
         $columns = implode(', ', $columns);
 
         $joins = '';
         if (isset($query->joins)) {
-            $joins = ' '.$this->compileJoins($query, $query->joins);
+            $joins = ' ' . $this->compileJoins($query, $query->joins);
         }
         $where = $this->compileWheres($query);
 
@@ -98,7 +98,7 @@ class Grammar extends IlluminateGrammar
         $parameters = [];
 
         foreach ($values as $record) {
-            $parameters[] = '('.$this->parameterize($record).')';
+            $parameters[] = '(' . $this->parameterize($record) . ')';
         }
         $parameters = (!$keyClause) ? implode(', ', $parameters) : "({$keyClause}, \$parameters)";
         $keyValue = (!$keyClause) ? null : '(KEY, VALUE)';
@@ -116,12 +116,16 @@ class Grammar extends IlluminateGrammar
         // keyspace-ref:
         $table = $this->wrapTable($query->from);
         // use-keys-clause:
-        $keyClause = $this->wrapKey($query->key);
+        $keyClause = null;
+        if ($query->key) {
+            $key = $this->wrapKey($query->key);
+            $keyClause = "USE KEYS {$key}";
+        }
         // returning-clause
         $returning = implode(', ', $query->returning);
         $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
 
-        return trim("delete from {$table} USE KEYS {$keyClause} {$where} RETURNING {$returning}");
+        return trim("delete from {$table} {$keyClause} {$where} RETURNING {$returning}");
     }
 
     /**
@@ -145,7 +149,7 @@ class Grammar extends IlluminateGrammar
         $parameters = [];
 
         foreach ($values as $record) {
-            $parameters[] = '('.$this->parameterize($record).')';
+            $parameters[] = '(' . $this->parameterize($record) . ')';
         }
         $parameters = (!$keyClause) ? implode(', ', $parameters) : "({$keyClause}, \$parameters)";
         $keyValue = (!$keyClause) ? null : '(KEY, VALUE)';

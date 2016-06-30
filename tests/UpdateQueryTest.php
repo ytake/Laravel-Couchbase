@@ -35,8 +35,6 @@ class UpdateQueryTest extends CouchbaseTestCase
                 ['click' => 'testing edit']
             );
         $this->assertInstanceOf('stdClass', $result->testing);
-
-        $result = $connection->table('testing')->where('click', 'testing edit')->first();
         $this->assertSame('testing edit', $result->testing->click);
         $connection->table('testing')->key($key)->delete();
     }
