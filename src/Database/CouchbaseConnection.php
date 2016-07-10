@@ -176,7 +176,7 @@ class CouchbaseConnection extends Connection
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
             $query->options['args'] = $bindings;
-            $query->consistency(\CouchbaseN1qlQuery::NOT_BOUNDED);
+            $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
             $bucket = $this->openBucket($this->bucket);
 
             return $bucket->query($query);
