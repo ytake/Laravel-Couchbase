@@ -44,8 +44,11 @@ class CouchbaseConnection extends Connection
     /** @var array */
     protected $enableN1qlServers = [];
 
-    /** @var string  */
+    /** @var string */
     protected $bucketPassword = '';
+
+    /** @var string[] */
+    protected $metrics;
 
     /**
      * @param array $config
@@ -175,11 +178,21 @@ class CouchbaseConnection extends Connection
                 return [];
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
+            if ($this->latestVersion()) {
+                $query->positionalParams($bindings);
+                $bucket = $this->openBucket($this->bucket);
+                $result = $bucket->query($query);
+                $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
+
+                return (isset($result->rows)) ? $result->rows : [];
+            }
+            // @codeCoverageIgnoreStart
             $query->options['args'] = $bindings;
             $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
             $bucket = $this->openBucket($this->bucket);
 
             return $bucket->query($query);
+            // @codeCoverageIgnoreEnd
         });
     }
 
@@ -204,11 +217,22 @@ class CouchbaseConnection extends Connection
                 return 0;
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
+            if ($this->latestVersion()) {
+                $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
+                $bucket = $this->openBucket($this->bucket);
+                $query->namedParams(['parameters' => $bindings]);
+                $result = $bucket->query($query);
+                $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
+
+                return (isset($result->rows[0])) ? $result->rows[0] : false;
+            }
+            // @codeCoverageIgnoreStart
             $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
             $bucket = $this->openBucket($this->bucket);
             $result = $bucket->query($query, ['parameters' => $bindings]);
 
             return (isset($result[0])) ? $result[0] : false;
+            // @codeCoverageIgnoreEnd
         });
     }
 
@@ -225,12 +249,23 @@ class CouchbaseConnection extends Connection
                 return 0;
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
+            if ($this->latestVersion()) {
+                $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
+                $query->positionalParams($bindings);
+                $bucket = $this->openBucket($this->bucket);
+                $result = $bucket->query($query);
+                $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
+
+                return (isset($result->rows[0])) ? $result->rows[0] : false;
+            }
+            // @codeCoverageIgnoreStart
             $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
             $query->options['args'] = $bindings;
             $bucket = $this->openBucket($this->bucket);
             $result = $bucket->query($query);
 
             return (isset($result[0])) ? $result[0] : false;
+            // @codeCoverageIgnoreEnd
         });
     }
 
@@ -348,5 +383,27 @@ class CouchbaseConnection extends Connection
     public function delete($query, $bindings = [])
     {
         return $this->positionalStatement($query, $bindings);
+    }
+
+    /**
+     * @return \string[]
+     */
+    public function metrics()
+    {
+        return $this->metrics;
+    }
+
+    /**
+     * @return bool
+     */
+    private function latestVersion()
+    {
+        if (!str_contains(phpversion('couchbase'), 'beta')) {
+            if (floatval(phpversion('couchbase')) >= 2.2) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
