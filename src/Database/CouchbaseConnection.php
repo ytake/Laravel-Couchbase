@@ -18,6 +18,7 @@ use Illuminate\Database\Connection;
 use Ytake\LaravelCouchbase\Query\Grammar;
 use Ytake\LaravelCouchbase\Query\Processor;
 use Ytake\LaravelCouchbase\Exceptions\NotSupportedException;
+use Ytake\LaravelCouchbase\VersionTrait;
 
 /**
  * Class CouchbaseConnection.
@@ -26,6 +27,8 @@ use Ytake\LaravelCouchbase\Exceptions\NotSupportedException;
  */
 class CouchbaseConnection extends Connection
 {
+    use VersionTrait;
+
     /** @var string */
     protected $bucket;
 
@@ -49,6 +52,9 @@ class CouchbaseConnection extends Connection
 
     /** @var string[] */
     protected $metrics;
+
+    /** @var int  default consistency */
+    protected $consistency = \CouchbaseN1qlQuery::NOT_BOUNDED;
 
     /**
      * @param array $config
@@ -157,6 +163,32 @@ class CouchbaseConnection extends Connection
     }
 
     /**
+     * @param int      $consistency
+     * @param callable $callback
+     *
+     * @return mixed
+     */
+    public function callableConsistency($consistency, callable $callback)
+    {
+        $clone = clone $this;
+        $clone->consistency = $consistency;
+
+        return call_user_func_array($callback, [$clone]);
+    }
+
+    /**
+     * @param int $consistency
+     *
+     * @return $this
+     */
+    public function consistency($consistency)
+    {
+        $this->consistency = $consistency;
+
+        return $this;
+    }
+
+    /**
      * @param string $bucket
      *
      * @return $this
@@ -178,7 +210,8 @@ class CouchbaseConnection extends Connection
                 return [];
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
-            if ($this->latestVersion()) {
+            if ($this->breakingVersion()) {
+                $query->consistency($this->consistency);
                 $query->positionalParams($bindings);
                 $bucket = $this->openBucket($this->bucket);
                 $result = $bucket->query($query);
@@ -188,7 +221,7 @@ class CouchbaseConnection extends Connection
             }
             // @codeCoverageIgnoreStart
             $query->options['args'] = $bindings;
-            $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
+            $query->consistency($this->consistency);
             $bucket = $this->openBucket($this->bucket);
 
             return $bucket->query($query);
@@ -217,8 +250,9 @@ class CouchbaseConnection extends Connection
                 return 0;
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
-            if ($this->latestVersion()) {
-                $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
+
+            if ($this->breakingVersion()) {
+                $query->consistency($this->consistency);
                 $bucket = $this->openBucket($this->bucket);
                 $query->namedParams(['parameters' => $bindings]);
                 $result = $bucket->query($query);
@@ -227,7 +261,7 @@ class CouchbaseConnection extends Connection
                 return (isset($result->rows[0])) ? $result->rows[0] : false;
             }
             // @codeCoverageIgnoreStart
-            $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
+            $query->consistency($this->consistency);
             $bucket = $this->openBucket($this->bucket);
             $result = $bucket->query($query, ['parameters' => $bindings]);
 
@@ -249,8 +283,9 @@ class CouchbaseConnection extends Connection
                 return 0;
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
-            if ($this->latestVersion()) {
-                $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
+
+            if ($this->breakingVersion()) {
+                $query->consistency($this->consistency);
                 $query->positionalParams($bindings);
                 $bucket = $this->openBucket($this->bucket);
                 $result = $bucket->query($query);
@@ -259,7 +294,7 @@ class CouchbaseConnection extends Connection
                 return (isset($result->rows[0])) ? $result->rows[0] : false;
             }
             // @codeCoverageIgnoreStart
-            $query->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS);
+            $query->consistency($this->consistency);
             $query->options['args'] = $bindings;
             $bucket = $this->openBucket($this->bucket);
             $result = $bucket->query($query);
@@ -391,19 +426,5 @@ class CouchbaseConnection extends Connection
     public function metrics()
     {
         return $this->metrics;
-    }
-
-    /**
-     * @return bool
-     */
-    private function latestVersion()
-    {
-        if (!str_contains(phpversion('couchbase'), 'beta')) {
-            if (floatval(phpversion('couchbase')) >= 2.2) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

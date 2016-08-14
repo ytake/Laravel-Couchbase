@@ -173,3 +173,14 @@ $this->app['db']->connection('couchbase')
 .env etc..
 
 specify couchbase driver
+
+### consistency
+default :CouchbaseN1qlQuery::NOT_BOUNDED
+
+```php
+$this->app['db']->connection('couchbase')
+    ->consistency(\CouchbaseN1qlQuery::REQUEST_PLUS)
+    ->table('testing')
+    ->where('id', 1)
+    ->returning(['id', 'name'])->get();
+```

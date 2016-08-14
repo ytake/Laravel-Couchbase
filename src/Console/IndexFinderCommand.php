@@ -26,7 +26,7 @@ class IndexFinderCommand extends Command
     /** @var string */
     protected $description = 'List all N1QL indexes that are registered for the current bucket.';
 
-    /** @var CouchbaseCluster  */
+    /** @var CouchbaseCluster */
     protected $cluster;
 
     /**
@@ -40,7 +40,10 @@ class IndexFinderCommand extends Command
         parent::__construct();
     }
 
-    public function getArguments()
+    /**
+     * @return string[]
+     */
+    public function getOptions()
     {
         return [
             ['bucket', 'bu', InputOption::VALUE_REQUIRED, 'Represents a bucket connection.'],
@@ -50,6 +53,21 @@ class IndexFinderCommand extends Command
     public function fire()
     {
         $bucket = $this->cluster->openBucket($this->option('bucket'));
-        $bucket->manager()->info();
+        $this->recursiveInformation($bucket->manager()->info());
+    }
+
+    /**
+     * @param array $array
+     * @param int   $level
+     */
+    private function recursiveInformation(array $array, $level = 1)
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $this->recursiveInformation($value, $level + 1);
+            } else {
+                $this->line("<comment>{$key} : {$value}</comment>");
+            }
+        }
     }
 }

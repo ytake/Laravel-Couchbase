@@ -17,18 +17,18 @@
   "license": "MIT",
   "require": {
     "php": ">=5.5.9",
-    "illuminate/support": "~5.0",
-    "illuminate/config": "~5.0",
-    "illuminate/console": "~5.0",
-    "illuminate/events": "~5.0",
-    "illuminate/cache": "~5.0",
-    "illuminate/session": "~5.0",
-    "illuminate/database": "~5.0",
-    "illuminate/encryption": "~5.0"
+    "illuminate/support": "~5.1",
+    "illuminate/config": "~5.1",
+    "illuminate/console": "~5.1",
+    "illuminate/events": "~5.1",
+    "illuminate/cache": "~5.1",
+    "illuminate/session": "~5.1",
+    "illuminate/database": "~5.1",
+    "illuminate/encryption": "~5.1"
   },
   "require-dev": {
-    "symfony/framework-bundle": "2.*",
-    "symfony/console": "2.*",
+    "symfony/framework-bundle": "~2.0|~3.0",
+    "symfony/console": "~2.0|~3.0",
     "phpunit/phpunit": "4.*",
     "satooshi/php-coveralls": "*",
     "phing/phing": "~2.0",
