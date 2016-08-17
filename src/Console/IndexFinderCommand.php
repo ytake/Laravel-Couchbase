@@ -11,9 +11,11 @@
  */
 namespace Ytake\LaravelCouchbase\Console;
 
-use CouchbaseCluster;
 use Illuminate\Console\Command;
+use Illuminate\Database\DatabaseManager;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
+use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
 /**
  * Class IndexFinderCommand
@@ -26,17 +28,20 @@ class IndexFinderCommand extends Command
     /** @var string */
     protected $description = 'List all N1QL indexes that are registered for the current bucket.';
 
-    /** @var CouchbaseCluster */
-    protected $cluster;
+    /** @var DatabaseManager */
+    protected $databaseManager;
+
+    /** @var string */
+    protected $defaultDatabase = 'couchbase';
 
     /**
      * IndexFinderCommand constructor.
      *
-     * @param \CouchbaseCluster $cluster
+     * @param DatabaseManager $databaseManager
      */
-    public function __construct(CouchbaseCluster $cluster)
+    public function __construct(DatabaseManager $databaseManager)
     {
-        $this->cluster = $cluster;
+        $this->databaseManager = $databaseManager;
         parent::__construct();
     }
 
@@ -46,14 +51,36 @@ class IndexFinderCommand extends Command
     public function getOptions()
     {
         return [
-            ['bucket', 'bu', InputOption::VALUE_REQUIRED, 'Represents a bucket connection.'],
+            ['bucket', 'b', InputOption::VALUE_REQUIRED, 'Represents a bucket connection.'],
         ];
     }
 
+    /**
+     * @return string[]
+     */
+    protected function getArguments()
+    {
+        return [
+            ['database', InputArgument::OPTIONAL, 'The database connection to use.', $this->defaultDatabase],
+        ];
+    }
+
+    /**
+     * Execute the console command
+     */
     public function fire()
     {
-        $bucket = $this->cluster->openBucket($this->option('bucket'));
-        $this->recursiveInformation($bucket->manager()->info());
+        /** @var \Illuminate\Database\Connection|CouchbaseConnection $connection */
+        $connection = $this->databaseManager->connection($this->argument('database'));
+        if ($connection instanceof CouchbaseConnection) {
+            $bucket = $connection->getCouchbase()->openBucket($this->option('bucket'));
+            $this->recursiveInformation($bucket->manager()->info());
+
+            return;
+        }
+        $this->error('couchbase is not specified ');
+
+        return;
     }
 
     /**

@@ -21,9 +21,10 @@ class CouchbaseConnector implements Connectable
 {
     /** @var array */
     protected $configure = [
-        'host' => '127.0.0.1',
-        'user' => '',
-        'password' => '',
+        'host'          => '127.0.0.1',
+        'user'          => '',
+        'password'      => '',
+        'authenticator' => null,
     ];
 
     /**
@@ -38,7 +39,8 @@ class CouchbaseConnector implements Connectable
         return new \CouchbaseCluster(
             $configure['host'],
             $configure['user'],
-            $configure['password']
+            $configure['password'],
+            $configure['authenticator']
         );
     }
 }

@@ -60,4 +60,10 @@ class DatabaseTest extends CouchbaseTestCase
             PHPUnit_Framework_TestCase::assertSame(\CouchbaseN1qlQuery::NOT_BOUNDED, $this->consistency);
         }, $this->connection, get_class($this->connection))->__invoke();
     }
+
+    public function testShouldReturnConfigurationArray()
+    {
+        $bucket = $this->connection->openBucket('testing');
+        static::assertInternalType('array', $this->connection->getOptions($bucket));
+    }
 }

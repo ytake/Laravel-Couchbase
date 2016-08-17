@@ -41,6 +41,9 @@ class CouchbaseConnection extends Connection
     /** @var */
     protected $managerPassword;
 
+    /** @var array */
+    protected $options = [];
+
     /** @var int */
     protected $fetchMode = 0;
 
@@ -55,6 +58,19 @@ class CouchbaseConnection extends Connection
 
     /** @var int  default consistency */
     protected $consistency = \CouchbaseN1qlQuery::NOT_BOUNDED;
+
+    /** @var string[]  function to handle the retrieval of various properties. */
+    private $properties = [
+        'operationTimeout',
+        'viewTimeout',
+        'durabilityInterval',
+        'durabilityTimeout',
+        'httpTimeout',
+        'configTimeout',
+        'configDelay',
+        'configNodeTimeout',
+        'htconfigIdleTimeout',
+    ];
 
     /**
      * @param array $config
@@ -92,6 +108,33 @@ class CouchbaseConnection extends Connection
     }
 
     /**
+     * @param CouchbaseBucket $bucket
+     *
+     * @return string[]
+     */
+    public function getOptions(\CouchbaseBucket $bucket)
+    {
+        $options = [];
+        foreach ($this->properties as $property) {
+            $options[$property] = $bucket->$property;
+        }
+
+        return $options;
+    }
+
+    /**
+     * @param CouchbaseBucket $bucket
+     */
+    protected function registerOption(\CouchbaseBucket $bucket)
+    {
+        if (count($this->options)) {
+            foreach ($this->options as $option => $value) {
+                $bucket->$option = $value;
+            }
+        }
+    }
+
+    /**
      * @return Processor
      */
     protected function getDefaultPostProcessor()
@@ -113,6 +156,7 @@ class CouchbaseConnection extends Connection
     protected function getManagedConfigure(array $config)
     {
         $this->enableN1qlServers = (isset($config['enables'])) ? $config['enables'] : [];
+        $this->options = (isset($config['options'])) ? $config['options'] : [];
         $manager = (isset($config['manager'])) ? $config['manager'] : null;
         if (is_null($manager)) {
             $this->managerUser = (isset($config['user'])) ? $config['user'] : null;
@@ -131,7 +175,7 @@ class CouchbaseConnection extends Connection
      */
     protected function createConnection($dsn)
     {
-        return (new CouchbaseConnector())->connect($dsn);
+        return (new CouchbaseConnector)->connect($dsn);
     }
 
     /**
@@ -214,6 +258,7 @@ class CouchbaseConnection extends Connection
                 $query->consistency($this->consistency);
                 $query->positionalParams($bindings);
                 $bucket = $this->openBucket($this->bucket);
+                $this->registerOption($bucket);
                 $result = $bucket->query($query);
                 $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
@@ -223,6 +268,7 @@ class CouchbaseConnection extends Connection
             $query->options['args'] = $bindings;
             $query->consistency($this->consistency);
             $bucket = $this->openBucket($this->bucket);
+            $this->registerOption($bucket);
 
             return $bucket->query($query);
             // @codeCoverageIgnoreEnd
@@ -254,6 +300,7 @@ class CouchbaseConnection extends Connection
             if ($this->breakingVersion()) {
                 $query->consistency($this->consistency);
                 $bucket = $this->openBucket($this->bucket);
+                $this->registerOption($bucket);
                 $query->namedParams(['parameters' => $bindings]);
                 $result = $bucket->query($query);
                 $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
@@ -263,6 +310,7 @@ class CouchbaseConnection extends Connection
             // @codeCoverageIgnoreStart
             $query->consistency($this->consistency);
             $bucket = $this->openBucket($this->bucket);
+            $this->registerOption($bucket);
             $result = $bucket->query($query, ['parameters' => $bindings]);
 
             return (isset($result[0])) ? $result[0] : false;
@@ -288,6 +336,7 @@ class CouchbaseConnection extends Connection
                 $query->consistency($this->consistency);
                 $query->positionalParams($bindings);
                 $bucket = $this->openBucket($this->bucket);
+                $this->registerOption($bucket);
                 $result = $bucket->query($query);
                 $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
@@ -297,6 +346,7 @@ class CouchbaseConnection extends Connection
             $query->consistency($this->consistency);
             $query->options['args'] = $bindings;
             $bucket = $this->openBucket($this->bucket);
+            $this->registerOption($bucket);
             $result = $bucket->query($query);
 
             return (isset($result[0])) ? $result[0] : false;
