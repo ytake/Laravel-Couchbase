@@ -10,27 +10,25 @@
  * THE SOFTWARE.
  */
 
-namespace Ytake\LaravelCouchbase;
+namespace Ytake\LaravelCouchbase\Events;
 
 /**
- * trait VersionTrait
+ * Class ResultReturning
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
-trait VersionTrait
+class ResultReturning
 {
-    /**
-     * @codeCoverageIgnore
-     * @return bool
-     */
-    private function breakingVersion()
-    {
-        if (!str_contains(phpversion('couchbase'), 'beta')) {
-            if (floatval(phpversion('couchbase')) >= 2.2) {
-                return true;
-            }
-        }
+    /** @var mixed  */
+    public $returning;
 
-        return false;
+    /**
+     * ResultReturning constructor.
+     *
+     * @param mixed $returning
+     */
+    public function __construct($returning)
+    {
+        $this->returning = $returning;
     }
 }

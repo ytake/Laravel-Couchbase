@@ -9,6 +9,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 namespace Ytake\LaravelCouchbase\Console;
 
 use Illuminate\Console\Command;
@@ -19,6 +20,8 @@ use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
 /**
  * Class IndexFinderCommand
+ *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 class IndexFinderCommand extends Command
 {

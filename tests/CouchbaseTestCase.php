@@ -81,6 +81,7 @@ class CouchbaseTestCase extends \PHPUnit_Framework_TestCase
                 return $this->app;
             }
         );
+        (new \Illuminate\Events\EventServiceProvider($this->app))->register();
         \Illuminate\Container\Container::setInstance($this->app);
     }
 

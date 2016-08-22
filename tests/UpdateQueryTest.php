@@ -50,6 +50,14 @@ class UpdateQueryTest extends CouchbaseTestCase
         $connection = $this->app['db']->connection('couchbase');
         $result = $connection->table('testing')->key($key)->insert($value);
         $this->assertInstanceOf('stdClass', $result);
+        /** @var Illuminate\Events\Dispatcher $dispatcher */
+        $dispatcher = $this->app['events'];
+        $dispatcher->listen(\Ytake\LaravelCouchbase\Events\QueryPrepared::class, function ($instance) {
+            static::assertInstanceOf(Ytake\LaravelCouchbase\Events\QueryPrepared::class, $instance);
+        });
+        $dispatcher->listen(\Ytake\LaravelCouchbase\Events\ResultReturning::class, function ($instance) {
+            static::assertInstanceOf(\Ytake\LaravelCouchbase\Events\ResultReturning::class, $instance);
+        });
         $this->assertSame(null, $connection->table('testing')->key($key)->where('clicking', 'to edit')->first());
         $connection->table('testing')->key($key)->where('content', 'testing')->delete();
     }

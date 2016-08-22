@@ -11,7 +11,7 @@ class IndexFinderCommandTest extends CouchbaseTestCase
     public function setUp()
     {
         parent::setUp();
-        $cluster = $this->app['db']->connection('couchbase')->getCouchbase();
+        $cluster = $this->app['db'];
         $this->command = new \Ytake\LaravelCouchbase\Console\IndexFinderCommand($cluster);
         $this->command->setLaravel(new MockApplication());
     }
@@ -21,7 +21,7 @@ class IndexFinderCommandTest extends CouchbaseTestCase
         $output = new \Symfony\Component\Console\Output\BufferedOutput();
         $this->command->run(
             new \Symfony\Component\Console\Input\ArrayInput([
-                '-bu' => 'testing'
+                '-b' => 'testing'
             ]),
             $output
         );

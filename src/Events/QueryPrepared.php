@@ -10,25 +10,40 @@
  * THE SOFTWARE.
  */
 
-namespace Ytake\LaravelCouchbase;
+namespace Ytake\LaravelCouchbase\Events;
 
 /**
- * trait VersionTrait
+ * Class QueryPrepared
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
-trait VersionTrait
+class QueryPrepared
 {
+    /** @var array */
+    public $object = [];
+
     /**
-     * @codeCoverageIgnore
+     * QueryPrepared constructor.
+     *
+     * @param $queryObject
+     */
+    public function __construct($queryObject)
+    {
+        /** @var \CouchbaseN1qlQuery $queryObject */
+        if ($this->isN1ql($queryObject)) {
+            $this->object = $queryObject->toObject();
+        }
+    }
+
+    /**
+     * @param mixed $queryObject
+     *
      * @return bool
      */
-    private function breakingVersion()
+    protected function isN1ql($queryObject)
     {
-        if (!str_contains(phpversion('couchbase'), 'beta')) {
-            if (floatval(phpversion('couchbase')) >= 2.2) {
-                return true;
-            }
+        if ($queryObject instanceof \CouchbaseN1qlQuery) {
+            return true;
         }
 
         return false;

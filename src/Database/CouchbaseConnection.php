@@ -15,6 +15,8 @@ namespace Ytake\LaravelCouchbase\Database;
 use Closure;
 use CouchbaseBucket;
 use Illuminate\Database\Connection;
+use Ytake\LaravelCouchbase\Events\QueryPrepared;
+use Ytake\LaravelCouchbase\Events\ResultReturning;
 use Ytake\LaravelCouchbase\Query\Grammar;
 use Ytake\LaravelCouchbase\Query\Processor;
 use Ytake\LaravelCouchbase\Exceptions\NotSupportedException;
@@ -259,7 +261,9 @@ class CouchbaseConnection extends Connection
                 $query->positionalParams($bindings);
                 $bucket = $this->openBucket($this->bucket);
                 $this->registerOption($bucket);
+                $this->firePreparedQuery($query);
                 $result = $bucket->query($query);
+                $this->fireReturning($result);
                 $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
                 return (isset($result->rows)) ? $result->rows : [];
@@ -269,8 +273,12 @@ class CouchbaseConnection extends Connection
             $query->consistency($this->consistency);
             $bucket = $this->openBucket($this->bucket);
             $this->registerOption($bucket);
+            $this->firePreparedQuery($query);
 
-            return $bucket->query($query);
+            $result = $bucket->query($query);
+            $this->fireReturning($result);
+
+            return $result;
             // @codeCoverageIgnoreEnd
         });
     }
@@ -302,7 +310,9 @@ class CouchbaseConnection extends Connection
                 $bucket = $this->openBucket($this->bucket);
                 $this->registerOption($bucket);
                 $query->namedParams(['parameters' => $bindings]);
+                $this->firePreparedQuery($query);
                 $result = $bucket->query($query);
+                $this->fireReturning($result);
                 $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
                 return (isset($result->rows[0])) ? $result->rows[0] : false;
@@ -311,7 +321,9 @@ class CouchbaseConnection extends Connection
             $query->consistency($this->consistency);
             $bucket = $this->openBucket($this->bucket);
             $this->registerOption($bucket);
+            $this->firePreparedQuery($query);
             $result = $bucket->query($query, ['parameters' => $bindings]);
+            $this->fireReturning($result);
 
             return (isset($result[0])) ? $result[0] : false;
             // @codeCoverageIgnoreEnd
@@ -337,7 +349,9 @@ class CouchbaseConnection extends Connection
                 $query->positionalParams($bindings);
                 $bucket = $this->openBucket($this->bucket);
                 $this->registerOption($bucket);
+                $this->firePreparedQuery($query);
                 $result = $bucket->query($query);
+                $this->fireReturning($result);
                 $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
                 return (isset($result->rows[0])) ? $result->rows[0] : false;
@@ -347,7 +361,9 @@ class CouchbaseConnection extends Connection
             $query->options['args'] = $bindings;
             $bucket = $this->openBucket($this->bucket);
             $this->registerOption($bucket);
+            $this->firePreparedQuery($query);
             $result = $bucket->query($query);
+            $this->fireReturning($result);
 
             return (isset($result[0])) ? $result[0] : false;
             // @codeCoverageIgnoreEnd
@@ -476,5 +492,25 @@ class CouchbaseConnection extends Connection
     public function metrics()
     {
         return $this->metrics;
+    }
+
+    /**
+     * @param \CouchbaseN1qlQuery $queryObject
+     */
+    protected function firePreparedQuery(\CouchbaseN1qlQuery $queryObject)
+    {
+        if (isset($this->events)) {
+            $this->events->fire(new QueryPrepared($queryObject));
+        }
+    }
+
+    /**
+     * @param mixed $returning
+     */
+    protected function fireReturning($returning)
+    {
+        if (isset($this->events)) {
+            $this->events->fire(new ResultReturning($returning));
+        }
     }
 }
