@@ -20,7 +20,7 @@ use Illuminate\Database\Query\Builder;
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  *
- * @see http://developer.couchbase.com/documentation/server/4.1/n1ql/n1ql-language-reference/index.html
+ * @see    http://developer.couchbase.com/documentation/server/4.1/n1ql/n1ql-language-reference/index.html
  */
 class QueryBuilder extends Builder
 {

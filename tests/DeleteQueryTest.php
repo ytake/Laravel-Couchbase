@@ -38,6 +38,7 @@ class DeleteQueryTest extends CouchbaseTestCase
         /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
         $connection->table('testing')->key($key)->insert($value);
+        $this->assertInternalType('array', $connection->metrics());
         $deleteReturning = $connection->table('testing')->key($key)->returning()->delete();
         $this->assertInstanceOf('stdClass', $deleteReturning->testing);
     }

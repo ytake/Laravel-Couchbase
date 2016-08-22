@@ -26,7 +26,7 @@ class CouchbaseStoreTest extends \CouchbaseTestCase
         $this->store->add(['test', 'test2'], 'test', 120);
         $result = $this->store->get(['test', 'test2']);
         foreach ($result as $row) {
-            // $this->assertSame('test', $row->value);
+            $this->assertSame('test', $row);
         }
 
         $this->store->forget(['test', 'test2']);

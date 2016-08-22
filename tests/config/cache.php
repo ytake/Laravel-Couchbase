@@ -27,6 +27,20 @@ return [
                 ],
             ],
         ],
+        'couchbase-memcached_second' => [
+            'driver'  => 'couchbase-memcached',
+            'servers' => [
+                [
+                    'host' => '127.0.0.1',
+                    'port' => 11255,
+                    'weight' => 100,
+                    'bucket' => 'memcache-couch',
+                    'options' => [
+
+                    ],
+                ],
+            ],
+        ],
         'memcached' => [
             'driver'  => 'memcached',
             'servers' => [
