@@ -247,6 +247,22 @@ class CouchbaseConnection extends Connection
     }
 
     /**
+     * @param \CouchbaseN1qlQuery $query
+     *
+     * @return mixed
+     */
+    protected function executeQuery(\CouchbaseN1qlQuery $query)
+    {
+        $bucket = $this->openBucket($this->bucket);
+        $this->registerOption($bucket);
+        $this->firePreparedQuery($query);
+        $result = $bucket->query($query);
+        $this->fireReturning($result);
+
+        return $result;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function select($query, $bindings = [], $useReadPdo = true)
@@ -259,11 +275,7 @@ class CouchbaseConnection extends Connection
             if ($this->breakingVersion()) {
                 $query->consistency($this->consistency);
                 $query->positionalParams($bindings);
-                $bucket = $this->openBucket($this->bucket);
-                $this->registerOption($bucket);
-                $this->firePreparedQuery($query);
-                $result = $bucket->query($query);
-                $this->fireReturning($result);
+                $result = $this->executeQuery($query);
                 $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
                 return (isset($result->rows)) ? $result->rows : [];
@@ -271,14 +283,8 @@ class CouchbaseConnection extends Connection
             // @codeCoverageIgnoreStart
             $query->options['args'] = $bindings;
             $query->consistency($this->consistency);
-            $bucket = $this->openBucket($this->bucket);
-            $this->registerOption($bucket);
-            $this->firePreparedQuery($query);
 
-            $result = $bucket->query($query);
-            $this->fireReturning($result);
-
-            return $result;
+            return $this->executeQuery($query);
             // @codeCoverageIgnoreEnd
         });
     }
@@ -307,12 +313,8 @@ class CouchbaseConnection extends Connection
 
             if ($this->breakingVersion()) {
                 $query->consistency($this->consistency);
-                $bucket = $this->openBucket($this->bucket);
-                $this->registerOption($bucket);
                 $query->namedParams(['parameters' => $bindings]);
-                $this->firePreparedQuery($query);
-                $result = $bucket->query($query);
-                $this->fireReturning($result);
+                $result = $this->executeQuery($query);
                 $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
                 return (isset($result->rows[0])) ? $result->rows[0] : false;
@@ -347,23 +349,16 @@ class CouchbaseConnection extends Connection
             if ($this->breakingVersion()) {
                 $query->consistency($this->consistency);
                 $query->positionalParams($bindings);
-                $bucket = $this->openBucket($this->bucket);
-                $this->registerOption($bucket);
-                $this->firePreparedQuery($query);
-                $result = $bucket->query($query);
-                $this->fireReturning($result);
+                $result = $this->executeQuery($query);
                 $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
                 return (isset($result->rows[0])) ? $result->rows[0] : false;
             }
+
             // @codeCoverageIgnoreStart
             $query->consistency($this->consistency);
             $query->options['args'] = $bindings;
-            $bucket = $this->openBucket($this->bucket);
-            $this->registerOption($bucket);
-            $this->firePreparedQuery($query);
-            $result = $bucket->query($query);
-            $this->fireReturning($result);
+            $result = $this->executeQuery($query);
 
             return (isset($result[0])) ? $result[0] : false;
             // @codeCoverageIgnoreEnd
