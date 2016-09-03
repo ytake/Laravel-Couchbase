@@ -37,6 +37,18 @@ class IndexFinderCommand extends Command
     /** @var string */
     protected $defaultDatabase = 'couchbase';
 
+    /** @var string[] */
+    private $headers = [
+        "name",
+        "isPrimary",
+        "type",
+        "state",
+        "keyspace",
+        "namespace",
+        "fields",
+        "condition",
+    ];
+
     /**
      * IndexFinderCommand constructor.
      *
@@ -73,31 +85,28 @@ class IndexFinderCommand extends Command
      */
     public function fire()
     {
+        $row = [];
+        $tableRows = [];
         /** @var \Illuminate\Database\Connection|CouchbaseConnection $connection */
         $connection = $this->databaseManager->connection($this->argument('database'));
         if ($connection instanceof CouchbaseConnection) {
             $bucket = $connection->getCouchbase()->openBucket($this->option('bucket'));
-            $this->recursiveInformation($bucket->manager()->info());
+            $indexes = $bucket->manager()->listN1qlIndexes();
+            // $this->recursiveInformation($bucket->manager()->info());
+            foreach ($indexes as $index) {
+                foreach ($index as $key => $value) {
+                    if (array_search($key, $this->headers) !== false) {
+                        $row[] = (!is_array($value)) ? $value : implode(",", $value);
+                    }
+                }
+                $tableRows[] = $row;
+            }
+            $this->table($this->headers, $tableRows);
 
             return;
         }
         $this->error('couchbase is not specified ');
 
         return;
-    }
-
-    /**
-     * @param array $array
-     * @param int   $level
-     */
-    private function recursiveInformation(array $array, $level = 1)
-    {
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $this->recursiveInformation($value, $level + 1);
-            } else {
-                $this->line("<comment>{$key} : {$value}</comment>");
-            }
-        }
     }
 }

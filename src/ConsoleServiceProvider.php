@@ -44,7 +44,7 @@ class ConsoleServiceProvider extends ServiceProvider
     protected function registerCommands()
     {
         $this->app->singleton('command.couchbase.list-indexes', function ($app) {
-            return new IndexFinderCommand($app['config']);
+            return new IndexFinderCommand($app['Illuminate\Database\DatabaseManager']);
         });
 
         $this->commands([
