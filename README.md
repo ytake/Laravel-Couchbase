@@ -184,3 +184,19 @@ $this->app['db']->connection('couchbase')
     ->where('id', 1)
     ->returning(['id', 'name'])->get();
 ```
+
+## hacking
+
+To run tests there are should be following buckets created on local Couchbase cluster:
+
+``` php
+$cluster = new CouchbaseCluster('couchbase://127.0.0.1');
+$clusterManager = $cluster->manager('Administrator', 'password');
+$clusterManager->createBucket('testing', ['bucketType' => 'couchbase', 'saslPassword' => '', 'flushEnabled' => true]);
+$clusterManager->createBucket('memcache-couch', ['bucketType' => 'memcached', 'saslPassword' => '', 'flushEnabled' => true]);
+sleep(5);
+$bucketManager = $cluster->openBucket('testing')->manager();
+$bucketManager->createN1qlPrimaryIndex();
+```
+
+Also tests are expecting regular Memcached daemon listening on port 11255.
