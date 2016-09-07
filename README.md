@@ -1,8 +1,8 @@
 # Laravel-Couchbase
 for Laravel 5.1.*(higher)
 
-cache, session, database extension package  
-*required ext-couchbase*  
+cache, session, database extension package
+*required ext-couchbase*
 
 [![Build Status](https://img.shields.io/scrutinizer/build/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/build-status/develop)
 [![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/?branch=develop)
