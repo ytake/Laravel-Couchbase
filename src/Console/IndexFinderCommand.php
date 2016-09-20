@@ -92,7 +92,6 @@ class IndexFinderCommand extends Command
         if ($connection instanceof CouchbaseConnection) {
             $bucket = $connection->getCouchbase()->openBucket($this->option('bucket'));
             $indexes = $bucket->manager()->listN1qlIndexes();
-            // $this->recursiveInformation($bucket->manager()->info());
             foreach ($indexes as $index) {
                 foreach ($index as $key => $value) {
                     if (array_search($key, $this->headers) !== false) {
@@ -100,6 +99,7 @@ class IndexFinderCommand extends Command
                     }
                 }
                 $tableRows[] = $row;
+                $row = [];
             }
             $this->table($this->headers, $tableRows);
 
