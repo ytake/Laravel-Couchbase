@@ -169,7 +169,7 @@ class CouchbaseStore extends TaggableStore implements Store
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = !empty($prefix) ? $prefix.':' : '';
+        $this->prefix = !empty($prefix) ? $prefix . ':' : '';
     }
 
     /**
@@ -199,13 +199,13 @@ class CouchbaseStore extends TaggableStore implements Store
         if (is_array($keys)) {
             $result = [];
             foreach ($keys as $key) {
-                $result[] = $this->prefix.$key;
+                $result[] = $this->prefix . $key;
             }
 
             return $result;
         }
 
-        return $this->prefix.$keys;
+        return $this->prefix . $keys;
     }
 
     /**
@@ -227,6 +227,6 @@ class CouchbaseStore extends TaggableStore implements Store
             return $result;
         }
 
-        return;
+        return null;
     }
 }

@@ -13,7 +13,11 @@
 namespace Ytake\LaravelCouchbase;
 
 use Illuminate\Support\ServiceProvider;
+use Ytake\LaravelCouchbase\Console\IndexCreatorCommand;
 use Ytake\LaravelCouchbase\Console\IndexFinderCommand;
+use Ytake\LaravelCouchbase\Console\IndexRemoverCommand;
+use Ytake\LaravelCouchbase\Console\PrimaryIndexCreatorCommand;
+use Ytake\LaravelCouchbase\Console\PrimaryIndexRemoverCommand;
 
 /**
  * Class ConsoleServiceProvider.
@@ -43,12 +47,27 @@ class ConsoleServiceProvider extends ServiceProvider
      */
     protected function registerCommands()
     {
-        $this->app->singleton('command.couchbase.list-indexes', function ($app) {
+        $this->app->singleton('command.couchbase.indexes', function ($app) {
             return new IndexFinderCommand($app['Illuminate\Database\DatabaseManager']);
         });
-
+        $this->app->singleton('command.couchbase.primary.index.create', function ($app) {
+            return new PrimaryIndexCreatorCommand($app['Illuminate\Database\DatabaseManager']);
+        });
+        $this->app->singleton('command.couchbase.primary.index.drop', function ($app) {
+            return new PrimaryIndexRemoverCommand($app['Illuminate\Database\DatabaseManager']);
+        });
+        $this->app->singleton('command.couchbase.index.create', function ($app) {
+            return new IndexCreatorCommand($app['Illuminate\Database\DatabaseManager']);
+        });
+        $this->app->singleton('command.couchbase.index.drop', function ($app) {
+            return new IndexRemoverCommand($app['Illuminate\Database\DatabaseManager']);
+        });
         $this->commands([
-            'command.couchbase.list-indexes',
+            'command.couchbase.indexes',
+            'command.couchbase.primary.index.create',
+            'command.couchbase.primary.index.drop',
+            'command.couchbase.index.create',
+            'command.couchbase.index.drop',
         ]);
     }
 
@@ -58,7 +77,11 @@ class ConsoleServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'command.couchbase.list-indexes',
+            'command.couchbase.indexes',
+            'command.couchbase.primary.index.create',
+            'command.couchbase.primary.index.drop',
+            'command.couchbase.index.create',
+            'command.couchbase.index.drop',
         ];
     }
 }

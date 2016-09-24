@@ -5,8 +5,9 @@
  *
  * @see \Ytake\LaravelCouchbase\Console\IndexFinderCommand
  */
-class IndexFinderCommandTest extends CouchbaseTestCase
+class IndexFinderCommandTest extends \CouchbaseTestCase
 {
+    /** @var \Ytake\LaravelCouchbase\Console\IndexFinderCommand */
     private $command;
     public function setUp()
     {
@@ -21,74 +22,11 @@ class IndexFinderCommandTest extends CouchbaseTestCase
         $output = new \Symfony\Component\Console\Output\BufferedOutput();
         $this->command->run(
             new \Symfony\Component\Console\Input\ArrayInput([
-                '-b' => 'testing'
+                'bucket' => 'testing',
             ]),
             $output
         );
         $fetch = $output->fetch();
         $this->assertNotNull($fetch);
-    }
-}
-
-class MockApplication extends \Illuminate\Container\Container implements \Illuminate\Contracts\Foundation\Application
-{
-    public function version()
-    {
-        // TODO: Implement version() method.
-    }
-
-    public function environment()
-    {
-        // TODO: Implement environment() method.
-    }
-
-    public function isDownForMaintenance()
-    {
-        // TODO: Implement isDownForMaintenance() method.
-    }
-
-    public function registerConfiguredProviders()
-    {
-        // TODO: Implement registerConfiguredProviders() method.
-    }
-
-    public function register($provider, $options = [], $force = false)
-    {
-        // TODO: Implement register() method.
-    }
-
-    public function registerDeferredProvider($provider, $service = null)
-    {
-        // TODO: Implement registerDeferredProvider() method.
-    }
-
-    public function boot()
-    {
-        // TODO: Implement boot() method.
-    }
-
-    public function booting($callback)
-    {
-        // TODO: Implement booting() method.
-    }
-
-    public function booted($callback)
-    {
-        // TODO: Implement booted() method.
-    }
-
-    public function basePath()
-    {
-        // TODO: Implement basePath() method.
-    }
-
-    public function getCachedCompilePath()
-    {
-        // TODO: Implement getCachedCompilePath() method.
-    }
-
-    public function getCachedServicesPath()
-    {
-        // TODO: Implement getCachedServicesPath() method.
     }
 }

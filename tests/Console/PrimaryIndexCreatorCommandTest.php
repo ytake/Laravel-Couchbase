@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * Class PrimaryIndexCreatorCommandTest
+ */
+class PrimaryIndexCreatorCommandTest extends \CouchbaseTestCase
+{
+    /** @var \Ytake\LaravelCouchbase\Console\PrimaryIndexCreatorCommand */
+    private $command;
+    /** @var \Illuminate\Database\DatabaseManager */
+    private $databaseManager;
+    /** @var string */
+    private $bucket = 'index_testing';
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->databaseManager = $this->app['db'];
+        $this->command = new \Ytake\LaravelCouchbase\Console\PrimaryIndexCreatorCommand($this->databaseManager);
+        $this->command->setLaravel(new MockApplication);
+    }
+
+    public function testCreatePrimaryIndex()
+    {
+        $cluster = new \CouchbaseCluster('127.0.0.1');
+        $clusterManager = $cluster->manager('Administrator', 'Administrator');
+        $clusterManager->createBucket($this->bucket,
+            ['bucketType' => 'couchbase', 'saslPassword' => '', 'flushEnabled' => true]);
+        sleep(5);
+        $output = new \Symfony\Component\Console\Output\BufferedOutput();
+        $this->command->run(
+            new \Symfony\Component\Console\Input\ArrayInput([
+                'bucket'   => $this->bucket,
+                '--ignore' => true,
+            ]),
+            $output
+        );
+        $fetch = $output->fetch();
+        $this->assertNotNull($fetch);
+        $this->assertSame("created PRIMARY INDEX [#primary] for [index_testing] bucket.", trim($fetch));
+        /** @var \Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
+        $connection = $this->databaseManager->connection('couchbase');
+        $bucket = $connection->openBucket($this->bucket);
+        $indexes = $bucket->manager()->listN1qlIndexes();
+        foreach ($indexes as $index) {
+            $this->assertInstanceOf('CouchbaseN1qlIndex', $index);
+        }
+        $bucket->manager()->dropN1qlPrimaryIndex();
+        $clusterManager->removeBucket($this->bucket);
+        sleep(5);
+    }
+}

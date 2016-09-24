@@ -15,12 +15,12 @@ namespace Ytake\LaravelCouchbase\Database;
 use Closure;
 use CouchbaseBucket;
 use Illuminate\Database\Connection;
-use Ytake\LaravelCouchbase\Events\QueryPrepared;
-use Ytake\LaravelCouchbase\Events\ResultReturning;
+use Ytake\LaravelCouchbase\VersionTrait;
 use Ytake\LaravelCouchbase\Query\Grammar;
 use Ytake\LaravelCouchbase\Query\Processor;
+use Ytake\LaravelCouchbase\Events\QueryPrepared;
+use Ytake\LaravelCouchbase\Events\ResultReturning;
 use Ytake\LaravelCouchbase\Exceptions\NotSupportedException;
-use Ytake\LaravelCouchbase\VersionTrait;
 
 /**
  * Class CouchbaseConnection.
@@ -74,12 +74,15 @@ class CouchbaseConnection extends Connection
         'htconfigIdleTimeout',
     ];
 
+    /** @var array */
+    protected $config = [];
+
     /**
      * @param array $config
      */
     public function __construct(array $config)
     {
-        $this->connection = $this->createConnection($config);
+        $this->config = $config;
         $this->getManagedConfigure($config);
 
         $this->useDefaultQueryGrammar();
@@ -106,7 +109,15 @@ class CouchbaseConnection extends Connection
      */
     public function openBucket($name)
     {
-        return $this->connection->openBucket($name, $this->bucketPassword);
+        return $this->getCouchbase()->openBucket($name, $this->bucketPassword);
+    }
+
+    /**
+     * @return \CouchbaseClusterManager
+     */
+    public function manager()
+    {
+        return $this->getCouchbase()->manager($this->managerUser, $this->managerPassword);
     }
 
     /**
@@ -153,31 +164,35 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @param array $config
+     *
+     * @param array $config enable(array), options(array), administrator(array), bucket_password(string)
      */
     protected function getManagedConfigure(array $config)
     {
         $this->enableN1qlServers = (isset($config['enables'])) ? $config['enables'] : [];
         $this->options = (isset($config['options'])) ? $config['options'] : [];
-        $manager = (isset($config['manager'])) ? $config['manager'] : null;
-        if (is_null($manager)) {
-            $this->managerUser = (isset($config['user'])) ? $config['user'] : null;
-            $this->managerPassword = (isset($config['password'])) ? $config['password'] : null;
-
-            return;
+        $manager = (isset($config['administrator'])) ? $config['administrator'] : null;
+        $this->managerUser = '';
+        $this->managerPassword = '';
+        if (!is_null($manager)) {
+            $this->managerUser = $config['administrator']['user'];
+            $this->managerPassword = $config['administrator']['password'];
         }
-        $this->managerUser = $config['manager']['user'];
-        $this->managerPassword = $config['manager']['password'];
+        $this->bucketPassword = (isset($config['bucket_password'])) ? $config['bucket_password'] : '';
     }
 
     /**
-     * @param $dsn
-     *
      * @return \CouchbaseCluster
      */
-    protected function createConnection($dsn)
+    protected function createConnection()
     {
-        return (new CouchbaseConnector)->connect($dsn);
+        $this->setReconnector(function ($connection) {
+            $this->connection = (new CouchbaseConnector)->connect($this->config);
+
+            return $this;
+        });
+
+        return (new CouchbaseConnector)->connect($this->config);
     }
 
     /**
@@ -193,6 +208,10 @@ class CouchbaseConnection extends Connection
      */
     public function getCouchbase()
     {
+        if (is_null($this->connection)) {
+            $this->connection = $this->createConnection();
+        }
+
         return $this->connection;
     }
 
@@ -203,9 +222,7 @@ class CouchbaseConnection extends Connection
      */
     public function table($table)
     {
-        $this->bucket = $table;
-
-        return $this->query()->from($table);
+        return $this->bucket($table)->query()->from($table);
     }
 
     /**
@@ -446,7 +463,7 @@ class CouchbaseConnection extends Connection
     /**
      * Get a new query builder instance.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder|QueryBuilder
      */
     public function query()
     {

@@ -19,35 +19,23 @@ use Symfony\Component\Console\Input\InputArgument;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
 /**
- * Class IndexFinderCommand
+ * Class PrimaryIndexRemoverCommand
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
-class IndexFinderCommand extends Command
+class PrimaryIndexRemoverCommand extends Command
 {
     /** @var string */
-    protected $name = 'couchbase:indexes';
+    protected $name = 'couchbase:drop-primary-index';
 
     /** @var string */
-    protected $description = 'List all N1QL indexes that are registered for the current bucket.';
+    protected $description = 'Drop the given primary index associated with the current bucket.';
 
     /** @var DatabaseManager */
     protected $databaseManager;
 
     /** @var string */
     protected $defaultDatabase = 'couchbase';
-
-    /** @var string[] */
-    private $headers = [
-        "name",
-        "isPrimary",
-        "type",
-        "state",
-        "keyspace",
-        "namespace",
-        "fields",
-        "condition",
-    ];
 
     /**
      * IndexFinderCommand constructor.
@@ -79,6 +67,13 @@ class IndexFinderCommand extends Command
     {
         return [
             ['database', 'db', InputOption::VALUE_REQUIRED, 'The database connection to use.', $this->defaultDatabase],
+            ['name', 'n', InputOption::VALUE_REQUIRED, 'the custom name for the primary index.', '#primary'],
+            [
+                'ignore',
+                'ig',
+                InputOption::VALUE_NONE,
+                'if a primary index already exists, an exception will be thrown unless this is set to true.',
+            ],
         ];
     }
 
@@ -87,23 +82,15 @@ class IndexFinderCommand extends Command
      */
     public function fire()
     {
-        $row = [];
-        $tableRows = [];
         /** @var \Illuminate\Database\Connection|CouchbaseConnection $connection */
         $connection = $this->databaseManager->connection($this->option('database'));
         if ($connection instanceof CouchbaseConnection) {
-            $bucket = $connection->getCouchbase()->openBucket($this->argument('bucket'));
-            $indexes = $bucket->manager()->listN1qlIndexes();
-            foreach ($indexes as $index) {
-                foreach ($index as $key => $value) {
-                    if (array_search($key, $this->headers) !== false) {
-                        $row[] = (!is_array($value)) ? $value : implode(",", $value);
-                    }
-                }
-                $tableRows[] = $row;
-                $row = [];
-            }
-            $this->table($this->headers, $tableRows);
+            $bucket = $connection->openBucket($this->argument('bucket'));
+            $bucket->manager()->dropN1qlPrimaryIndex(
+                $this->option('name'),
+                $this->option('ignore')
+            );
+            $this->info("dropped PRIMARY INDEX [{$this->option('name')}] for [{$this->argument('bucket')}] bucket.");
         }
 
         return;
