@@ -10,36 +10,27 @@
  * THE SOFTWARE.
  */
 
-namespace Ytake\LaravelCouchbase\Database;
+namespace Ytake\LaravelCouchbase\Events;
+
+use CouchbaseViewQuery;
 
 /**
- * Class ViewQuery.
+ * Class ViewQuerying
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
-class ViewQuery
+class ViewQuerying
 {
-    /** @var \CouchbaseBucket  */
-    protected $bucket;
+    /** @var mixed  Generates the view query as it will be passed to the server. */
+    public $path;
 
     /**
-     * ViewQuery constructor.
+     * ViewQuerying constructor.
      *
-     * @param \CouchbaseBucket $bucket
+     * @param CouchbaseViewQuery $viewQuery
      */
-    public function __construct(\CouchbaseBucket $bucket)
+    public function __construct(CouchbaseViewQuery $viewQuery)
     {
-        $this->bucket = $bucket;
-    }
-
-    /**
-     * @param $designDoc
-     * @param $name
-     *
-     * @return \_CouchbaseDefaultViewQuery
-     */
-    public function from($designDoc, $name)
-    {
-        return \CouchbaseViewQuery::from($designDoc, $name);
+        $this->path = $viewQuery->toString();
     }
 }

@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
 namespace Ytake\LaravelCouchbase\Schema;
 
@@ -7,9 +16,13 @@ use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
 /**
  * Class Blueprint
+ *
+ * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 class Blueprint extends \Illuminate\Database\Schema\Blueprint
 {
+    use NotSupportedTrait;
+
     /** @var  CouchbaseConnection */
     protected $connection;
 
@@ -19,12 +32,6 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
         'saslPassword' => '',
         'flushEnabled' => true,
     ];
-
-    public function __call($name, array $arguments)
-    {
-        // TODO: Implement __call() method.
-        dd($name);
-    }
 
     /**
      * @param CouchbaseConnection $connection
@@ -69,6 +76,7 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
     public function dropPrimary($index = null, $ignoreIfNotExist = false)
     {
         $index = (is_null($index)) ? "" : $index;
+
         return $this->connection->openBucket($this->getTable())
             ->manager()->dropN1qlPrimaryIndex($index, $ignoreIfNotExist);
     }
@@ -90,10 +98,10 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
     /**
      * Specify the primary index for the current bucket.
      *
-     * @param  string|null $name
-     * @param boolean      $ignoreIfExist if a primary index already exists, an exception will be thrown unless this is
+     * @param string|null $name
+     * @param boolean     $ignoreIfExist  if a primary index already exists, an exception will be thrown unless this is
      *                                    set to true.
-     * @param boolean      $defer         true to defer building of the index until buildN1qlDeferredIndexes()}is
+     * @param boolean     $defer          true to defer building of the index until buildN1qlDeferredIndexes()}is
      *                                    called (or a direct call to the corresponding query service API).
      *
      * @return mixed
@@ -126,6 +134,7 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
     public function index($columns, $name = null, $whereClause = '', $ignoreIfExist = false, $defer = false)
     {
         $name = (is_null($name)) ? $this->getTable() . "_secondary_index" : $name;
+
         return $this->connection->openBucket($this->getTable())
             ->manager()->createN1qlIndex(
                 $name,

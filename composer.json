@@ -49,9 +49,6 @@
       "tests/MockApplication.php"
     ]
   },
-  "suggest": {
-    "ext-couchbase": "for n1ql query builder, use bucket type couchbase require"
-  },
   "scripts": {
     "test": [
       "php vendor/bin/phpunit"

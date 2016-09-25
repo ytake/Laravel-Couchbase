@@ -15,6 +15,7 @@ namespace Ytake\LaravelCouchbase\Database;
 use Closure;
 use CouchbaseBucket;
 use Illuminate\Database\Connection;
+use Ytake\LaravelCouchbase\Query\View;
 use Ytake\LaravelCouchbase\Schema\Builder;
 use Ytake\LaravelCouchbase\VersionTrait;
 use Ytake\LaravelCouchbase\Query\Grammar;
@@ -109,7 +110,7 @@ class CouchbaseConnection extends Connection
      *
      * @return \CouchbaseBucket
      *
-     * @throws CouchbaseException
+     * @throws \CouchbaseException
      */
     public function openBucket($name)
     {
@@ -482,6 +483,18 @@ class CouchbaseConnection extends Connection
         return new QueryBuilder(
             $this, $this->getQueryGrammar(), $this->getPostProcessor()
         );
+    }
+
+    /**
+     * @param string|null $bucket
+     *
+     * @return View
+     */
+    public function view($bucket = null)
+    {
+        $bucket = is_null($bucket) ? $this->bucket : $bucket;
+
+        return new View($this->openBucket($bucket), $this->events);
     }
 
     /**

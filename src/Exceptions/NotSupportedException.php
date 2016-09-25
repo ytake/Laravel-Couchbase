@@ -20,7 +20,7 @@ namespace Ytake\LaravelCouchbase\Exceptions;
 class NotSupportedException extends \Exception
 {
     /**
-     * @param array           $message
+     * @param string          $message
      * @param int             $code
      * @param \Exception|null $previous
      */

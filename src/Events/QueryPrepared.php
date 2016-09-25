@@ -25,11 +25,10 @@ class QueryPrepared
     /**
      * QueryPrepared constructor.
      *
-     * @param $queryObject
+     * @param mixed $queryObject
      */
     public function __construct($queryObject)
     {
-        /** @var \CouchbaseN1qlQuery $queryObject */
         if ($this->isN1ql($queryObject)) {
             $this->object = $queryObject->toObject();
         }
