@@ -89,6 +89,30 @@ class CouchbaseTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->app = null;
     }
+
+    /**
+     * @param string $bucket
+     *
+     * @return CouchbaseClusterManager
+     */
+    protected function createBucket($bucket)
+    {
+        $cluster = new \CouchbaseCluster('127.0.0.1');
+        $clusterManager = $cluster->manager('Administrator', 'Administrator');
+        $clusterManager->createBucket($bucket,
+            ['bucketType' => 'couchbase', 'saslPassword' => '', 'flushEnabled' => true]);
+        sleep(5);
+        return $clusterManager;
+    }
+
+    /**
+     * @param CouchbaseClusterManager $clusterManager
+     * @param string                  $bucket
+     */
+    protected function removeBucket(\CouchbaseClusterManager $clusterManager, $bucket)
+    {
+        $clusterManager->removeBucket($bucket);
+    }
 }
 
 class TestContainer extends \Illuminate\Container\Container

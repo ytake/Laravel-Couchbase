@@ -15,11 +15,13 @@ namespace Ytake\LaravelCouchbase\Database;
 use Closure;
 use CouchbaseBucket;
 use Illuminate\Database\Connection;
+use Ytake\LaravelCouchbase\Schema\Builder;
 use Ytake\LaravelCouchbase\VersionTrait;
 use Ytake\LaravelCouchbase\Query\Grammar;
 use Ytake\LaravelCouchbase\Query\Processor;
 use Ytake\LaravelCouchbase\Events\QueryPrepared;
 use Ytake\LaravelCouchbase\Events\ResultReturning;
+use Ytake\LaravelCouchbase\Query\Builder as QueryBuilder;
 use Ytake\LaravelCouchbase\Exceptions\NotSupportedException;
 
 /**
@@ -103,9 +105,11 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @param $name
+     * @param string $name
      *
      * @return \CouchbaseBucket
+     *
+     * @throws CouchbaseException
      */
     public function openBucket($name)
     {
@@ -164,6 +168,14 @@ class CouchbaseConnection extends Connection
     }
 
     /**
+     * @return Builder|\Illuminate\Database\Schema\Builder
+     */
+    public function getSchemaBuilder()
+    {
+        return new Builder($this);
+    }
+
+    /**
      *
      * @param array $config enable(array), options(array), administrator(array), bucket_password(string)
      */
@@ -218,7 +230,7 @@ class CouchbaseConnection extends Connection
     /**
      * @param string $table
      *
-     * @return \Ytake\LaravelCouchbase\Database\QueryBuilder
+     * @return QueryBuilder
      */
     public function table($table)
     {
@@ -463,7 +475,7 @@ class CouchbaseConnection extends Connection
     /**
      * Get a new query builder instance.
      *
-     * @return \Illuminate\Database\Query\Builder|QueryBuilder
+     * @return QueryBuilder|\Illuminate\Database\Query\Builder|Builder
      */
     public function query()
     {

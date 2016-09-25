@@ -10,19 +10,12 @@
  * THE SOFTWARE.
  */
 
-namespace Ytake\LaravelCouchbase\Database;
-
-use Illuminate\Database\Query\Builder;
+namespace Ytake\LaravelCouchbase\Query;
 
 /**
- * Class QueryBuilder
- * supported N1QL.
- *
- * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
- *
- * @see    http://developer.couchbase.com/documentation/server/4.1/n1ql/n1ql-language-reference/index.html
+ * Class Builder
  */
-class QueryBuilder extends Builder
+class Builder extends \Illuminate\Database\Query\Builder
 {
     /**
      * The database connection instance.

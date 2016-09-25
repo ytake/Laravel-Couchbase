@@ -41,10 +41,6 @@ class PrimaryIndexCreatorCommandTest extends \CouchbaseTestCase
         /** @var \Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->databaseManager->connection('couchbase');
         $bucket = $connection->openBucket($this->bucket);
-        $indexes = $bucket->manager()->listN1qlIndexes();
-        foreach ($indexes as $index) {
-            $this->assertInstanceOf('CouchbaseN1qlIndex', $index);
-        }
         $bucket->manager()->dropN1qlPrimaryIndex();
         $clusterManager->removeBucket($this->bucket);
         sleep(5);

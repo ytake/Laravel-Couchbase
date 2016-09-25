@@ -1,0 +1,148 @@
+<?php
+
+
+namespace Ytake\LaravelCouchbase\Schema;
+
+use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
+
+/**
+ * Class Blueprint
+ */
+class Blueprint extends \Illuminate\Database\Schema\Blueprint
+{
+    /** @var  CouchbaseConnection */
+    protected $connection;
+
+    /** @var string[] */
+    protected $options = [
+        'bucketType'   => 'couchbase',
+        'saslPassword' => '',
+        'flushEnabled' => true,
+    ];
+
+    public function __call($name, array $arguments)
+    {
+        // TODO: Implement __call() method.
+        dd($name);
+    }
+
+    /**
+     * @param CouchbaseConnection $connection
+     */
+    public function connector(CouchbaseConnection $connection)
+    {
+        $this->connection = $connection;
+    }
+
+    /**
+     * @param array $options
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = array_merge($this->options, $options);
+    }
+
+    /**
+     * @return bool
+     */
+    public function create()
+    {
+        return $this->connection->manager()->createBucket($this->table, $this->options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function drop()
+    {
+        return $this->connection->manager()->removeBucket($this->table);
+    }
+
+    /**
+     * drop for N1QL primary index
+     *
+     * @param string $index
+     * @param bool   $ignoreIfNotExist
+     *
+     * @return mixed
+     */
+    public function dropPrimary($index = null, $ignoreIfNotExist = false)
+    {
+        $index = (is_null($index)) ? "" : $index;
+        return $this->connection->openBucket($this->getTable())
+            ->manager()->dropN1qlPrimaryIndex($index, $ignoreIfNotExist);
+    }
+
+    /**
+     * drop for N1QL secondary index
+     *
+     * @param string $index
+     * @param bool   $ignoreIfNotExist
+     *
+     * @return mixed
+     */
+    public function dropIndex($index, $ignoreIfNotExist = false)
+    {
+        return $this->connection->openBucket($this->getTable())
+            ->manager()->dropN1qlIndex($index, $ignoreIfNotExist);
+    }
+
+    /**
+     * Specify the primary index for the current bucket.
+     *
+     * @param  string|null $name
+     * @param boolean      $ignoreIfExist if a primary index already exists, an exception will be thrown unless this is
+     *                                    set to true.
+     * @param boolean      $defer         true to defer building of the index until buildN1qlDeferredIndexes()}is
+     *                                    called (or a direct call to the corresponding query service API).
+     *
+     * @return mixed
+     */
+    public function primaryIndex($name = null, $ignoreIfExist = false, $defer = false)
+    {
+        $name = (is_null($name)) ? "" : $name;
+
+        return $this->connection->openBucket($this->getTable())
+            ->manager()->createN1qlPrimaryIndex(
+                $name,
+                $ignoreIfExist,
+                $defer
+            );
+    }
+
+    /**
+     * Specify a secondary index for the current bucket.
+     *
+     * @param array   $columns            the JSON fields to index.
+     * @param string  $name               the name of the index.
+     * @param string  $whereClause        the WHERE clause of the index.
+     * @param boolean $ignoreIfExist      if a secondary index already exists with that name, an exception will be
+     *                                    thrown unless this is set to true.
+     * @param boolean $defer              true to defer building of the index until buildN1qlDeferredIndexes() is
+     *                                    called (or a direct call to the corresponding query service API).
+     *
+     * @return mixed
+     */
+    public function index($columns, $name = null, $whereClause = '', $ignoreIfExist = false, $defer = false)
+    {
+        $name = (is_null($name)) ? $this->getTable() . "_secondary_index" : $name;
+        return $this->connection->openBucket($this->getTable())
+            ->manager()->createN1qlIndex(
+                $name,
+                $columns,
+                $whereClause,
+                $ignoreIfExist,
+                $defer
+            );
+    }
+
+    /**
+     * Get the table the blueprint describes.
+     *
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+}
