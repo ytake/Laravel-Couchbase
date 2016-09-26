@@ -363,7 +363,7 @@ class CouchbaseConnection extends Connection
     /**
      * {@inheritdoc}
      */
-    public function transaction(Closure $callback)
+    public function transaction(Closure $callback, $attempts = 1)
     {
         throw new NotSupportedException(__METHOD__);
     }
