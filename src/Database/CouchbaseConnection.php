@@ -17,7 +17,6 @@ use CouchbaseBucket;
 use Illuminate\Database\Connection;
 use Ytake\LaravelCouchbase\Query\View;
 use Ytake\LaravelCouchbase\Schema\Builder;
-use Ytake\LaravelCouchbase\VersionTrait;
 use Ytake\LaravelCouchbase\Query\Grammar;
 use Ytake\LaravelCouchbase\Query\Processor;
 use Ytake\LaravelCouchbase\Events\QueryPrepared;
@@ -32,8 +31,6 @@ use Ytake\LaravelCouchbase\Exceptions\NotSupportedException;
  */
 class CouchbaseConnection extends Connection
 {
-    use VersionTrait;
-
     /** @var string */
     protected $bucket;
 
@@ -199,7 +196,7 @@ class CouchbaseConnection extends Connection
      */
     protected function createConnection()
     {
-        $this->setReconnector(function ($connection) {
+        $this->setReconnector(function () {
             $this->connection = (new CouchbaseConnector)->connect($this->config);
 
             return $this;
@@ -302,20 +299,12 @@ class CouchbaseConnection extends Connection
                 return [];
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
-            if ($this->breakingVersion()) {
-                $query->consistency($this->consistency);
-                $query->positionalParams($bindings);
-                $result = $this->executeQuery($query);
-                $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
-
-                return (isset($result->rows)) ? $result->rows : [];
-            }
-            // @codeCoverageIgnoreStart
-            $query->options['args'] = $bindings;
             $query->consistency($this->consistency);
+            $query->positionalParams($bindings);
+            $result = $this->executeQuery($query);
+            $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
-            return $this->executeQuery($query);
-            // @codeCoverageIgnoreEnd
+            return (isset($result->rows)) ? $result->rows : [];
         });
     }
 
@@ -340,25 +329,12 @@ class CouchbaseConnection extends Connection
                 return 0;
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
-
-            if ($this->breakingVersion()) {
-                $query->consistency($this->consistency);
-                $query->namedParams(['parameters' => $bindings]);
-                $result = $this->executeQuery($query);
-                $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
-
-                return (isset($result->rows[0])) ? $result->rows[0] : false;
-            }
-            // @codeCoverageIgnoreStart
             $query->consistency($this->consistency);
-            $bucket = $this->openBucket($this->bucket);
-            $this->registerOption($bucket);
-            $this->firePreparedQuery($query);
-            $result = $bucket->query($query, ['parameters' => $bindings]);
-            $this->fireReturning($result);
+            $query->namedParams(['parameters' => $bindings]);
+            $result = $this->executeQuery($query);
+            $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
-            return (isset($result[0])) ? $result[0] : false;
-            // @codeCoverageIgnoreEnd
+            return (isset($result->rows[0])) ? $result->rows[0] : false;
         });
     }
 
@@ -375,23 +351,12 @@ class CouchbaseConnection extends Connection
                 return 0;
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
-
-            if ($this->breakingVersion()) {
-                $query->consistency($this->consistency);
-                $query->positionalParams($bindings);
-                $result = $this->executeQuery($query);
-                $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
-
-                return (isset($result->rows[0])) ? $result->rows[0] : false;
-            }
-
-            // @codeCoverageIgnoreStart
             $query->consistency($this->consistency);
-            $query->options['args'] = $bindings;
+            $query->positionalParams($bindings);
             $result = $this->executeQuery($query);
+            $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
-            return (isset($result[0])) ? $result[0] : false;
-            // @codeCoverageIgnoreEnd
+            return (isset($result->rows[0])) ? $result->rows[0] : false;
         });
     }
 
@@ -476,7 +441,7 @@ class CouchbaseConnection extends Connection
     /**
      * Get a new query builder instance.
      *
-     * @return QueryBuilder|\Illuminate\Database\Query\Builder|Builder
+     * @return QueryBuilder
      */
     public function query()
     {

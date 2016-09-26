@@ -15,6 +15,7 @@ namespace Ytake\LaravelCouchbase;
 /**
  * Class MemcachedConnector.
  * for couchbase memcached bucket.
+ * @codeCoverageIgnore
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */

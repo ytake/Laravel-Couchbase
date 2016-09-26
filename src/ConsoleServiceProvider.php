@@ -18,6 +18,7 @@ use Ytake\LaravelCouchbase\Console\IndexFinderCommand;
 use Ytake\LaravelCouchbase\Console\IndexRemoverCommand;
 use Ytake\LaravelCouchbase\Console\PrimaryIndexCreatorCommand;
 use Ytake\LaravelCouchbase\Console\PrimaryIndexRemoverCommand;
+use Ytake\LaravelCouchbase\Migrations\CouchbaseMigrationRepository;
 
 /**
  * Class ConsoleServiceProvider.
@@ -39,7 +40,11 @@ class ConsoleServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // TODO: Implement register() method.
+        $this->app->singleton('migration.repository', function ($app) {
+            $table = $app['config']['database.migrations'];
+
+            return new CouchbaseMigrationRepository($app['db'], $table);
+        });
     }
 
     /**
@@ -82,6 +87,7 @@ class ConsoleServiceProvider extends ServiceProvider
             'command.couchbase.primary.index.drop',
             'command.couchbase.index.create',
             'command.couchbase.index.drop',
+            'migration.repository',
         ];
     }
 }

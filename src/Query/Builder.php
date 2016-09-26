@@ -73,18 +73,8 @@ class Builder extends \Illuminate\Database\Query\Builder
         if (empty($values)) {
             return true;
         }
-
-        if (!is_array(reset($values))) {
-            $values = [$values];
-        } else {
-            foreach ($values as $key => $value) {
-                ksort($value);
-                $values[$key] = $value;
-            }
-        }
-
+        $values = $this->detectValues($values);
         $bindings = [];
-
         foreach ($values as $record) {
             foreach ($record as $key => $value) {
                 $bindings[$key] = $value;
@@ -108,18 +98,8 @@ class Builder extends \Illuminate\Database\Query\Builder
         if (empty($values)) {
             return true;
         }
-
-        if (!is_array(reset($values))) {
-            $values = [$values];
-        } else {
-            foreach ($values as $key => $value) {
-                ksort($value);
-                $values[$key] = $value;
-            }
-        }
-
+        $values = $this->detectValues($values);
         $bindings = [];
-
         foreach ($values as $record) {
             foreach ($record as $key => $value) {
                 $bindings[$key] = $value;
@@ -129,5 +109,24 @@ class Builder extends \Illuminate\Database\Query\Builder
         $sql = $this->grammar->compileUpsert($this, $values);
 
         return $this->connection->upsert($sql, $bindings);
+    }
+
+    /**
+     * @param string|int|array $values
+     *
+     * @return array
+     */
+    protected function detectValues($values)
+    {
+        if (!is_array(reset($values))) {
+            $values = [$values];
+        } else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+                $values[$key] = $value;
+            }
+        }
+
+        return $values;
     }
 }

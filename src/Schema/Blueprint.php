@@ -75,10 +75,8 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
      */
     public function dropPrimary($index = null, $ignoreIfNotExist = false)
     {
-        $index = (is_null($index)) ? "" : $index;
-
         return $this->connection->openBucket($this->getTable())
-            ->manager()->dropN1qlPrimaryIndex($index, $ignoreIfNotExist);
+            ->manager()->dropN1qlPrimaryIndex($this->detectIndexName($index), $ignoreIfNotExist);
     }
 
     /**
@@ -108,11 +106,9 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
      */
     public function primaryIndex($name = null, $ignoreIfExist = false, $defer = false)
     {
-        $name = (is_null($name)) ? "" : $name;
-
         return $this->connection->openBucket($this->getTable())
             ->manager()->createN1qlPrimaryIndex(
-                $name,
+                $index = $this->detectIndexName($name),
                 $ignoreIfExist,
                 $defer
             );
@@ -153,5 +149,17 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
     public function getTable()
     {
         return $this->table;
+    }
+
+    /**
+     * @param $index
+     *
+     * @return string
+     */
+    protected function detectIndexName($index):string
+    {
+        $index = (is_null($index)) ? "" : $index;
+
+        return $index;
     }
 }

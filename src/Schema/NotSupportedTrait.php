@@ -18,6 +18,7 @@ use Ytake\LaravelCouchbase\Exceptions\NotSupportedException;
 
 /**
  * Trait NotSupportedTrait
+ *
  * @codeCoverageIgnore
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
