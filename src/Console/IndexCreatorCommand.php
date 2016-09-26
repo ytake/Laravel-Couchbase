@@ -19,35 +19,23 @@ use Symfony\Component\Console\Input\InputArgument;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
 /**
- * Class IndexFinderCommand
+ * Class IndexCreatorCommand
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
-class IndexFinderCommand extends Command
+class IndexCreatorCommand extends Command
 {
     /** @var string */
-    protected $name = 'couchbase:indexes';
+    protected $name = 'couchbase:create-index';
 
     /** @var string */
-    protected $description = 'List all N1QL indexes that are registered for the current bucket.';
+    protected $description = 'Create a secondary index for the current bucket.';
 
     /** @var DatabaseManager */
     protected $databaseManager;
 
     /** @var string */
     protected $defaultDatabase = 'couchbase';
-
-    /** @var string[] */
-    private $headers = [
-        "name",
-        "isPrimary",
-        "type",
-        "state",
-        "keyspace",
-        "namespace",
-        "fields",
-        "condition",
-    ];
 
     /**
      * IndexFinderCommand constructor.
@@ -67,6 +55,8 @@ class IndexFinderCommand extends Command
     {
         return [
             ['bucket', InputArgument::REQUIRED, 'Represents a bucket connection.'],
+            ['name', InputArgument::REQUIRED, 'the name of the index.'],
+            ['fields', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'the JSON fields to index.'],
         ];
     }
 
@@ -79,6 +69,25 @@ class IndexFinderCommand extends Command
     {
         return [
             ['database', 'db', InputOption::VALUE_REQUIRED, 'The database connection to use.', $this->defaultDatabase],
+            [
+                'where',
+                'w',
+                InputOption::VALUE_REQUIRED,
+                'the WHERE clause of the index.',
+                '',
+            ],
+            [
+                'ignore',
+                'ig',
+                InputOption::VALUE_NONE,
+                'if a primary index already exists, an exception will be thrown unless this is set to true.',
+            ],
+            [
+                'defer',
+                'd',
+                InputOption::VALUE_NONE,
+                'true to defer building of the index until buildN1qlDeferredIndexes()}is called (or a direct call to the corresponding query service API)',
+            ],
         ];
     }
 
@@ -87,23 +96,25 @@ class IndexFinderCommand extends Command
      */
     public function fire()
     {
-        $row = [];
-        $tableRows = [];
         /** @var \Illuminate\Database\Connection|CouchbaseConnection $connection */
         $connection = $this->databaseManager->connection($this->option('database'));
         if ($connection instanceof CouchbaseConnection) {
-            $bucket = $connection->getCouchbase()->openBucket($this->argument('bucket'));
-            $indexes = $bucket->manager()->listN1qlIndexes();
-            foreach ($indexes as $index) {
-                foreach ($index as $key => $value) {
-                    if (array_search($key, $this->headers) !== false) {
-                        $row[] = (!is_array($value)) ? $value : implode(",", $value);
-                    }
-                }
-                $tableRows[] = $row;
-                $row = [];
+            $bucket = $connection->openBucket($this->argument('bucket'));
+            $fields = $this->argument('fields');
+            $whereClause = $this->option('where');
+            $name = $this->argument('name');
+            $bucket->manager()->createN1qlIndex(
+                $name,
+                $fields,
+                $whereClause,
+                $this->option('ignore'),
+                $this->option('defer')
+            );
+            $field = implode(",", $fields);
+            $this->info("created SECONDARY INDEX [{$name}] fields [{$field}], for [{$this->argument('bucket')}] bucket.");
+            if ($whereClause !== '') {
+                $this->comment("WHERE clause [{$whereClause}]");
             }
-            $this->table($this->headers, $tableRows);
         }
 
         return;

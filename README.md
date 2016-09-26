@@ -25,7 +25,7 @@ your config/app.php
 'providers' => [
     // added service provider
     \Ytake\LaravelCouchbase\CouchbaseServiceProvider::class,
-    //
+    \Ytake\LaravelCouchbase\ConsoleServiceProvider::class,
 ]
 ```
 
@@ -33,6 +33,7 @@ your config/app.php
 ### database extension
 
 add database driver(config/database.php)
+
 ```php
 
 'couchbase' => [
@@ -40,10 +41,16 @@ add database driver(config/database.php)
     'host' => 'couchbase://127.0.0.1',
     'user' => 'userName', // optional administrator
     'password' => 'password', // optional administrator
+    // optional configuration / management operations against a bucket.
+    'administrator' => [
+        'user'     => 'Administrator',
+        'password' => 'password',
+    ],
 ],
 ```
 
 case cluster
+
 ```php
 
 'couchbase' => [
@@ -84,10 +91,10 @@ $value = [
 ];
 $key = 'insert:and:delete';
 
-$result = $this->app['db']->connection('couchbase')
+$result = \DB::connection('couchbase')
     ->table('testing')->key($key)->insert($value);
 
-$this->app['db']->connection('couchbase')
+\DB::connection('couchbase')
     ->table('testing')->key($key)->upsert([
         'click'   => 'to edit',
         'content' => 'testing for upsert',
@@ -97,10 +104,10 @@ $this->app['db']->connection('couchbase')
 #### DELETE / UPDATE
 
 ```php
-$this->app['db']->connection('couchbase')
+\DB::connection('couchbase')
     ->table('testing')->key($key)->where('clicking', 'to edit')->delete();
 
-$this->app['db']->connection('couchbase')
+\DB::connection('couchbase')
     ->table('testing')->key($key)
     ->where('click', 'to edit')->update(
         ['click' => 'testing edit']
@@ -109,6 +116,7 @@ $this->app['db']->connection('couchbase')
 
 ##### execute queries
 example)
+
 ````php
 "delete from testing USE KEYS "delete" RETURNING *"
 "update testing USE KEYS "insert" set click = ? where click = ? RETURNING *"
@@ -117,8 +125,9 @@ example)
 #### returning
 
 default *
+
 ```php
-$this->app['db']->connection('couchbase')
+\DB::connection('couchbase')
     ->table('testing')
     ->where('id', 1)
     ->offset($from)->limit($perPage)
@@ -126,10 +135,18 @@ $this->app['db']->connection('couchbase')
     ->returning(['id', 'name'])->get();
 ```
 
+#### View Query
+
+```php
+$view = \DB::view("testing");
+$result = $view->execute($view->from("dev_testing", "testing"));
+```
+
 ### cache extension
 #### for bucket type couchbase
 
 *config/cache.php*
+
 ```php
 'couchbase' => [
    'driver' => 'couchbase',
@@ -156,9 +173,12 @@ $this->app['db']->connection('couchbase')
 ],
 ```
 
+*not supported*
+
 ### couchbase bucket, use bucket password
 
 *config/cache.php*
+
 ```php
 'couchbase' => [
    'driver' => 'couchbase',
@@ -185,6 +205,56 @@ $this->app['db']->connection('couchbase')
     ->returning(['id', 'name'])->get();
 ```
 
+#### callable consistency
+
+```php
+$this->app['db']->connection('couchbase')
+    ->callableConsistency(\CouchbaseN1qlQuery::REQUEST_PLUS, function ($con) {
+        return $con->table('testing')->where('id', 1)->returning(['id', 'name'])->get();           
+    });
+```
+
+### Event
+for N1QL
+
+| events | description |
+| ------------- | ------------- |
+| \Ytake\LaravelCouchbase\Events\QueryPrepared | get n1ql query |
+| \Ytake\LaravelCouchbase\Events\ResultReturning | get all property from returned result |
+| \Ytake\LaravelCouchbase\Events\ViewQuerying | for view query (request uri) |
+
+### Schema / Migrations
+The database driver also has (limited) schema builder support.  
+easily manipulate indexes(primary and secondary)
+
+```php
+use Ytake\LaravelCouchbase\Schema\Blueprint as CouchbaseBlueprint;
+
+\Schema::create('samples', function (CouchbaseBlueprint $table) {
+    $table->primaryIndex(); // primary index
+    $table->index(['message', 'identifier'], 'sample_secondary_index'); // secondary index
+    // dropped
+    $table->dropIndex('sample_secondary_index'); 
+    $table->dropPrimary();
+});
+```
+
+Supported operations:
+
+ - create and drop
+ - index and dropIndex (primary index and secondary index)
+
+### Artisan
+for couchbase manipulate indexes
+
+| commands | description |
+| ------------- | ------------- |
+| couchbase:create-index | Create a secondary index for the current bucket. |
+| couchbase:create-primary-index | Create a primary N1QL index for the current bucket. |
+| couchbase:drop-index | Drop the given secondary index associated with the current bucket. |
+| couchbase:drop-primary-index | Drop the given primary index associated with the current bucket. |
+| couchbase:indexes | List all N1QL indexes that are registered for the current bucket. |
+
 ## hacking
 
 To run tests there are should be following buckets created on local Couchbase cluster:
@@ -200,3 +270,8 @@ $bucketManager->createN1qlPrimaryIndex();
 ```
 
 Also tests are expecting regular Memcached daemon listening on port 11255.
+
+## soon
+ - couchbase queue driver
+ - authintication driver
+ - Eloquent support

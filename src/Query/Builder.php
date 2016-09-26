@@ -10,19 +10,12 @@
  * THE SOFTWARE.
  */
 
-namespace Ytake\LaravelCouchbase\Database;
-
-use Illuminate\Database\Query\Builder;
+namespace Ytake\LaravelCouchbase\Query;
 
 /**
- * Class QueryBuilder
- * supported N1QL.
- *
- * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
- *
- * @see    http://developer.couchbase.com/documentation/server/4.1/n1ql/n1ql-language-reference/index.html
+ * Class Builder
  */
-class QueryBuilder extends Builder
+class Builder extends \Illuminate\Database\Query\Builder
 {
     /**
      * The database connection instance.
@@ -80,18 +73,8 @@ class QueryBuilder extends Builder
         if (empty($values)) {
             return true;
         }
-
-        if (!is_array(reset($values))) {
-            $values = [$values];
-        } else {
-            foreach ($values as $key => $value) {
-                ksort($value);
-                $values[$key] = $value;
-            }
-        }
-
+        $values = $this->detectValues($values);
         $bindings = [];
-
         foreach ($values as $record) {
             foreach ($record as $key => $value) {
                 $bindings[$key] = $value;
@@ -115,18 +98,8 @@ class QueryBuilder extends Builder
         if (empty($values)) {
             return true;
         }
-
-        if (!is_array(reset($values))) {
-            $values = [$values];
-        } else {
-            foreach ($values as $key => $value) {
-                ksort($value);
-                $values[$key] = $value;
-            }
-        }
-
+        $values = $this->detectValues($values);
         $bindings = [];
-
         foreach ($values as $record) {
             foreach ($record as $key => $value) {
                 $bindings[$key] = $value;
@@ -136,5 +109,24 @@ class QueryBuilder extends Builder
         $sql = $this->grammar->compileUpsert($this, $values);
 
         return $this->connection->upsert($sql, $bindings);
+    }
+
+    /**
+     * @param string|int|array $values
+     *
+     * @return array
+     */
+    protected function detectValues($values)
+    {
+        if (!is_array(reset($values))) {
+            $values = [$values];
+        } else {
+            foreach ($values as $key => $value) {
+                ksort($value);
+                $values[$key] = $value;
+            }
+        }
+
+        return $values;
     }
 }

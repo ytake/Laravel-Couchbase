@@ -20,6 +20,7 @@
             <directory>./src</directory>
             <exclude>
                 <file>./src/CouchbaseServiceProvider.php</file>
+                <file>./src/ConsoleServiceProvider.php</file>
             </exclude>
         </whitelist>
     </filter>

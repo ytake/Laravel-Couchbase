@@ -15,12 +15,14 @@ namespace Ytake\LaravelCouchbase\Database;
 use Closure;
 use CouchbaseBucket;
 use Illuminate\Database\Connection;
-use Ytake\LaravelCouchbase\Events\QueryPrepared;
-use Ytake\LaravelCouchbase\Events\ResultReturning;
+use Ytake\LaravelCouchbase\Query\View;
+use Ytake\LaravelCouchbase\Schema\Builder;
 use Ytake\LaravelCouchbase\Query\Grammar;
 use Ytake\LaravelCouchbase\Query\Processor;
+use Ytake\LaravelCouchbase\Events\QueryPrepared;
+use Ytake\LaravelCouchbase\Events\ResultReturning;
+use Ytake\LaravelCouchbase\Query\Builder as QueryBuilder;
 use Ytake\LaravelCouchbase\Exceptions\NotSupportedException;
-use Ytake\LaravelCouchbase\VersionTrait;
 
 /**
  * Class CouchbaseConnection.
@@ -29,8 +31,6 @@ use Ytake\LaravelCouchbase\VersionTrait;
  */
 class CouchbaseConnection extends Connection
 {
-    use VersionTrait;
-
     /** @var string */
     protected $bucket;
 
@@ -74,12 +74,15 @@ class CouchbaseConnection extends Connection
         'htconfigIdleTimeout',
     ];
 
+    /** @var array */
+    protected $config = [];
+
     /**
      * @param array $config
      */
     public function __construct(array $config)
     {
-        $this->connection = $this->createConnection($config);
+        $this->config = $config;
         $this->getManagedConfigure($config);
 
         $this->useDefaultQueryGrammar();
@@ -100,13 +103,23 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @param $name
+     * @param string $name
      *
      * @return \CouchbaseBucket
+     *
+     * @throws \CouchbaseException
      */
     public function openBucket($name)
     {
-        return $this->connection->openBucket($name, $this->bucketPassword);
+        return $this->getCouchbase()->openBucket($name, $this->bucketPassword);
+    }
+
+    /**
+     * @return \CouchbaseClusterManager
+     */
+    public function manager()
+    {
+        return $this->getCouchbase()->manager($this->managerUser, $this->managerPassword);
     }
 
     /**
@@ -153,31 +166,43 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @param array $config
+     * @return Builder|\Illuminate\Database\Schema\Builder
+     */
+    public function getSchemaBuilder()
+    {
+        return new Builder($this);
+    }
+
+    /**
+     *
+     * @param array $config enable(array), options(array), administrator(array), bucket_password(string)
      */
     protected function getManagedConfigure(array $config)
     {
         $this->enableN1qlServers = (isset($config['enables'])) ? $config['enables'] : [];
         $this->options = (isset($config['options'])) ? $config['options'] : [];
-        $manager = (isset($config['manager'])) ? $config['manager'] : null;
-        if (is_null($manager)) {
-            $this->managerUser = (isset($config['user'])) ? $config['user'] : null;
-            $this->managerPassword = (isset($config['password'])) ? $config['password'] : null;
-
-            return;
+        $manager = (isset($config['administrator'])) ? $config['administrator'] : null;
+        $this->managerUser = '';
+        $this->managerPassword = '';
+        if (!is_null($manager)) {
+            $this->managerUser = $config['administrator']['user'];
+            $this->managerPassword = $config['administrator']['password'];
         }
-        $this->managerUser = $config['manager']['user'];
-        $this->managerPassword = $config['manager']['password'];
+        $this->bucketPassword = (isset($config['bucket_password'])) ? $config['bucket_password'] : '';
     }
 
     /**
-     * @param $dsn
-     *
      * @return \CouchbaseCluster
      */
-    protected function createConnection($dsn)
+    protected function createConnection()
     {
-        return (new CouchbaseConnector)->connect($dsn);
+        $this->setReconnector(function () {
+            $this->connection = (new CouchbaseConnector)->connect($this->config);
+
+            return $this;
+        });
+
+        return (new CouchbaseConnector)->connect($this->config);
     }
 
     /**
@@ -193,19 +218,21 @@ class CouchbaseConnection extends Connection
      */
     public function getCouchbase()
     {
+        if (is_null($this->connection)) {
+            $this->connection = $this->createConnection();
+        }
+
         return $this->connection;
     }
 
     /**
      * @param string $table
      *
-     * @return \Ytake\LaravelCouchbase\Database\QueryBuilder
+     * @return QueryBuilder
      */
     public function table($table)
     {
-        $this->bucket = $table;
-
-        return $this->query()->from($table);
+        return $this->bucket($table)->query()->from($table);
     }
 
     /**
@@ -272,20 +299,12 @@ class CouchbaseConnection extends Connection
                 return [];
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
-            if ($this->breakingVersion()) {
-                $query->consistency($this->consistency);
-                $query->positionalParams($bindings);
-                $result = $this->executeQuery($query);
-                $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
-
-                return (isset($result->rows)) ? $result->rows : [];
-            }
-            // @codeCoverageIgnoreStart
-            $query->options['args'] = $bindings;
             $query->consistency($this->consistency);
+            $query->positionalParams($bindings);
+            $result = $this->executeQuery($query);
+            $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
-            return $this->executeQuery($query);
-            // @codeCoverageIgnoreEnd
+            return (isset($result->rows)) ? $result->rows : [];
         });
     }
 
@@ -310,25 +329,12 @@ class CouchbaseConnection extends Connection
                 return 0;
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
-
-            if ($this->breakingVersion()) {
-                $query->consistency($this->consistency);
-                $query->namedParams(['parameters' => $bindings]);
-                $result = $this->executeQuery($query);
-                $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
-
-                return (isset($result->rows[0])) ? $result->rows[0] : false;
-            }
-            // @codeCoverageIgnoreStart
             $query->consistency($this->consistency);
-            $bucket = $this->openBucket($this->bucket);
-            $this->registerOption($bucket);
-            $this->firePreparedQuery($query);
-            $result = $bucket->query($query, ['parameters' => $bindings]);
-            $this->fireReturning($result);
+            $query->namedParams(['parameters' => $bindings]);
+            $result = $this->executeQuery($query);
+            $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
-            return (isset($result[0])) ? $result[0] : false;
-            // @codeCoverageIgnoreEnd
+            return (isset($result->rows[0])) ? $result->rows[0] : false;
         });
     }
 
@@ -345,23 +351,12 @@ class CouchbaseConnection extends Connection
                 return 0;
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
-
-            if ($this->breakingVersion()) {
-                $query->consistency($this->consistency);
-                $query->positionalParams($bindings);
-                $result = $this->executeQuery($query);
-                $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
-
-                return (isset($result->rows[0])) ? $result->rows[0] : false;
-            }
-
-            // @codeCoverageIgnoreStart
             $query->consistency($this->consistency);
-            $query->options['args'] = $bindings;
+            $query->positionalParams($bindings);
             $result = $this->executeQuery($query);
+            $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
-            return (isset($result[0])) ? $result[0] : false;
-            // @codeCoverageIgnoreEnd
+            return (isset($result->rows[0])) ? $result->rows[0] : false;
         });
     }
 
@@ -446,13 +441,25 @@ class CouchbaseConnection extends Connection
     /**
      * Get a new query builder instance.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return QueryBuilder
      */
     public function query()
     {
         return new QueryBuilder(
             $this, $this->getQueryGrammar(), $this->getPostProcessor()
         );
+    }
+
+    /**
+     * @param string|null $bucket
+     *
+     * @return View
+     */
+    public function view($bucket = null)
+    {
+        $bucket = is_null($bucket) ? $this->bucket : $bucket;
+
+        return new View($this->openBucket($bucket), $this->events);
     }
 
     /**

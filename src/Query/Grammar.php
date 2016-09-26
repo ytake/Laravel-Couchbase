@@ -13,8 +13,8 @@
 namespace Ytake\LaravelCouchbase\Query;
 
 use Illuminate\Database\Query\Builder;
+use Ytake\LaravelCouchbase\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Grammars\Grammar as IlluminateGrammar;
-use Ytake\LaravelCouchbase\Database\QueryBuilder;
 
 /**
  * Class Grammar.

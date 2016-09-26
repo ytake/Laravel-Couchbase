@@ -17,6 +17,7 @@
   "license": "MIT",
   "require": {
     "php": ">=5.5.9",
+    "ext-couchbase": ">=2.2.0",
     "illuminate/support": "5.1.*|5.2.*",
     "illuminate/config": "5.1.*|5.2.*",
     "illuminate/console": "5.1.*|5.2.*",
@@ -29,7 +30,7 @@
   "require-dev": {
     "symfony/framework-bundle": "~2.0|~3.0",
     "symfony/console": "~2.0|~3.0",
-    "phpunit/phpunit": "4.*",
+    "phpunit/phpunit": "~4.0|~5.0",
     "satooshi/php-coveralls": "*",
     "phing/phing": "~2.0",
     "friendsofphp/php-cs-fixer": "~1.0"
@@ -44,11 +45,9 @@
   },
   "autoload-dev": {
     "classmap": [
-      "tests/CouchbaseTestCase.php"
+      "tests/CouchbaseTestCase.php",
+      "tests/MockApplication.php"
     ]
-  },
-  "suggest": {
-    "ext-couchbase": "for n1ql query builder, use bucket type couchbase require"
   },
   "scripts": {
     "test": [
