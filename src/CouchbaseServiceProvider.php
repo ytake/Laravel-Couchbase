@@ -81,16 +81,6 @@ class CouchbaseServiceProvider extends ServiceProvider
             /** @var \CouchbaseCluster $cluster */
             $cluster = $app['db']->connection($config['driver'])->getCouchbase();
             $password = (isset($config['bucket_password'])) ? $config['bucket_password'] : '';
-            if (floatval($this->app->version()) <= 5.1) {
-                return new Repository(
-                    new LegacyCouchbaseStore(
-                        $cluster,
-                        $config['bucket'],
-                        $password,
-                        $app['config']->get('cache.prefix'))
-                );
-            }
-
             return new Repository(
                 new CouchbaseStore(
                     $cluster,
