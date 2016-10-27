@@ -71,7 +71,7 @@ class IndexCreatorCommand extends Command
             ['database', 'db', InputOption::VALUE_REQUIRED, 'The database connection to use.', $this->defaultDatabase],
             [
                 'where',
-                'w',
+                null,
                 InputOption::VALUE_REQUIRED,
                 'the WHERE clause of the index.',
                 '',
