@@ -67,7 +67,7 @@ class PrimaryIndexRemoverCommand extends Command
     {
         return [
             ['database', 'db', InputOption::VALUE_REQUIRED, 'The database connection to use.', $this->defaultDatabase],
-            ['name', 'n', InputOption::VALUE_REQUIRED, 'the custom name for the primary index.', '#primary'],
+            ['name', null, InputOption::VALUE_REQUIRED, 'the custom name for the primary index.', '#primary'],
             [
                 'ignore',
                 'ig',

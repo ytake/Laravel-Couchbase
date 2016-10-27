@@ -13,6 +13,8 @@ cache, session, database extension package
 [![Packagist](https://img.shields.io/packagist/v/ytake/laravel-couchbase.svg?style=flat-square)](https://packagist.org/packages/ytake/laravel-couchbase)
 [![Packagist](https://img.shields.io/packagist/l/ytake/laravel-couchbase.svg?style=flat-square)](https://packagist.org/packages/ytake/laravel-couchbase)
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/944f9bc0-7ee6-4f5f-b371-8ec216ea317e/mini.png)](https://insight.sensiolabs.com/projects/944f9bc0-7ee6-4f5f-b371-8ec216ea317e)
+
 ## install
 
 ### for composer command

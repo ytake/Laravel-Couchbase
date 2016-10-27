@@ -67,7 +67,7 @@ class PrimaryIndexCreatorCommand extends Command
     {
         return [
             ['database', 'db', InputOption::VALUE_REQUIRED, 'The database connection to use.', $this->defaultDatabase],
-            ['name', 'n', InputOption::VALUE_REQUIRED, 'the custom name for the primary index.', '#primary'],
+            ['name', null, InputOption::VALUE_REQUIRED, 'the custom name for the primary index.', '#primary'],
             [
                 'ignore',
                 'ig',
@@ -76,7 +76,7 @@ class PrimaryIndexCreatorCommand extends Command
             ],
             [
                 'defer',
-                'd',
+                null,
                 InputOption::VALUE_NONE,
                 'true to defer building of the index until buildN1qlDeferredIndexes()}is called (or a direct call to the corresponding query service API)',
             ],
