@@ -71,7 +71,7 @@ class IndexCreatorCommand extends Command
             ['database', 'db', InputOption::VALUE_REQUIRED, 'The database connection to use.', $this->defaultDatabase],
             [
                 'where',
-                'w',
+                null,
                 InputOption::VALUE_REQUIRED,
                 'the WHERE clause of the index.',
                 '',
@@ -84,7 +84,7 @@ class IndexCreatorCommand extends Command
             ],
             [
                 'defer',
-                'd',
+                null,
                 InputOption::VALUE_NONE,
                 'true to defer building of the index until buildN1qlDeferredIndexes()}is called (or a direct call to the corresponding query service API)',
             ],
