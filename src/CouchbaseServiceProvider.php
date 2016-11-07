@@ -66,8 +66,8 @@ class CouchbaseServiceProvider extends ServiceProvider
         });
 
         // add couchbase extension
-        $this->app['db']->extend('couchbase', function ($config) {
-            return new CouchbaseConnection($config);
+        $this->app['db']->extend('couchbase', function ($config, $name) {
+            return new CouchbaseConnection($config, $name);
         });
     }
 
@@ -132,8 +132,10 @@ class CouchbaseServiceProvider extends ServiceProvider
             base_path() . '/vendor/ytake/laravel-couchbase/src/Database/CouchbaseConnector.php',
             base_path() . '/vendor/ytake/laravel-couchbase/src/Exceptions/FlushException.php',
             base_path() . '/vendor/ytake/laravel-couchbase/src/Exceptions/NotSupportedException.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Query/Builder.php',
             base_path() . '/vendor/ytake/laravel-couchbase/src/Query/Grammer.php',
             base_path() . '/vendor/ytake/laravel-couchbase/src/Query/Processor.php',
+            base_path() . '/vendor/ytake/laravel-couchbase/src/Query/View.php',
             base_path() . '/vendor/ytake/laravel-couchbase/src/CouchbaseServiceProvider.php',
         ];
     }
