@@ -74,11 +74,20 @@ class CouchbaseConnection extends Connection
         'htconfigIdleTimeout',
     ];
 
+    /** @var string */
+    private $name;
+
+    /** @var array */
+    protected $config;
+
     /**
-     * @param array $config
+     * @param array  $config
+     * @param string $name
      */
-    public function __construct(array $config)
+    public function __construct(array $config, $name)
     {
+        $this->name = $name;
+        $this->config = $config;
         $this->connection = $this->createConnection($config);
         $this->getManagedConfigure($config);
 
@@ -194,6 +203,14 @@ class CouchbaseConnection extends Connection
     public function getCouchbase()
     {
         return $this->connection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -507,5 +524,19 @@ class CouchbaseConnection extends Connection
         if (isset($this->events)) {
             $this->events->fire(new ResultReturning($returning));
         }
+    }
+
+    /**
+     * @param null|\PDO $pdo
+     * @return $this
+     */
+    public function setPdo($pdo)
+    {
+        $this->connection = $this->createConnection($this->config);
+        $this->getManagedConfigure($this->config);
+        $this->useDefaultQueryGrammar();
+        $this->useDefaultPostProcessor();
+
+        return $this;
     }
 }
