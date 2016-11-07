@@ -9,7 +9,8 @@ class DatabaseTest extends CouchbaseTestCase
     {
         parent::setUp();
         $this->connection = new \Ytake\LaravelCouchbase\Database\CouchbaseConnection(
-            $this->app['config']->get('database.connections.couchbase')
+            $this->app['config']->get('database.connections.couchbase'),
+            'couchbase'
         );
     }
 
@@ -65,5 +66,20 @@ class DatabaseTest extends CouchbaseTestCase
     {
         $bucket = $this->connection->openBucket('testing');
         static::assertInternalType('array', $this->connection->getOptions($bucket));
+    }
+
+    public function testShouldBeCouchbaseInstanceForReconnection()
+    {
+        /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $db */
+        $db = $this->app['db']->connection();
+        $this->assertSame('couchbase', $db->getName());
+        $bucket = $db->bucket('testing');
+        $db->disconnect();
+        $this->app['db']->reconnect();
+        $this->assertInstanceOf(get_class($bucket), $this->app['db']->connection()->bucket('testing'));
+        /** @var \Illuminate\Database\DatabaseManager $manager */
+        $manager = $this->app['db'];
+        $this->assertInstanceOf(Ytake\LaravelCouchbase\Database\CouchbaseConnection::class, $manager->reconnect());
+        $this->assertInstanceOf(Ytake\LaravelCouchbase\Database\CouchbaseConnection::class, $db->setPdo(null));
     }
 }
