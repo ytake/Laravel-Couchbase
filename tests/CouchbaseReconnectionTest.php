@@ -25,7 +25,7 @@ class CouchbaseReconnectionTest extends \CouchbaseTestCase
         $this->assertNull($property->getValue($couchbase));
         $couchbase = $database->reconnect('couchbase');
         $property = $this->getProtectProperty($couchbase, 'connection');
-        $this->assertNull($property->getValue($couchbase));
+        $this->assertInstanceOf(\CouchbaseCluster::class, $property->getValue($couchbase));
     }
 
     public function testShouldReturnedReconnectableConnectionInstance()

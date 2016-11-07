@@ -77,12 +77,17 @@ class CouchbaseConnection extends Connection
     /** @var array */
     protected $config = [];
 
+    /** @var string */
+    protected $name;
+
     /**
-     * @param array $config
+     * @param array  $config
+     * @param string $name
      */
-    public function __construct(array $config)
+    public function __construct(array $config, $name)
     {
         $this->config = $config;
+        $this->name = $name;
         $this->getManagedConfigure($config);
 
         $this->useDefaultQueryGrammar();
@@ -189,6 +194,14 @@ class CouchbaseConnection extends Connection
             $this->managerPassword = $config['administrator']['password'];
         }
         $this->bucketPassword = (isset($config['bucket_password'])) ? $config['bucket_password'] : '';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -514,5 +527,19 @@ class CouchbaseConnection extends Connection
         if (isset($this->events)) {
             $this->events->fire(new ResultReturning($returning));
         }
+    }
+
+    /**
+     * @param null|\PDO $pdo
+     *
+     * @return $this
+     */
+    public function setPdo($pdo)
+    {
+        $this->connection = $this->createConnection($this->config);
+        $this->getManagedConfigure($this->config);
+        $this->useDefaultQueryGrammar();
+        $this->useDefaultPostProcessor();
+        return $this;
     }
 }

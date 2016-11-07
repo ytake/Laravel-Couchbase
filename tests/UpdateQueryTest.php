@@ -9,7 +9,8 @@ class UpdateQueryTest extends CouchbaseTestCase
     {
         parent::setUp();
         $this->connection = new \Ytake\LaravelCouchbase\Database\CouchbaseConnection(
-            $this->app['config']->get('database.connections.couchbase')
+            $this->app['config']->get('database.connections.couchbase'),
+            'couchbase'
         );
     }
 
