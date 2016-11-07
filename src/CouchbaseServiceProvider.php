@@ -66,8 +66,9 @@ class CouchbaseServiceProvider extends ServiceProvider
         });
 
         // add couchbase extension
-        $this->app['db']->extend('couchbase', function ($config) {
-            return new CouchbaseConnection($config);
+        $this->app['db']->extend('couchbase', function ($config, $name) {
+            /* @var \CouchbaseCluster $cluster */
+            return new CouchbaseConnection($config, $name);
         });
     }
 
