@@ -44,6 +44,9 @@ class CouchbaseTestCase extends \PHPUnit_Framework_TestCase
         $this->app->singleton('db', function ($app) {
             return new DatabaseManager($app, $app['db.factory']);
         });
+        $this->app->bind('db.connection', function ($app) {
+            return $app['db']->connection();
+        });
     }
 
     protected function registerCache()
