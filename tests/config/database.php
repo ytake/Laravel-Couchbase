@@ -5,8 +5,7 @@ return [
     'connections' => [
         'couchbase' => [
             'driver'        => 'couchbase',
-            'host'          => '127.0.0.1',
-            'enables'       => ['127.0.0.1:8093'],
+            'host'          => 'couchbase://127.0.0.1?detailed_errcodes=1&http_poolsize=0&operation_timeout=4',
             // 'bucket_password' => null,
             // 'bucket' => '',
             'administrator' => [
