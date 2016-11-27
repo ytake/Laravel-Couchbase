@@ -15,6 +15,7 @@ namespace Ytake\LaravelCouchbase\Database;
 use Closure;
 use CouchbaseBucket;
 use Illuminate\Database\Connection;
+use Illuminate\Database\QueryException;
 use Ytake\LaravelCouchbase\Query\View;
 use Ytake\LaravelCouchbase\Schema\Builder;
 use Ytake\LaravelCouchbase\Query\Grammar;
@@ -536,7 +537,7 @@ class CouchbaseConnection extends Connection
      */
     public function setPdo($pdo)
     {
-        $this->connection = $this->createConnection($this->config);
+        $this->connection = $this->createConnection();
         $this->getManagedConfigure($this->config);
         $this->useDefaultQueryGrammar();
         $this->useDefaultPostProcessor();

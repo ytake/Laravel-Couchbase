@@ -13,17 +13,19 @@
 namespace Ytake\LaravelCouchbase;
 
 use Illuminate\Cache\Repository;
+use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Session\CacheBasedSessionHandler;
 use Ytake\LaravelCouchbase\Database\Connectable;
 use Ytake\LaravelCouchbase\Cache\CouchbaseStore;
-use Ytake\LaravelCouchbase\Cache\LegacyCouchbaseStore;
 use Ytake\LaravelCouchbase\Cache\MemcachedBucketStore;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnector;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
 /**
  * Class CouchbaseServiceProvider.
+ *
+ * @codeCoverageIgnore
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
@@ -36,6 +38,7 @@ class CouchbaseServiceProvider extends ServiceProvider
     {
         $this->registerCouchbaseBucketCacheDriver();
         $this->registerMemcachedBucketCacheDriver();
+        $this->registerCouchbaseQueueDriver();
     }
 
     /**
@@ -109,23 +112,12 @@ class CouchbaseServiceProvider extends ServiceProvider
         });
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @codeCoverageIgnore
-     */
-    public static function compiles()
+    protected function registerCouchbaseQueueDriver()
     {
-        return [
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Cache/CouchbaseStore.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Cache/MemcachedBucketStore.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Database/CouchbaseConnection.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Database/CouchbaseConnector.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Exceptions/FlushException.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Exceptions/NotSupportedException.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Query/Grammer.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/Query/Processor.php',
-            base_path() . '/vendor/ytake/laravel-couchbase/src/CouchbaseServiceProvider.php',
-        ];
+        /** @var QueueManager $queueManager */
+        $queueManager = $this->app['queue'];
+        $queueManager->addConnector('couchbase', function () {
+            return new \Ytake\LaravelCouchbase\Queue\CouchbaseConnector($this->app['db']);
+        });
     }
 }
