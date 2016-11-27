@@ -262,7 +262,7 @@ for couchbase manipulate indexes
 
 ## Queue
 
-If you want to use MongoDB as your database backend, change the the driver in config/queue.php:
+Change the the driver in config/queue.php:
 
 ```php
     'connections' => [
