@@ -1,7 +1,7 @@
 # Laravel-Couchbase
 for Laravel 5.1.*(higher)
 
-cache, session, database extension package
+cache, session, database, queue extension package
 *required ext-couchbase*
 
 [![Build Status](https://img.shields.io/scrutinizer/build/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/build-status/develop)
@@ -256,6 +256,30 @@ for couchbase manipulate indexes
 | couchbase:drop-index | Drop the given secondary index associated with the current bucket. |
 | couchbase:drop-primary-index | Drop the given primary index associated with the current bucket. |
 | couchbase:indexes | List all N1QL indexes that are registered for the current bucket. |
+| couchbase:create-queue-index | Create primary index, secondary indexes for the queue jobs couchbase bucket. |
+
+`-h` more information.
+
+## Queue
+
+If you want to use MongoDB as your database backend, change the the driver in config/queue.php:
+
+```php
+    'connections' => [
+        'couchbase' => [
+            'driver' => 'couchbase',
+            'bucket' => 'jobs',
+            'queue' => 'default',
+            'retry_after' => 90,
+        ],
+    ],
+```
+
+example  
+
+```bash
+php artisan queue:work couchbase --queue=send_email
+```
 
 ## hacking
 
@@ -274,6 +298,5 @@ $bucketManager->createN1qlPrimaryIndex();
 Also tests are expecting regular Memcached daemon listening on port 11255.
 
 ## soon
- - couchbase queue driver
  - authintication driver
  - Eloquent support

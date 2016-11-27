@@ -6,7 +6,8 @@
     "couchbase",
     "database",
     "session",
-    "cache"
+    "cache",
+    "queue"
   ],
   "authors": [
     {
@@ -25,7 +26,8 @@
     "illuminate/cache": "^5.3",
     "illuminate/session": "^5.3",
     "illuminate/database": "^5.3",
-    "illuminate/encryption": "^5.3"
+    "illuminate/encryption": "^5.3",
+    "illuminate/queue": "^5.3"
   },
   "require-dev": {
     "symfony/framework-bundle": "~2.0|~3.0",

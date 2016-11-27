@@ -28,16 +28,16 @@ class UpdateQueryTest extends CouchbaseTestCase
             $cluster, 'testing', '', 'testing'
         );
         $store->flush();
-
         $result = $connection->table('testing')->key($key)->insert($value);
         $this->assertInstanceOf('stdClass', $result);
+
         $result = $connection->table('testing')->key($key)
             ->where('click', 'to edit')->update(
                 ['click' => 'testing edit']
             );
         $this->assertInstanceOf('stdClass', $result->testing);
         $this->assertSame('testing edit', $result->testing->click);
-        $connection->table('testing')->key($key)->delete();
+        $connection->openBucket('testing')->manager()->flush();
     }
 
     public function testInsertAndNotUpdateQueries()
@@ -51,6 +51,7 @@ class UpdateQueryTest extends CouchbaseTestCase
         $connection = $this->app['db']->connection('couchbase');
         $result = $connection->table('testing')->key($key)->insert($value);
         $this->assertInstanceOf('stdClass', $result);
+        sleep(1);
         /** @var Illuminate\Events\Dispatcher $dispatcher */
         $dispatcher = $this->app['events'];
         $dispatcher->listen(\Ytake\LaravelCouchbase\Events\QueryPrepared::class, function ($instance) {
@@ -60,7 +61,7 @@ class UpdateQueryTest extends CouchbaseTestCase
             static::assertInstanceOf(\Ytake\LaravelCouchbase\Events\ResultReturning::class, $instance);
         });
         $this->assertSame(null, $connection->table('testing')->key($key)->where('clicking', 'to edit')->first());
-        $connection->table('testing')->key($key)->where('content', 'testing')->delete();
+        $connection->openBucket('testing')->manager()->flush();
     }
 
     public function testUpsertQuery()
@@ -79,6 +80,6 @@ class UpdateQueryTest extends CouchbaseTestCase
             'content' => 'testing for upsert',
         ]);
         $this->assertSame('testing for upsert', $result->testing->content);
-        $connection->table('testing')->key($key)->delete();
+        $connection->openBucket('testing')->manager()->flush();
     }
 }
