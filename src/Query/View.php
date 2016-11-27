@@ -21,7 +21,7 @@ use Ytake\LaravelCouchbase\Events\ViewQuerying;
  * Class View.
  *
  * @see    http://developer.couchbase.com/documentation/server/4.1/developer-guide/views-intro.html
- *
+ * @codeCoverageIgnore
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 class View

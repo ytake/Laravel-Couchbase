@@ -32,6 +32,18 @@ class CouchbaseTestCase extends \PHPUnit_Framework_TestCase
             "cache",
             $filesystem->getRequire(__DIR__ . '/config/cache.php')
         );
+        $this->app['config']->set(
+            "session",
+            $filesystem->getRequire(__DIR__ . '/config/session.php')
+        );
+        $this->app['config']->set(
+            "queue",
+            $filesystem->getRequire(__DIR__ . '/config/queue.php')
+        );
+        $this->app['config']->set(
+            "app",
+            $filesystem->getRequire(__DIR__ . '/config/app.php')
+        );
         $this->app['files'] = $filesystem;
     }
 
@@ -71,6 +83,12 @@ class CouchbaseTestCase extends \PHPUnit_Framework_TestCase
             return new \Illuminate\Config\Repository;
         });
         $this->registerConfigure();
+        $eventServiceProvider = new \Illuminate\Encryption\EncryptionServiceProvider($this->app);
+        $eventServiceProvider->register();
+        $eventServiceProvider = new \Illuminate\Events\EventServiceProvider($this->app);
+        $eventServiceProvider->register();
+        $queueProvider = new \Illuminate\Queue\QueueServiceProvider($this->app);
+        $queueProvider->register();
         $sessionProvider = new \Illuminate\Session\SessionServiceProvider($this->app);
         $sessionProvider->register();
         $this->registerDatabase();
