@@ -4,9 +4,9 @@ for Laravel 5.1.*(higher)
 cache, session, database, queue extension package
 *required ext-couchbase*
 
-[![Build Status](https://img.shields.io/scrutinizer/build/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/build-status/develop)
-[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/?branch=develop)
-[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/?branch=develop)
+[![Build Status](https://img.shields.io/scrutinizer/build/g/ytake/Laravel-Couchbase/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/build-status/master)
+[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/ytake/Laravel-Couchbase/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/?branch=master)
+[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/ytake/Laravel-Couchbase/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/?branch=master)
 [![StyleCI](https://styleci.io/repos/45177780/shield)](https://styleci.io/repos/45177780)
 
 [![Packagist](https://img.shields.io/packagist/dt/ytake/laravel-couchbase.svg?style=flat-square)](https://packagist.org/packages/ytake/laravel-couchbase)
