@@ -67,7 +67,6 @@ class CouchbaseQueue extends DatabaseQueue
 
         $first = $this->buildQueueQuery($queue, $expired)
             ->first(['*', 'meta().id']);
-        $identifier = null;
         if ($first) {
             $attempts = (isset($first->$bucket->attempts)) ? $first->$bucket->attempts : 1;
             $identifier = $first->id;
