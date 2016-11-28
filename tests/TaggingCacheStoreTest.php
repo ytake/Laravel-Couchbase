@@ -12,7 +12,7 @@ class TaggingCacheStoreTest extends \CouchbaseTestCase
     {
         parent::setUp();
         $cluster = $this->app['db']->connection('couchbase')->getCouchbase();
-        $this->store = new \Ytake\LaravelCouchbase\Cache\CouchbaseStore(
+        $this->store = new \Ytake\LaravelCouchbase\Cache\LegacyCouchbaseStore(
             $cluster, 'testing', '', 'testing'
         );
     }

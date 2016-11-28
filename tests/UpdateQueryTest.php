@@ -24,7 +24,7 @@ class UpdateQueryTest extends CouchbaseTestCase
         /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
         $cluster = $connection->getCouchbase();
-        $store = new \Ytake\LaravelCouchbase\Cache\CouchbaseStore(
+        $store = new \Ytake\LaravelCouchbase\Cache\LegacyCouchbaseStore(
             $cluster, 'testing', '', 'testing'
         );
         $store->flush();
@@ -37,7 +37,7 @@ class UpdateQueryTest extends CouchbaseTestCase
             );
         $this->assertInstanceOf('stdClass', $result->testing);
         $this->assertSame('testing edit', $result->testing->click);
-        $connection->table('testing')->key($key)->delete();
+        $connection->openBucket('testing')->manager()->flush();
     }
 
     public function testInsertAndNotUpdateQueries()
@@ -60,7 +60,7 @@ class UpdateQueryTest extends CouchbaseTestCase
             static::assertInstanceOf(\Ytake\LaravelCouchbase\Events\ResultReturning::class, $instance);
         });
         $this->assertSame(null, $connection->table('testing')->key($key)->where('clicking', 'to edit')->first());
-        $connection->table('testing')->key($key)->where('content', 'testing')->delete();
+        $connection->openBucket('testing')->manager()->flush();
     }
 
     public function testUpsertQuery()
@@ -79,6 +79,6 @@ class UpdateQueryTest extends CouchbaseTestCase
             'content' => 'testing for upsert',
         ]);
         $this->assertSame('testing for upsert', $result->testing->content);
-        $connection->table('testing')->key($key)->delete();
+        $connection->openBucket('testing')->manager()->flush();
     }
 }
