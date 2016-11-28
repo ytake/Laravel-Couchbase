@@ -15,9 +15,9 @@ namespace Ytake\LaravelCouchbase;
 use Illuminate\Cache\Repository;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\ServiceProvider;
+use Ytake\LaravelCouchbase\Cache\CouchbaseStore;
 use Illuminate\Session\CacheBasedSessionHandler;
 use Ytake\LaravelCouchbase\Database\Connectable;
-use Ytake\LaravelCouchbase\Cache\LegacyCouchbaseStore;
 use Ytake\LaravelCouchbase\Cache\MemcachedBucketStore;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnector;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
@@ -85,11 +85,12 @@ class CouchbaseServiceProvider extends ServiceProvider
             $cluster = $app['db']->connection($config['driver'])->getCouchbase();
             $password = (isset($config['bucket_password'])) ? $config['bucket_password'] : '';
             return new Repository(
-                new LegacyCouchbaseStore(
+                new CouchbaseStore(
                     $cluster,
                     $config['bucket'],
                     $password,
-                    $app['config']->get('cache.prefix'))
+                    $app['config']->get('cache.prefix')
+                )
             );
         });
     }

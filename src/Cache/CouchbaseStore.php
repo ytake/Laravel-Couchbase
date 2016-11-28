@@ -1,5 +1,4 @@
 <?php
-
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -9,35 +8,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace Ytake\LaravelCouchbase\Cache;
 
 use CouchbaseBucket;
 use CouchbaseCluster;
 use CouchbaseException;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Cache\RetrievesMultipleKeys;
 use Ytake\LaravelCouchbase\Exceptions\FlushException;
-use Ytake\LaravelCouchbase\Cache\Legacy\CouchbaseTaggableStore;
 
 /**
- * Class LegacyCouchbaseStore.
+ * Class CouchbaseStore.
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
- * @codeCoverageIgnore
  */
-class LegacyCouchbaseStore extends CouchbaseTaggableStore implements Store
+class CouchbaseStore extends TaggableStore implements Store
 {
+    use RetrievesMultipleKeys;
     /** @var string */
     protected $prefix;
-
     /** @var CouchbaseBucket */
     protected $bucket;
-
     /** @var CouchbaseCluster */
     protected $cluster;
 
     /**
-     * LegacyCouchbaseStore constructor.
+     * CouchbaseStore constructor.
      *
      * @param CouchbaseCluster $cluster
      * @param                  $bucket
@@ -121,7 +118,8 @@ class LegacyCouchbaseStore extends CouchbaseTaggableStore implements Store
         try {
             $this->bucket->insert($this->resolveKey($key), $value);
         } catch (CouchbaseException $e) {
-            // bucket->insert when called from resetTag in TagSet can throw CAS exceptions, ignore.
+            // bucket->insert when called from resetTag in TagSet can throw CAS exceptions, ignore.\
+            $this->bucket->upsert($this->resolveKey($key), $value);
         }
     }
 
@@ -166,7 +164,7 @@ class LegacyCouchbaseStore extends CouchbaseTaggableStore implements Store
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = !empty($prefix) ? $prefix.':' : '';
+        $this->prefix = !empty($prefix) ? $prefix . ':' : '';
     }
 
     /**
@@ -196,13 +194,13 @@ class LegacyCouchbaseStore extends CouchbaseTaggableStore implements Store
         if (is_array($keys)) {
             $result = [];
             foreach ($keys as $key) {
-                $result[] = $this->prefix.$key;
+                $result[] = $this->prefix . $key;
             }
 
             return $result;
         }
 
-        return $this->prefix.$keys;
+        return $this->prefix . $keys;
     }
 
     /**
@@ -224,6 +222,6 @@ class LegacyCouchbaseStore extends CouchbaseTaggableStore implements Store
             return $result;
         }
 
-        return;
+        return null;
     }
 }

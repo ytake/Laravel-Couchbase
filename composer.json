@@ -19,15 +19,15 @@
   "require": {
     "php": ">=5.5.9",
     "ext-couchbase": ">=2.2.0",
-    "illuminate/support": "5.1.*",
-    "illuminate/config": "5.1.*",
-    "illuminate/console": "5.1.*",
-    "illuminate/events": "5.1.*",
-    "illuminate/cache": "5.1.*",
-    "illuminate/session": "5.1.*",
-    "illuminate/database": "5.1.*",
-    "illuminate/encryption": "5.1.*",
-    "illuminate/queue": "5.1.*"
+    "illuminate/support": "5.2.*",
+    "illuminate/config": "5.2.*",
+    "illuminate/console": "5.2.*",
+    "illuminate/events": "5.2.*",
+    "illuminate/cache": "5.2.*",
+    "illuminate/session": "5.2.*",
+    "illuminate/database": "5.2.*",
+    "illuminate/encryption": "5.2.*",
+    "illuminate/queue": "5.2.*"
   },
   "require-dev": {
     "symfony/framework-bundle": "~2.0|~3.0",

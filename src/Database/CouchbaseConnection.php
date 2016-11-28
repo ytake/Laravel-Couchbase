@@ -536,7 +536,7 @@ class CouchbaseConnection extends Connection
      */
     public function setPdo($pdo)
     {
-        $this->connection = $this->createConnection($this->config);
+        $this->connection = $this->createConnection();
         $this->getManagedConfigure($this->config);
         $this->useDefaultQueryGrammar();
         $this->useDefaultPostProcessor();
