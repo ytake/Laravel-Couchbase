@@ -22,7 +22,9 @@ $ composer require ytake/laravel-couchbase
 ```
 
 for laravel5.3 ^0.6
+
 for laravel5.2 ^0.5
+
 for laravel5.1 ^0.4
 
 your config/app.php

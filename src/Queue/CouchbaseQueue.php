@@ -13,9 +13,9 @@
 namespace Ytake\LaravelCouchbase\Queue;
 
 use Carbon\Carbon;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Queue\Jobs\DatabaseJob;
+use Ytake\LaravelCouchbase\Query\Builder;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
 /**
@@ -65,34 +65,34 @@ class CouchbaseQueue extends DatabaseQueue
         $bucket = $this->table;
         $expired = Carbon::now()->subSeconds($this->expire)->getTimestamp();
 
-        $first = $this->database->table($this->table)
-            ->where('queue', $this->getQueue($queue))
-            ->where('reserved', 1)
-            ->where('reserved_at', '<=', $expired)
+        $first = $this->buildQueueQuery($queue, $expired)
             ->first(['*', 'meta().id']);
-        $attempts = 1;
         $identifier = null;
         if ($first) {
             $attempts = (isset($first->$bucket->attempts)) ? $first->$bucket->attempts : 1;
             $identifier = $first->id;
+            $this->buildQueueQuery($queue, $expired)
+                ->key($identifier)
+                ->update([
+                    'reserved'    => 0,
+                    'reserved_at' => null,
+                    'attempts'    => $attempts,
+                ]);
         }
-        if (is_null($identifier)) {
-            $identifier = $this->uniqueKey([
-                'queue'    => $this->getQueue($queue),
-                'attempts' => $attempts,
-                'id'       => $this->incrementKey(),
-            ]);
-        }
-        $this->database->table($this->table)
+    }
+
+    /**
+     * @param $queue
+     * @param $expired
+     *
+     * @return Builder
+     */
+    protected function buildQueueQuery($queue, $expired)
+    {
+        return $this->database->table($this->table)
             ->where('queue', $this->getQueue($queue))
             ->where('reserved', 1)
-            ->where('reserved_at', '<=', $expired)
-            ->key($identifier)
-            ->update([
-                'reserved'    => 0,
-                'reserved_at' => null,
-                'attempts'    => $attempts,
-            ]);
+            ->where('reserved_at', '<=', $expired);
     }
 
     /**
