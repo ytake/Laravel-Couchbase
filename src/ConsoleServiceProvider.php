@@ -16,12 +16,15 @@ use Illuminate\Support\ServiceProvider;
 use Ytake\LaravelCouchbase\Console\IndexCreatorCommand;
 use Ytake\LaravelCouchbase\Console\IndexFinderCommand;
 use Ytake\LaravelCouchbase\Console\IndexRemoverCommand;
+use Ytake\LaravelCouchbase\Console\QueueCreatorCommand;
 use Ytake\LaravelCouchbase\Console\PrimaryIndexCreatorCommand;
 use Ytake\LaravelCouchbase\Console\PrimaryIndexRemoverCommand;
 use Ytake\LaravelCouchbase\Migrations\CouchbaseMigrationRepository;
 
 /**
  * Class ConsoleServiceProvider.
+ *
+ * @codeCoverageIgnore
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
@@ -67,12 +70,16 @@ class ConsoleServiceProvider extends ServiceProvider
         $this->app->singleton('command.couchbase.index.drop', function ($app) {
             return new IndexRemoverCommand($app['Illuminate\Database\DatabaseManager']);
         });
+        $this->app->singleton('command.couchbase.queue.index.create', function ($app) {
+            return new QueueCreatorCommand($app['Illuminate\Database\DatabaseManager']);
+        });
         $this->commands([
             'command.couchbase.indexes',
             'command.couchbase.primary.index.create',
             'command.couchbase.primary.index.drop',
             'command.couchbase.index.create',
             'command.couchbase.index.drop',
+            'command.couchbase.queue.index.create',
         ]);
     }
 
@@ -87,6 +94,7 @@ class ConsoleServiceProvider extends ServiceProvider
             'command.couchbase.primary.index.drop',
             'command.couchbase.index.create',
             'command.couchbase.index.drop',
+            'command.couchbase.queue.index.create',
             'migration.repository',
         ];
     }
