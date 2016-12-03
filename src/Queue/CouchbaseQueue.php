@@ -78,7 +78,7 @@ class CouchbaseQueue extends DatabaseQueue
         $meta = $openBucket->getAndLock($job->id, 10);
         $meta->value->reserved = 1;
         $meta->value->reserved_at = $this->getTime();
-        $meta->value->attempts = $job->value->attempts + 1;
+        $meta->value->attempts = $job->$bucket->attempts + 1;
         $openBucket->replace($job->id, $meta->value, ['cas' => $meta->cas]);
 
         return $meta->value;

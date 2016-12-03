@@ -1,4 +1,5 @@
 <?php
+
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -8,6 +9,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 namespace Ytake\LaravelCouchbase\Cache;
 
 use CouchbaseBucket;
@@ -26,10 +28,13 @@ use Ytake\LaravelCouchbase\Exceptions\FlushException;
 class CouchbaseStore extends TaggableStore implements Store
 {
     use RetrievesMultipleKeys;
+
     /** @var string */
     protected $prefix;
+
     /** @var CouchbaseBucket */
     protected $bucket;
+
     /** @var CouchbaseCluster */
     protected $cluster;
 

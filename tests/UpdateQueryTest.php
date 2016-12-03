@@ -24,7 +24,7 @@ class UpdateQueryTest extends CouchbaseTestCase
         /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
         $cluster = $connection->getCouchbase();
-        $store = new \Ytake\LaravelCouchbase\Cache\LegacyCouchbaseStore(
+        $store = new \Ytake\LaravelCouchbase\Cache\CouchbaseStore(
             $cluster, 'testing', '', 'testing'
         );
         $store->flush();
