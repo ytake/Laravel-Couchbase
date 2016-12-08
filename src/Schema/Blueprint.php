@@ -156,7 +156,7 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
      *
      * @return string
      */
-    protected function detectIndexName($index):string
+    protected function detectIndexName($index)
     {
         $index = (is_null($index)) ? "" : $index;
 
