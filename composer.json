@@ -18,7 +18,7 @@
   "license": "MIT",
   "require": {
     "php": ">=5.5.9",
-    "ext-couchbase": ">=2.2.0",
+    "ext-couchbase": "^2.2.2",
     "illuminate/support": "5.2.*",
     "illuminate/config": "5.2.*",
     "illuminate/console": "5.2.*",
