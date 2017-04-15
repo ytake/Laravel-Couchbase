@@ -25,7 +25,7 @@ class QueueCouchbaseConnectorTest extends CouchbaseTestCase
         $connect = $queue->connection('couchbase');
         $this->assertNull($connect->pop());
         $connect->bulk(['testing:queue1', 'testing:queue2']);
-        sleep(1);
+        sleep(5);
         /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
         $this->assertSame(2, $connection->table(self::BUCKET)->where('queue', 'default')->count());

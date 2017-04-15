@@ -13,6 +13,7 @@
 namespace Ytake\LaravelCouchbase\Database;
 
 use Closure;
+use CouchbaseAuthenticator;
 use CouchbaseBucket;
 use Illuminate\Database\Connection;
 use Illuminate\Database\QueryException;
@@ -117,7 +118,9 @@ class CouchbaseConnection extends Connection
      */
     public function openBucket($name)
     {
-        return $this->getCouchbase()->openBucket($name, $this->bucketPassword);
+        $couchbase = $this->getCouchbase();
+
+        return $couchbase->openBucket($name, $this->bucketPassword);
     }
 
     /**
@@ -308,8 +311,8 @@ class CouchbaseConnection extends Connection
      */
     public function select($query, $bindings = [], $useReadPdo = true)
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) {
-            if ($me->pretending()) {
+        return $this->run($query, $bindings, function ($query, $bindings) {
+            if ($this->pretending()) {
                 return [];
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
@@ -338,8 +341,8 @@ class CouchbaseConnection extends Connection
      */
     public function affectingStatement($query, $bindings = [])
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) {
-            if ($me->pretending()) {
+        return $this->run($query, $bindings, function ($query, $bindings) {
+            if ($this->pretending()) {
                 return 0;
             }
             $query = \CouchbaseN1qlQuery::fromString($query);
@@ -360,8 +363,8 @@ class CouchbaseConnection extends Connection
      */
     public function positionalStatement($query, array $bindings = [])
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) {
-            if ($me->pretending()) {
+        return $this->run($query, $bindings, function ($query, $bindings) {
+            if ($this->pretending()) {
                 return 0;
             }
             $query = \CouchbaseN1qlQuery::fromString($query);

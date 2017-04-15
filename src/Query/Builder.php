@@ -22,14 +22,14 @@ class Builder extends \Illuminate\Database\Query\Builder
      *
      * @var \Ytake\LaravelCouchbase\Database\CouchbaseConnection
      */
-    protected $connection;
+    public $connection;
 
     /**
      * The database query grammar instance.
      *
      * @var \Ytake\LaravelCouchbase\Query\Grammar
      */
-    protected $grammar;
+    public $grammar;
 
     /** @var string  use-keys-clause */
     public $key;

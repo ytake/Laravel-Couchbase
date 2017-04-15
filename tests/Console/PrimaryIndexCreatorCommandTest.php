@@ -22,11 +22,6 @@ class PrimaryIndexCreatorCommandTest extends \CouchbaseTestCase
 
     public function testCreatePrimaryIndex()
     {
-        $cluster = new \CouchbaseCluster('127.0.0.1');
-        $clusterManager = $cluster->manager('Administrator', 'Administrator');
-        $clusterManager->createBucket($this->bucket,
-            ['bucketType' => 'couchbase', 'saslPassword' => '', 'flushEnabled' => true]);
-        sleep(5);
         $output = new \Symfony\Component\Console\Output\BufferedOutput();
         $this->command->run(
             new \Symfony\Component\Console\Input\ArrayInput([
@@ -42,7 +37,5 @@ class PrimaryIndexCreatorCommandTest extends \CouchbaseTestCase
         $connection = $this->databaseManager->connection('couchbase');
         $bucket = $connection->openBucket($this->bucket);
         $bucket->manager()->dropN1qlPrimaryIndex();
-        $clusterManager->removeBucket($this->bucket);
-        sleep(5);
     }
 }

@@ -15,6 +15,7 @@ namespace Ytake\LaravelCouchbase\Queue;
 use Illuminate\Queue\DatabaseQueue;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Queue\Jobs\DatabaseJob;
+use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
 /**
@@ -41,14 +42,22 @@ class CouchbaseQueue extends DatabaseQueue
     {
         $queue = $this->getQueue($queue);
         if ($job = $this->getNextAvailableJob($queue)) {
-            $job = $this->markJobAsReserved($job);
-
-            return new DatabaseJob(
-                $this->container, $this, $job, $queue
-            );
+            return $this->marshalJob($queue, $job);
         }
 
         return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function marshalJob($queue, $job)
+    {
+        $job = $this->markJobAsReserved($job);
+
+        return new DatabaseJob(
+            $this->container, $this, $job, $this->connectionName, $queue
+        );
     }
 
     /**
@@ -65,7 +74,7 @@ class CouchbaseQueue extends DatabaseQueue
             ->orderBy('id', 'asc')
             ->first(['*', 'meta().id']);
 
-        return $job ? (object)$job : null;
+        return $job ? new DatabaseJobRecord((object)$job) : null;
     }
 
     /**
@@ -79,7 +88,7 @@ class CouchbaseQueue extends DatabaseQueue
         // lock bucket
         $meta = $openBucket->getAndLock($job->id, 10);
         $meta->value->attempts = $job->$bucket->attempts + 1;
-        $meta->value->reserved_at = $this->getTime();
+        $meta->value->reserved_at = $job->touch();
         $openBucket->replace($job->id, $meta->value, ['cas' => $meta->cas]);
 
         return $meta->value;
@@ -106,10 +115,10 @@ class CouchbaseQueue extends DatabaseQueue
     /**
      * {@inheritdoc}
      */
-    protected function pushToDatabase($delay, $queue, $payload, $attempts = 0)
+    protected function pushToDatabase($queue, $payload, $delay = 0, $attempts = 0)
     {
         $attributes = $this->buildDatabaseRecord(
-            $this->getQueue($queue), $payload, $this->getAvailableAt($delay), $attempts
+            $this->getQueue($queue), $payload, $this->availableAt($delay), $attempts
         );
         $increment = $this->incrementKey();
         $attributes['id'] = $increment;

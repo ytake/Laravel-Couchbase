@@ -9,9 +9,9 @@ class ProviderTest extends CouchbaseTestCase
         /** @var \Illuminate\Session\Store $driver */
         $driver = $session->driver('couchbase');
         $this->assertInstanceOf(\Illuminate\Session\Store::class, $driver);
-        $driver->set('session:data', 'hello');
+        $driver->put('session:data', 'hello');
         $this->assertSame('hello', $driver->get('session:data'));
-        $driver->clear();
+        $driver->flush();
         $this->assertNull($driver->get('session:data'));
     }
 
