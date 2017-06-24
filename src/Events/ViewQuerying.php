@@ -12,7 +12,7 @@
 
 namespace Ytake\LaravelCouchbase\Events;
 
-use CouchbaseViewQuery;
+use Couchbase\ViewQuery;
 
 /**
  * Class ViewQuerying
@@ -21,16 +21,24 @@ use CouchbaseViewQuery;
  */
 class ViewQuerying
 {
-    /** @var mixed  Generates the view query as it will be passed to the server. */
-    public $path;
+    /** @var ViewQuery */
+    private $viewQuery;
 
     /**
      * ViewQuerying constructor.
      *
-     * @param CouchbaseViewQuery $viewQuery
+     * @param ViewQuery $viewQuery
      */
-    public function __construct(CouchbaseViewQuery $viewQuery)
+    public function __construct(ViewQuery $viewQuery)
     {
-        $this->path = $viewQuery->toString();
+        $this->viewQuery = $viewQuery;
+    }
+
+    /**
+     * @return ViewQuery
+     */
+    public function viewQuery(): ViewQuery
+    {
+        return $this->viewQuery;
     }
 }

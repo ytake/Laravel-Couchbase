@@ -26,7 +26,8 @@ class DeleteQueryTest extends CouchbaseTestCase
         $result = $connection->table('testing')->key($key)->insert($value);
         $this->assertInstanceOf('stdClass', $result);
         sleep(1);
-        $deleteReturning = $connection->table('testing')->key($key)->where('click', 'to edit')->returning(['click'])->delete();
+        $deleteReturning = $connection->table('testing')->key($key)
+            ->where('click', 'to edit')->returning(['click'])->delete();
         $this->assertSame('to edit', $deleteReturning->click);
     }
 

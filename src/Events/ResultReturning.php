@@ -19,8 +19,8 @@ namespace Ytake\LaravelCouchbase\Events;
  */
 class ResultReturning
 {
-    /** @var mixed  */
-    public $returning;
+    /** @var mixed */
+    private $returning;
 
     /**
      * ResultReturning constructor.
@@ -30,5 +30,13 @@ class ResultReturning
     public function __construct($returning)
     {
         $this->returning = $returning;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function returning()
+    {
+        return $this->returning;
     }
 }

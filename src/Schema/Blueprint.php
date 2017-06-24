@@ -54,7 +54,7 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
      */
     public function create()
     {
-        return $this->connection->manager()->createBucket($this->table, $this->options);
+        $this->connection->manager()->createBucket($this->table, $this->options);
     }
 
     /**
@@ -62,7 +62,7 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
      */
     public function drop()
     {
-        return $this->connection->manager()->removeBucket($this->table);
+        $this->connection->manager()->removeBucket($this->table);
     }
 
     /**
@@ -75,7 +75,7 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
      */
     public function dropPrimary($index = null, $ignoreIfNotExist = false)
     {
-        return $this->connection->openBucket($this->getTable())
+        $this->connection->openBucket($this->getTable())
             ->manager()->dropN1qlPrimaryIndex($this->detectIndexName($index), $ignoreIfNotExist);
     }
 
@@ -89,7 +89,7 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
      */
     public function dropIndex($index, $ignoreIfNotExist = false)
     {
-        return $this->connection->openBucket($this->getTable())
+        $this->connection->openBucket($this->getTable())
             ->manager()->dropN1qlIndex($index, $ignoreIfNotExist);
     }
 
@@ -101,12 +101,10 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
      *                                    set to true.
      * @param boolean     $defer          true to defer building of the index until buildN1qlDeferredIndexes()}is
      *                                    called (or a direct call to the corresponding query service API).
-     *
-     * @return mixed
      */
     public function primaryIndex($name = null, $ignoreIfExist = false, $defer = false)
     {
-        return $this->connection->openBucket($this->getTable())
+        $this->connection->openBucket($this->getTable())
             ->manager()->createN1qlPrimaryIndex(
                 $index = $this->detectIndexName($name),
                 $ignoreIfExist,

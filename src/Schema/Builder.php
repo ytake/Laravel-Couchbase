@@ -13,6 +13,7 @@
 namespace Ytake\LaravelCouchbase\Schema;
 
 use Closure;
+use Couchbase\Exception;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
 /**
@@ -35,10 +36,13 @@ class Builder extends \Illuminate\Database\Schema\Builder
     public function hasTable($table)
     {
         try {
-            if (!is_null($this->connection->openBucket($table)->getName())) {
+            $bucketInfo = $this->connection->openBucket($table)->manager()->info();
+            if (!is_null($bucketInfo['name'])) {
                 return true;
             }
-        } catch (\CouchbaseException $e) {
+
+            return true;
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -61,6 +65,7 @@ class Builder extends \Illuminate\Database\Schema\Builder
 
     /**
      * needs administrator password, user
+     *
      * @param string       $collection
      * @param Closure|null $callback
      *
@@ -84,6 +89,7 @@ class Builder extends \Illuminate\Database\Schema\Builder
         $blueprint = $this->createBlueprint($collection);
         $blueprint->drop();
         sleep(5);
+
         return true;
     }
 

@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -12,21 +12,22 @@
 
 namespace Ytake\LaravelCouchbase\Query;
 
-use CouchbaseBucket;
-use CouchbaseViewQuery;
+use Couchbase\Bucket;
+use Couchbase\SpatialViewQuery;
+use Couchbase\ViewQuery;
 use Illuminate\Contracts\Events\Dispatcher;
 use Ytake\LaravelCouchbase\Events\ViewQuerying;
 
 /**
  * Class View.
  *
- * @see    http://developer.couchbase.com/documentation/server/4.1/developer-guide/views-intro.html
+ * @see    http://developer.couchbase.com/documentation/server/4.6/developer-guide/views-intro.html
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
 class View
 {
-    /** @var CouchbaseBucket */
+    /** @var Bucket */
     protected $bucket;
 
     /** @var Dispatcher */
@@ -35,47 +36,47 @@ class View
     /**
      * View constructor.
      *
-     * @param CouchbaseBucket $bucket
+     * @param Bucket          $bucket
      * @param Dispatcher|null $dispatcher
      */
-    public function __construct(CouchbaseBucket $bucket, Dispatcher $dispatcher = null)
+    public function __construct(Bucket $bucket, Dispatcher $dispatcher = null)
     {
         $this->bucket = $bucket;
         $this->dispatcher = $dispatcher;
     }
 
     /**
-     * @param $designDoc
-     * @param $name
+     * @param string $designDoc
+     * @param string $name
      *
-     * @return \_CouchbaseDefaultViewQuery
+     * @return ViewQuery
      */
-    public function from($designDoc, $name)
+    public function from(string $designDoc, string $name): ViewQuery
     {
-        return CouchbaseViewQuery::from($designDoc, $name);
+        return ViewQuery::from($designDoc, $name);
     }
 
     /**
-     * @param $designDoc
-     * @param $name
+     * @param string $designDoc
+     * @param string $name
      *
-     * @return \_CouchbaseSpatialViewQuery
+     * @return SpatialViewQuery
      */
-    public function fromSpatial($designDoc, $name)
+    public function fromSpatial(string $designDoc, string $name): SpatialViewQuery
     {
-        return CouchbaseViewQuery::fromSpatial($designDoc, $name);
+        return ViewQuery::fromSpatial($designDoc, $name);
     }
 
     /**
-     * @param CouchbaseViewQuery $viewQuery
-     * @param bool               $jsonAsArray
+     * @param ViewQuery $viewQuery
+     * @param bool      $jsonAsArray
      *
      * @return mixed
      */
-    public function execute(CouchbaseViewQuery $viewQuery, $jsonAsArray = false)
+    public function execute(ViewQuery $viewQuery, bool $jsonAsArray = false)
     {
         if (isset($this->dispatcher)) {
-            $this->dispatcher->fire(new ViewQuerying($viewQuery));
+            $this->dispatcher->dispatch(new ViewQuerying($viewQuery));
         }
 
         return $this->bucket->query($viewQuery, $jsonAsArray);

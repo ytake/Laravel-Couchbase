@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -161,7 +162,7 @@ class MemcachedBucketStore extends MemcachedStore
     /**
      * @param int $second
      */
-    public function timeout($second)
+    public function timeout(int $second)
     {
         $this->timeout = $second;
     }
@@ -169,7 +170,7 @@ class MemcachedBucketStore extends MemcachedStore
     /**
      * @param int $port
      */
-    public function port($port)
+    public function port(int $port)
     {
         $this->port = $port;
     }

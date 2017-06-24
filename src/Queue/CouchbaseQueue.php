@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -83,7 +84,7 @@ class CouchbaseQueue extends DatabaseQueue
     protected function markJobAsReserved($job)
     {
         $bucket = $this->table;
-        /** @var \CouchbaseBucket $openBucket */
+        /** @var \Couchbase\Bucket $openBucket */
         $openBucket = $this->database->openBucket($bucket);
         // lock bucket
         $meta = $openBucket->getAndLock($job->id, 10);
@@ -151,7 +152,7 @@ class CouchbaseQueue extends DatabaseQueue
      *
      * @return string
      */
-    protected function uniqueKey(array $attributes)
+    protected function uniqueKey(array $attributes): string
     {
         $array = array_only($attributes, ['queue', 'attempts', 'id']);
 
@@ -161,7 +162,7 @@ class CouchbaseQueue extends DatabaseQueue
     /**
      * @return string
      */
-    protected function identifier()
+    protected function identifier(): string
     {
         return __CLASS__ . ':sequence';
     }

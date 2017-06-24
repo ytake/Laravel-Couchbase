@@ -12,7 +12,7 @@
 
 namespace Ytake\LaravelCouchbase\Database;
 
-use CouchbaseCluster;
+use Couchbase\Cluster;
 
 /**
  * Class CouchbaseConnector.
@@ -23,7 +23,7 @@ class CouchbaseConnector implements Connectable
 {
     /** @var string[] */
     protected $configure = [
-        'host'     => '127.0.0.1',
+        'host'     => 'couchbase://127.0.0.1',
         'user'     => '',
         'password' => '',
     ];
@@ -31,16 +31,16 @@ class CouchbaseConnector implements Connectable
     /**
      * @param array $servers
      *
-     * @return CouchbaseCluster
+     * @return Cluster
      */
-    public function connect(array $servers)
+    public function connect(array $servers): Cluster
     {
         $configure = array_merge($this->configure, $servers);
+        $cluster = new Cluster($configure['host']);
+        if (!empty($configure['user']) && !empty($configure['password'])) {
+            $cluster->authenticateAs(strval($configure['user']), strval($configure['password']));
+        }
 
-        return new CouchbaseCluster(
-            $configure['host'],
-            $configure['user'],
-            $configure['password']
-        );
+        return $cluster;
     }
 }

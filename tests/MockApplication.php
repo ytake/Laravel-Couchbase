@@ -7,6 +7,16 @@
  */
 class MockApplication extends \Illuminate\Container\Container implements \Illuminate\Contracts\Foundation\Application
 {
+    public function runningInConsole()
+    {
+        // TODO: Implement runningInConsole() method.
+    }
+
+    public function getCachedPackagesPath()
+    {
+        // TODO: Implement getCachedPackagesPath() method.
+    }
+
     public function version()
     {
         // TODO: Implement version() method.

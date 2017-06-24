@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -12,12 +13,14 @@
 
 namespace Ytake\LaravelCouchbase\Events;
 
+use Couchbase\N1qlQuery;
+
 /**
  * Class QueryPrepared
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
-class QueryPrepared
+final class QueryPrepared
 {
     /** @var array */
     public $object = [];
@@ -30,7 +33,7 @@ class QueryPrepared
     public function __construct($queryObject)
     {
         if ($this->isN1ql($queryObject)) {
-            $this->object = $queryObject->toObject();
+            $this->object = $queryObject;
         }
     }
 
@@ -39,9 +42,9 @@ class QueryPrepared
      *
      * @return bool
      */
-    protected function isN1ql($queryObject)
+    protected function isN1ql($queryObject): bool
     {
-        if ($queryObject instanceof \CouchbaseN1qlQuery) {
+        if ($queryObject instanceof N1qlQuery) {
             return true;
         }
 

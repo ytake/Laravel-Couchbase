@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -38,11 +39,11 @@ class Builder extends \Illuminate\Database\Query\Builder
     public $returning = ['*'];
 
     /**
-     * @param $key
+     * @param string $key
      *
-     * @return $this
+     * @return Builder
      */
-    public function key($key)
+    public function key(string $key): Builder
     {
         $this->key = $key;
 
@@ -52,9 +53,9 @@ class Builder extends \Illuminate\Database\Query\Builder
     /**
      * @param array $column
      *
-     * @return $this
+     * @return Builder
      */
-    public function returning(array $column = ['*'])
+    public function returning(array $column = ['*']): Builder
     {
         $this->returning = $column;
 
@@ -116,7 +117,7 @@ class Builder extends \Illuminate\Database\Query\Builder
      *
      * @return array
      */
-    protected function detectValues($values)
+    protected function detectValues($values): array
     {
         if (!is_array(reset($values))) {
             $values = [$values];

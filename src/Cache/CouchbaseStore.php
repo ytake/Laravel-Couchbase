@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -12,12 +13,12 @@
 
 namespace Ytake\LaravelCouchbase\Cache;
 
-use CouchbaseBucket;
-use CouchbaseCluster;
-use CouchbaseException;
+use Couchbase\Bucket;
+use Couchbase\Cluster;
+use Couchbase\Exception as CouchbaseException;
+use Illuminate\Cache\RetrievesMultipleKeys;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\Cache\Store;
-use Illuminate\Cache\RetrievesMultipleKeys;
 use Ytake\LaravelCouchbase\Exceptions\FlushException;
 
 /**
@@ -32,23 +33,28 @@ class CouchbaseStore extends TaggableStore implements Store
     /** @var string */
     protected $prefix;
 
-    /** @var CouchbaseBucket */
+    /** @var Bucket */
     protected $bucket;
 
-    /** @var CouchbaseCluster */
+    /** @var Cluster */
     protected $cluster;
 
     /**
      * CouchbaseStore constructor.
      *
-     * @param CouchbaseCluster $cluster
-     * @param                  $bucket
-     * @param string           $password
-     * @param null             $prefix
-     * @param string           $serialize
+     * @param Cluster     $cluster
+     * @param string      $bucket
+     * @param string      $password
+     * @param string|null $prefix
+     * @param string      $serialize
      */
-    public function __construct(CouchbaseCluster $cluster, $bucket, $password = '', $prefix = null, $serialize = 'php')
-    {
+    public function __construct(
+        Cluster $cluster,
+        string $bucket,
+        string $password = '',
+        string $prefix = null,
+        string $serialize = 'php'
+    ) {
         $this->cluster = $cluster;
         $this->setBucket($bucket, $password, $serialize);
         $this->setPrefix($prefix);
@@ -77,7 +83,7 @@ class CouchbaseStore extends TaggableStore implements Store
      *
      * @return bool
      */
-    public function add($key, $value, $minutes = 0)
+    public function add($key, $value, $minutes = 0): bool
     {
         $options = ($minutes === 0) ? [] : ['expiry' => ($minutes * 60)];
         try {
@@ -167,19 +173,19 @@ class CouchbaseStore extends TaggableStore implements Store
      *
      * @param string $prefix
      */
-    public function setPrefix($prefix)
+    public function setPrefix(string $prefix)
     {
         $this->prefix = !empty($prefix) ? $prefix . ':' : '';
     }
 
     /**
-     * @param        $bucket
+     * @param string $bucket
      * @param string $password
      * @param string $serialize
      *
-     * @return $this
+     * @return CouchbaseStore
      */
-    public function setBucket($bucket, $password = '', $serialize = 'php')
+    public function setBucket(string $bucket, string $password = '', string $serialize = 'php'): CouchbaseStore
     {
         $this->bucket = $this->cluster->openBucket($bucket, $password);
         if ($serialize === 'php') {

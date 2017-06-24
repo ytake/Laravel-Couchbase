@@ -26,7 +26,6 @@ class ViewTest extends \CouchbaseTestCase
         $dispatcher = $this->app['events'];
         $dispatcher->listen(\Ytake\LaravelCouchbase\Events\ViewQuerying::class, function ($instance) {
             $this->assertInstanceOf(\Ytake\LaravelCouchbase\Events\ViewQuerying::class, $instance);
-            $this->assertNotNull($instance->path);
         });
         $view = $this->connection->view("testing");
         $query = $view->from("dev_testing", "testing");

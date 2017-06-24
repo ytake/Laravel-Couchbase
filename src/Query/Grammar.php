@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -36,7 +37,7 @@ class Grammar extends IlluminateGrammar
     }
 
     /**
-     * @param $value
+     * @param mixed $value
      *
      * @return string
      */
@@ -134,7 +135,7 @@ class Grammar extends IlluminateGrammar
      *
      * @return string
      */
-    public function compileUpsert(QueryBuilder $query, array $values)
+    public function compileUpsert(QueryBuilder $query, array $values): string
     {
         // keyspace-ref:
         $table = $this->wrapTable($query->from);

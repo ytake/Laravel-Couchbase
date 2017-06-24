@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -12,6 +13,8 @@
 
 namespace Ytake\LaravelCouchbase\Database;
 
+use Couchbase\Cluster;
+
 /**
  * Interface Connectable.
  *
@@ -22,7 +25,7 @@ interface Connectable
     /**
      * @param array $servers
      *
-     * @return \CouchbaseCluster
+     * @return Cluster
      */
-    public function connect(array $servers);
+    public function connect(array $servers): Cluster;
 }
