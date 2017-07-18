@@ -14,13 +14,13 @@ namespace Ytake\LaravelCouchbase;
 
 use Illuminate\Cache\Repository;
 use Illuminate\Queue\QueueManager;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Session\CacheBasedSessionHandler;
-use Ytake\LaravelCouchbase\Database\Connectable;
+use Illuminate\Support\ServiceProvider;
 use Ytake\LaravelCouchbase\Cache\CouchbaseStore;
 use Ytake\LaravelCouchbase\Cache\MemcachedBucketStore;
-use Ytake\LaravelCouchbase\Database\CouchbaseConnector;
+use Ytake\LaravelCouchbase\Database\Connectable;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
+use Ytake\LaravelCouchbase\Database\CouchbaseConnector;
 
 /**
  * Class CouchbaseServiceProvider.
@@ -70,7 +70,7 @@ class CouchbaseServiceProvider extends ServiceProvider
 
         // add couchbase extension
         $this->app['db']->extend('couchbase', function ($config, $name) {
-            /* @var \CouchbaseCluster $cluster */
+            /* @var \Couchbase\Cluster $cluster */
             return new CouchbaseConnection($config, $name);
         });
     }
@@ -82,9 +82,10 @@ class CouchbaseServiceProvider extends ServiceProvider
     protected function registerCouchbaseBucketCacheDriver()
     {
         $this->app['cache']->extend('couchbase', function ($app, $config) {
-            /** @var \CouchbaseCluster $cluster */
+            /** @var \Couchbase\Cluster $cluster */
             $cluster = $app['db']->connection($config['driver'])->getCouchbase();
             $password = (isset($config['bucket_password'])) ? $config['bucket_password'] : '';
+
             return new Repository(
                 new CouchbaseStore(
                     $cluster,
@@ -107,7 +108,7 @@ class CouchbaseServiceProvider extends ServiceProvider
             $memcachedBucket = $this->app['couchbase.memcached.connector']->connect($config['servers']);
 
             return new Repository(
-                new MemcachedBucketStore($memcachedBucket, $prefix, $config['servers'])
+                new MemcachedBucketStore($memcachedBucket, strval($prefix), $config['servers'])
             );
         });
     }

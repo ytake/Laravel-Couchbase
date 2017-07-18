@@ -30,12 +30,15 @@
     "illuminate/queue": "^5.5"
   },
   "require-dev": {
-    "symfony/framework-bundle": "~2.0|~3.0",
-    "symfony/console": "~2.0|~3.0",
-    "phpunit/phpunit": "~5.0",
+    "symfony/framework-bundle": "~3.0",
+    "symfony/console": "~3.0",
+    "phpunit/phpunit": "^6.0",
     "satooshi/php-coveralls": "*",
     "phing/phing": "~2.0",
-    "friendsofphp/php-cs-fixer": "~1.0"
+    "phploc/phploc": "*",
+    "pdepend/pdepend" : "^2.2.4",
+    "phpmd/phpmd": "@stable",
+    "friendsofphp/php-cs-fixer": "^2.0"
   },
   "autoload": {
     "psr-4": {

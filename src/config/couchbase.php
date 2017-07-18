@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -9,19 +8,15 @@ declare(strict_types=1);
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the MIT license.
+ *
+ * Copyright (c) 2015-2017 Yuuki Takezawa
  */
 
-/**
- * @param $value
- *
- * @return mixed
- */
-function couchbase_php_serialize_encoder($value)
-{
-    return couchbase_basic_encoder_v1($value, [
-        'sertype' => COUCHBASE_SERTYPE_PHP,
-        'cmprtype' => COUCHBASE_CMPRTYPE_NONE,
-        'cmprthresh' => 0,
-        'cmprfactor' => 0,
-    ]);
-}
+return [
+    'design' => [
+
+    ]
+];

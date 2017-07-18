@@ -40,6 +40,10 @@ class CouchbaseTestCase extends \PHPUnit_Framework_TestCase
             "queue",
             $filesystem->getRequire(__DIR__ . '/config/queue.php')
         );
+        $this->app['config']->set(
+            'couchbase',
+            $filesystem->getRequire(__DIR__ . '/config/couchbase.php')
+        );
         $this->app['files'] = $filesystem;
     }
 
@@ -132,6 +136,6 @@ class TestContainer extends \Illuminate\Container\Container
 {
     public function version()
     {
-        return '5.2.1';
+        return '5.5.1';
     }
 }

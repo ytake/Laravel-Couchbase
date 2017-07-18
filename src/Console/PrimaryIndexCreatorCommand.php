@@ -86,7 +86,7 @@ class PrimaryIndexCreatorCommand extends Command
     /**
      * Execute the console command
      */
-    public function fire()
+    public function handle()
     {
         /** @var \Illuminate\Database\Connection|CouchbaseConnection $connection */
         $connection = $this->databaseManager->connection($this->option('database'));

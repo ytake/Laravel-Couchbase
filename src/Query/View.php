@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -32,6 +33,15 @@ class View
 
     /** @var Dispatcher */
     protected $dispatcher;
+
+    /**
+     * Specifies the mode of updating to perorm before and after executing the query
+     *
+     * @see \Couchbase\ViewQuery::UPDATE_BEFORE
+     * @see \Couchbase\ViewQuery::UPDATE_NONE
+     * @see \Couchbase\ViewQuery::UPDATE_AFTER
+     */
+    private $consistency = null;
 
     /**
      * View constructor.
@@ -78,7 +88,18 @@ class View
         if (isset($this->dispatcher)) {
             $this->dispatcher->dispatch(new ViewQuerying($viewQuery));
         }
+        if (!is_null($this->consistency)) {
+            $viewQuery = $viewQuery->consistency($this->consistency);
+        }
 
         return $this->bucket->query($viewQuery, $jsonAsArray);
+    }
+
+    /**
+     * @param int $consistency
+     */
+    public function consistency(int $consistency)
+    {
+        $this->consistency = $consistency;
     }
 }

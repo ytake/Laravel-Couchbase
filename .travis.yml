@@ -1,0 +1,29 @@
+sudo: required
+language: php
+php:
+  - 7
+  - 7.1
+before_script:
+  - set -e
+  - wget http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-2-amd64.deb
+  - sudo dpkg -i couchbase-release-1.0-2-amd64.deb
+  - sudo apt-get update
+  - sudo apt-get install libcouchbase-dev
+  - wget http://packages.couchbase.com/releases/4.6.0-DP/couchbase-server-enterprise_4.6.0-DP-ubuntu12.04_amd64.deb
+  - sudo dpkg -i couchbase-server-enterprise_4.6.0-DP-ubuntu12.04_amd64.deb
+  - cd /opt/couchbase
+  - ./bin/couchbase-server -- -noinput -detached
+  - sleep 20
+  - ./bin/couchbase-cli cluster-init -c 127.0.0.1:8091  --cluster-username=Administrator --cluster-password=Administrator --cluster-port=8091 --cluster-index-ramsize=512 --cluster-ramsize=512 --services=data,query,index
+  - sleep 10
+  - pecl install pcs
+  - pecl install couchbase
+  - cd $TRAVIS_BUILD_DIR
+  - composer self-update
+  - composer install --prefer-source
+script:
+    - chmod -R 777 tests/logs
+    - ./vendor/bin/phpunit --coverage-clover tests/logs/clover.xml
+    - chmod 777 tests/logs/clover.xml
+after_success:
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7" ]]; then travis_retry php vendor/bin/coveralls; fi
