@@ -7,7 +7,7 @@ use Illuminate\Database\Connectors\ConnectionFactory;
 /**
  * Class CouchbaseTestCase
  */
-class CouchbaseTestCase extends \PHPUnit_Framework_TestCase
+class CouchbaseTestCase extends \PHPUnit\Framework\TestCase
 {
     /** @var \Illuminate\Container\Container $app */
     protected $app;

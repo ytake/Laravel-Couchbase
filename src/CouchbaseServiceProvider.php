@@ -13,6 +13,7 @@
 namespace Ytake\LaravelCouchbase;
 
 use Illuminate\Cache\Repository;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Session\CacheBasedSessionHandler;
 use Illuminate\Support\ServiceProvider;
@@ -21,6 +22,7 @@ use Ytake\LaravelCouchbase\Cache\MemcachedBucketStore;
 use Ytake\LaravelCouchbase\Database\Connectable;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnector;
+use Ytake\LaravelCouchbase\Queue\CouchbaseConnector as QueueConnector;
 
 /**
  * Class CouchbaseServiceProvider.
@@ -118,7 +120,10 @@ class CouchbaseServiceProvider extends ServiceProvider
         /** @var QueueManager $queueManager */
         $queueManager = $this->app['queue'];
         $queueManager->addConnector('couchbase', function () {
-            return new \Ytake\LaravelCouchbase\Queue\CouchbaseConnector($this->app['db']);
+            /** @var DatabaseManager $databaseManager */
+            $databaseManager = $this->app['db'];
+
+            return new QueueConnector($databaseManager);
         });
     }
 }

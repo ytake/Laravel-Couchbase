@@ -50,15 +50,15 @@ class DatabaseTest extends CouchbaseTestCase
 
     public function testCallableChangeToConsistency()
     {
-        $this->connection->callableConsistency(\CouchbaseN1qlQuery::REQUEST_PLUS,
+        $this->connection->callableConsistency(\Couchbase\N1qlQuery::REQUEST_PLUS,
             function (\Ytake\LaravelCouchbase\Database\CouchbaseConnection $con) {
                 \Closure::bind(function () {
-                    PHPUnit_Framework_TestCase::assertSame(\CouchbaseN1qlQuery::REQUEST_PLUS, $this->consistency);
+                    $this->assertSame(\Couchbase\N1qlQuery::REQUEST_PLUS, $this->consistency);
                 }, $con, get_class($con))->__invoke();
             }
         );
         \Closure::bind(function () {
-            PHPUnit_Framework_TestCase::assertSame(\CouchbaseN1qlQuery::NOT_BOUNDED, $this->consistency);
+            $this->assertSame(\Couchbase\N1qlQuery::NOT_BOUNDED, $this->consistency);
         }, $this->connection, get_class($this->connection))->__invoke();
     }
 

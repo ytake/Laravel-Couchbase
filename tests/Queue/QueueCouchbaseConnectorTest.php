@@ -1,5 +1,7 @@
 <?php
 
+use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
+
 /**
  * Class QueueCouchbaseConnectorTest
  *
@@ -8,6 +10,14 @@
 class QueueCouchbaseConnectorTest extends CouchbaseTestCase
 {
     const BUCKET = 'jobs';
+
+    protected function setUp()
+    {
+        parent::setUp();
+        /** @var CouchbaseConnection $connection */
+        $connection = $this->app['db']->connection('couchbase');
+        $connection->openBucket(self::BUCKET)->manager()->flush();
+    }
 
     public function testQueueConnect()
     {
@@ -47,15 +57,5 @@ class QueueCouchbaseConnectorTest extends CouchbaseTestCase
         $couchbase = $connect->getDatabase();
         $couchbase->openBucket(self::BUCKET)->manager()->flush();
         parent::tearDown();
-    }
-
-    /**
-     * @before
-     */
-    public function clean()
-    {
-        /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
-        $connection = $this->app['db']->connection('couchbase');
-        $connection->openBucket(self::BUCKET)->manager()->flush();
     }
 }
