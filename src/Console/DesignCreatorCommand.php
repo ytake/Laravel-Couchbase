@@ -86,16 +86,8 @@ final class DesignCreatorCommand extends Command
             $bucket = $connection->openBucket($this->argument('bucket'));
             foreach ($this->config as $name => $document) {
                 $bucket->manager()->insertDesignDocument($name, $document);
+                $this->comment("created view name [{$name}]");
             }
-
-            /*
-            $bucket->manager()->insertDesignDocument());
-            $field = implode(",", $fields);
-            $this->info("created SECONDARY INDEX [{$name}] fields [{$field}], for [{$this->argument('bucket')}] bucket.");
-            if ($whereClause !== '') {
-                $this->comment("WHERE clause [{$whereClause}]");
-            }
-            */
         }
 
         return;

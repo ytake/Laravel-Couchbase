@@ -30,7 +30,10 @@
     "illuminate/queue": "5.5.*@dev",
     "illuminate/contracts": "5.5.*@dev",
     "illuminate/container": "5.5.*@dev",
-    "illuminate/filesystem": "5.5.*@dev"
+    "illuminate/filesystem": "5.5.*@dev",
+    "illuminate/auth": "5.5.*@dev",
+    "illuminate/http": "5.5.*@dev",
+    "illuminate/hashing": "5.5.*@dev"
   },
   "require-dev": {
     "symfony/framework-bundle": "~3.0",

@@ -17,6 +17,14 @@
 
 return [
     'design' => [
-
+        /*
+        'Your Design Document Name' => [
+            'views' => [
+                'Your View Name' => [
+                    'map' => file_get_contents(__DIR__ . '/../resources/sample.ddoc'),
+                ],
+            ],
+        ],
+        */
     ]
 ];

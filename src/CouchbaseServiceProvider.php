@@ -48,6 +48,9 @@ class CouchbaseServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $configPath = __DIR__ . '/config/couchbase.php';
+        $this->mergeConfigFrom($configPath, 'couchbase');
+        $this->publishes([$configPath => config_path('couchbase.php')], 'couchbase');
         $this->app->singleton(Connectable::class, function () {
             return new CouchbaseConnector();
         });

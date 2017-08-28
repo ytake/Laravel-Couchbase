@@ -13,6 +13,7 @@
 namespace Ytake\LaravelCouchbase;
 
 use Illuminate\Support\ServiceProvider;
+use Ytake\LaravelCouchbase\Console\DesignCreatorCommand;
 use Ytake\LaravelCouchbase\Console\IndexCreatorCommand;
 use Ytake\LaravelCouchbase\Console\IndexFinderCommand;
 use Ytake\LaravelCouchbase\Console\IndexRemoverCommand;
@@ -73,6 +74,12 @@ class ConsoleServiceProvider extends ServiceProvider
         $this->app->singleton('command.couchbase.queue.index.create', function ($app) {
             return new QueueCreatorCommand($app['Illuminate\Database\DatabaseManager']);
         });
+        $this->app->singleton('command.couchbase.design.document.create', function ($app) {
+            return new DesignCreatorCommand(
+                $app['Illuminate\Database\DatabaseManager'],
+                $app['config']->get('couchbase.design')
+            );
+        });
         $this->commands([
             'command.couchbase.indexes',
             'command.couchbase.primary.index.create',
@@ -80,6 +87,7 @@ class ConsoleServiceProvider extends ServiceProvider
             'command.couchbase.index.create',
             'command.couchbase.index.drop',
             'command.couchbase.queue.index.create',
+            'command.couchbase.design.document.create',
         ]);
     }
 
@@ -95,6 +103,7 @@ class ConsoleServiceProvider extends ServiceProvider
             'command.couchbase.index.create',
             'command.couchbase.index.drop',
             'command.couchbase.queue.index.create',
+            'command.couchbase.design.document.create',
             'migration.repository',
         ];
     }
