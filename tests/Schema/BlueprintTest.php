@@ -38,9 +38,7 @@ class BlueprintTest extends \CouchbaseTestCase
             $blueprint->dropIndex("secondary");
         });
         $indexes = $this->connection->openBucket('sample')->manager()->listN1qlIndexes();
-        foreach ($indexes as $index) {
-            $this->assertNotSame('sample', $index->keyspace);
-        }
+        $this->assertCount(0, $indexes);
         $this->removeBucket($this->connection->manager(), 'sample');
         sleep(5);
     }

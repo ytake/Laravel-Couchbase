@@ -51,6 +51,11 @@ class CouchbaseServiceProvider extends ServiceProvider
         $configPath = __DIR__ . '/config/couchbase.php';
         $this->mergeConfigFrom($configPath, 'couchbase');
         $this->publishes([$configPath => config_path('couchbase.php')], 'couchbase');
+        $this->registerCouchbaseComponent();
+    }
+
+    protected function registerCouchbaseComponent()
+    {
         $this->app->singleton(Connectable::class, function () {
             return new CouchbaseConnector();
         });
@@ -74,7 +79,7 @@ class CouchbaseServiceProvider extends ServiceProvider
         });
 
         // add couchbase extension
-        $this->app['db']->extend('couchbase', function ($config, $name) {
+        $this->app['db']->extend('couchbase', function (array $config, $name) {
             /* @var \Couchbase\Cluster $cluster */
             return new CouchbaseConnection($config, $name);
         });

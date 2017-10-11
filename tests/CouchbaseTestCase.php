@@ -89,7 +89,7 @@ class CouchbaseTestCase extends \PHPUnit\Framework\TestCase
         $sessionProvider->register();
         $this->registerDatabase();
         $this->registerCache();
-        $couchbaseProvider = new \Ytake\LaravelCouchbase\CouchbaseServiceProvider($this->app);
+        $couchbaseProvider = new ServiceProvider($this->app);
         $couchbaseProvider->register();
         $couchbaseProvider->boot();
         $this->app->bind(
@@ -137,5 +137,15 @@ class TestContainer extends \Illuminate\Container\Container
     public function version()
     {
         return '5.5.1';
+    }
+}
+
+class ServiceProvider extends \Ytake\LaravelCouchbase\CouchbaseServiceProvider
+{
+    public function register()
+    {
+        $configPath = __DIR__ . '/config/couchbase.php';
+        $this->mergeConfigFrom($configPath, 'couchbase');
+        $this->registerCouchbaseComponent();
     }
 }

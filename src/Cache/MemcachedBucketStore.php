@@ -34,7 +34,7 @@ class MemcachedBucketStore extends MemcachedStore
     /** @var int */
     protected $port = 8091;
 
-    /** @var int  */
+    /** @var int */
     protected $timeout = 1;
 
     /** @var string */
@@ -47,7 +47,7 @@ class MemcachedBucketStore extends MemcachedStore
      * @param string     $prefix
      * @param array      $servers
      */
-    public function __construct($memcached, $prefix = '', array $servers)
+    public function __construct(\Memcached $memcached, string $prefix = '', array $servers)
     {
         parent::__construct($memcached, $prefix);
         $this->servers = $servers;
@@ -113,7 +113,7 @@ class MemcachedBucketStore extends MemcachedStore
 
             $options = array_replace($this->options, [
                 CURLOPT_POST => true,
-                CURLOPT_URL => $server['host'].sprintf($this->flushEndpoint, $this->port, $server['bucket']),
+                CURLOPT_URL  => $server['host'] . sprintf($this->flushEndpoint, $this->port, $server['bucket']),
             ], $configureOption);
             curl_setopt_array($initialize, $options);
             curl_multi_add_handle($handler, $initialize);

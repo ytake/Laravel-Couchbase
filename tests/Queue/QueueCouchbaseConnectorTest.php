@@ -16,6 +16,11 @@ class QueueCouchbaseConnectorTest extends CouchbaseTestCase
         parent::setUp();
         /** @var CouchbaseConnection $connection */
         $connection = $this->app['db']->connection('couchbase');
+
+        $schema = $connection->getSchemaBuilder();
+        $schema->create('jobs', function (\Ytake\LaravelCouchbase\Schema\Blueprint $blueprint) {
+            $blueprint->primaryIndex();
+        });
         $connection->openBucket(self::BUCKET)->manager()->flush();
     }
 
@@ -49,13 +54,9 @@ class QueueCouchbaseConnectorTest extends CouchbaseTestCase
 
     public function tearDown()
     {
-        /** @var \Illuminate\Queue\QueueManager $queue */
-        $queue = $this->app['queue'];
-        /** @var \Ytake\LaravelCouchbase\Queue\CouchbaseQueue $connect */
-        $connect = $queue->connection('couchbase');
-        /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $couchbase */
-        $couchbase = $connect->getDatabase();
-        $couchbase->openBucket(self::BUCKET)->manager()->flush();
+        /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
+        $connection = $this->app['db']->connection('couchbase');
+        $this->removeBucket($connection->manager(), self::BUCKET);
         parent::tearDown();
     }
 }

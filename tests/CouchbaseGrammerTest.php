@@ -6,7 +6,7 @@ class CouchbaseGrammerTest extends CouchbaseTestCase
     /** @var \Ytake\LaravelCouchbase\Query\Grammar */
     private $grammer;
 
-    /** @var \Ytake\LaravelCouchbase\Database\QueryBuilder */
+    /** @var \Ytake\LaravelCouchbase\Query\Builder */
     private $builder;
 
     protected function setUp()
