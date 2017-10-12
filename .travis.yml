@@ -4,6 +4,8 @@ php:
   - 7
   - 7.1
 before_script:
+  - chmod -R 755 tests/bin/memcached.sh
+  - tests/bin/memcached.sh
   - set -e
   - wget http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-2-amd64.deb
   - sudo dpkg -i couchbase-release-1.0-2-amd64.deb
