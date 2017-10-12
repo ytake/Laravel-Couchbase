@@ -15,8 +15,8 @@ before_script:
   - ./bin/couchbase-server -- -noinput -detached
   - sleep 20
   - ./bin/couchbase-cli cluster-init -c 127.0.0.1:8091  --cluster-username=Administrator --cluster-password=Administrator --cluster-port=8091 --cluster-index-ramsize=256 --cluster-ramsize=256 --services=data,query,index
-  - ./bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=testing --bucket-type=couchbase --bucket-port=11211 --bucket-ramsize=128  --bucket-replica=1 -u Administrator -p Administrator
-  - ./bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=memcache-couch --bucket-type=memcached --bucket-port=11255 --bucket-ramsize=128 --enable-flush=1 -u Administrator -p Administrator
+  - ./bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=testing --bucket-type=couchbase --bucket-port=11211 --bucket-ramsize=128  --bucket-replica=1 
+  - ./bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=memcache-couch --bucket-type=memcached --bucket-port=11255 --bucket-ramsize=128 --enable-flush=1 
   - sleep 10
   - ./bin/cbq -e http://127.0.0.1:8091 --script "CREATE PRIMARY INDEX ON testing USING GSI;"
   - pecl install pcs-beta
