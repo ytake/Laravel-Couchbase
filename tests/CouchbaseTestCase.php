@@ -110,11 +110,11 @@ class CouchbaseTestCase extends \PHPUnit\Framework\TestCase
     /**
      * @param string $bucket
      *
-     * @return CouchbaseClusterManager
+     * @return Couchbase\ClusterManager
      */
     protected function createBucket($bucket)
     {
-        $cluster = new \CouchbaseCluster('127.0.0.1');
+        $cluster = new \Couchbase\Cluster('127.0.0.1');
         $clusterManager = $cluster->manager('Administrator', 'Administrator');
         $clusterManager->createBucket($bucket,
             ['bucketType' => 'couchbase', 'saslPassword' => '', 'flushEnabled' => true]);
@@ -144,8 +144,6 @@ class ServiceProvider extends \Ytake\LaravelCouchbase\CouchbaseServiceProvider
 {
     public function register()
     {
-        $configPath = __DIR__ . '/config/couchbase.php';
-        $this->mergeConfigFrom($configPath, 'couchbase');
         $this->registerCouchbaseComponent();
     }
 }
