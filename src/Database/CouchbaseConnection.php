@@ -96,7 +96,7 @@ class CouchbaseConnection extends Connection
         $this->config = $config;
         $this->name = $name;
         $this->getManagedConfigure($config);
-
+var_dump($this); exit;
         $this->useDefaultQueryGrammar();
 
         $this->useDefaultPostProcessor();
