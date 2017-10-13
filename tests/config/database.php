@@ -12,6 +12,8 @@ return [
                 'user'     => 'Administrator',
                 'password' => 'Administrator',
             ],
+            'user'     => 'Administrator',
+            'password' => 'Administrator',
         ],
     ],
     'migrations'  => 'migrations',
