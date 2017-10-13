@@ -22,6 +22,7 @@ before_script:
   - ./bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=memcache-couch --bucket-type=memcached --bucket-port=11255 --bucket-ramsize=128 --enable-flush=1 -u Administrator -p Administrator
   - sleep 10
   - ./bin/cbq -e http://127.0.0.1:8091 --script "CREATE PRIMARY INDEX ON testing USING GSI;"
+  - pecl install igbinary
   - pecl install pcs-beta
   - pecl install couchbase
   - cd $TRAVIS_BUILD_DIR
