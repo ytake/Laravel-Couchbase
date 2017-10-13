@@ -13,7 +13,8 @@ before_script:
   - sudo apt-get install libcouchbase-dev
   - wget http://packages.couchbase.com/releases/4.6.0-DP/couchbase-server-enterprise_4.6.0-DP-ubuntu12.04_amd64.deb
   - sudo dpkg -i couchbase-server-enterprise_4.6.0-DP-ubuntu12.04_amd64.deb
-  - cd /opt/couchbase
+  - cd $home/opt/couchbase
+  - ./bin/install/reloc.sh `pwd`
   - ./bin/couchbase-server -- -noinput -detached
   - sleep 20
   - ./bin/couchbase-cli cluster-init -c 127.0.0.1:8091  --cluster-username=Administrator --cluster-password=Administrator --cluster-port=8091 --cluster-index-ramsize=256 --cluster-ramsize=256 --services=data,query,index
