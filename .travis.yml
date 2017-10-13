@@ -1,9 +1,15 @@
 sudo: required
 language: php
+
 php:
-  - 7
+  - 7.0
   - 7.1
 
+addons:
+  apt:
+    packages:
+      - python
+      
 before_script:
   - chmod -R 755 tests/bin/memcached.sh
   - tests/bin/memcached.sh
@@ -13,16 +19,15 @@ before_script:
   - sudo dpkg -i couchbase-release-1.0-2-amd64.deb
   - sudo apt-get -y update
   - sudo apt-get -y install libcouchbase-dev build-essential zlib1g-dev
+  - pecl install pcs-1.3.3
+  - pecl install igbinary
+  - pecl install couchbase 
   - cd $home/opt/couchbase
   - ./bin/couchbase-cli cluster-init -c 127.0.0.1:8091  --cluster-username=Administrator --cluster-password=Administrator --cluster-port=8091 --cluster-init-ramsize=2048 --cluster-index-ramsize=512 --services=data,query,index --wait
   - ./bin/couchbase-cli rebalance -c 127.0.0.1:8091 -u Administrator -p Administrator
   - ./bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=testing --bucket-type=couchbase --bucket-ramsize=128 --enable-flush=1 --bucket-replica=1 -u Administrator -p Administrator --wait
   - ./bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=memcache-couch --bucket-type=memcached --bucket-port=11255 --bucket-ramsize=128 --enable-flush=1 -u Administrator -p Administrator --wait
-  - sleep 10
   - ./bin/cbq -e http://127.0.0.1:8091 --script "CREATE PRIMARY INDEX ON testing USING GSI;"
-  - pecl install igbinary
-  - pecl install pcs-beta
-  - pecl install couchbase
   - cd $TRAVIS_BUILD_DIR
   - composer self-update
   - composer install --prefer-source
