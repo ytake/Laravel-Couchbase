@@ -15,8 +15,11 @@ class CouchbaseGrammerTest extends CouchbaseTestCase
         /** @var \Illuminate\Database\DatabaseManager $databaseManager */
         $databaseManager = $this->app['db'];
         $this->grammer = new \Ytake\LaravelCouchbase\Query\Grammar;
+        $processor = new \Ytake\LaravelCouchbase\Query\Processor();
         $this->builder = new \Ytake\LaravelCouchbase\Query\Builder(
-            $databaseManager->connection()
+            $databaseManager->connection(),
+            $this->grammer,
+            $processor
         );
     }
 
