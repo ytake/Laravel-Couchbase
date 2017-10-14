@@ -51,7 +51,6 @@ class CouchbaseLock extends Lock implements Lockable
         try {
             $result = $this->bucket->insert($this->name, 1, ['expiry' => $this->seconds]);
             if ($result instanceof Document) {
-
                 return true;
             }
         } catch (CouchbaseException $e) {
