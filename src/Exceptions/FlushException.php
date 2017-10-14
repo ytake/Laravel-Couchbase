@@ -30,5 +30,4 @@ class FlushException extends \Exception
     {
         parent::__construct($message['_'], $code, $previous);
     }
-
 }
