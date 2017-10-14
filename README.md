@@ -257,8 +257,28 @@ for couchbase manipulate indexes
 | couchbase:drop-primary-index | Drop the given primary index associated with the current bucket. |
 | couchbase:indexes | List all N1QL indexes that are registered for the current bucket. |
 | couchbase:create-queue-index | Create primary index, secondary indexes for the queue jobs couchbase bucket. |
+| couchbase:create-design | Inserts design document and fails if it is exist already. for MapReduce views |
 
 `-h` more information.
+
+#### create design
+
+config/couchbase.php
+
+```php
+return [
+    'design' => [
+        'Your Design Document Name' => [
+            'views' => [
+                'Your View Name' => [
+                    'map' => file_get_contents(__DIR__ . '/../resources/sample.ddoc'),
+                ],
+            ],
+        ],
+    ]
+];
+
+```
 
 ## Queue
 
