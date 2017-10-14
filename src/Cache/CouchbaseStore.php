@@ -18,6 +18,7 @@ use Couchbase\Cluster;
 use Couchbase\Exception as CouchbaseException;
 use Illuminate\Cache\RetrievesMultipleKeys;
 use Illuminate\Cache\TaggableStore;
+use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Contracts\Cache\Store;
 use Ytake\LaravelCouchbase\Exceptions\FlushException;
 
@@ -221,7 +222,7 @@ class CouchbaseStore extends TaggableStore implements Store
      */
     protected function getMetaDoc($meta)
     {
-        if ($meta instanceof \CouchbaseMetaDoc) {
+        if ($meta instanceof \Couchbase\Document) {
             return $meta->value;
         }
         if (is_array($meta)) {
@@ -234,5 +235,17 @@ class CouchbaseStore extends TaggableStore implements Store
         }
 
         return null;
+    }
+
+    /**
+     * Get a lock instance.
+     *
+     * @param  string  $name
+     * @param  int  $seconds
+     * @return \Illuminate\Contracts\Cache\Lock
+     */
+    public function lock(string $name, int $seconds = 0): Lock
+    {
+        return new CouchbaseLock($this->bucket, $this->prefix.$name, $seconds);
     }
 }

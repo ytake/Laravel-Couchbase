@@ -63,5 +63,13 @@
       "php vendor/bin/php-cs-fixer fix"
     ]
   },
-  "minimum-stability": "stable"
+  "minimum-stability": "stable",
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Ytake\\LaravelCouchbase\\CouchbaseServiceProvider",
+        "Ytake\\LaravelCouchbase\\ConsoleServiceProvider"
+      ]
+    }
+  }
 }

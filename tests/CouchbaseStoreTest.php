@@ -84,4 +84,16 @@ class CouchbaseStoreTest extends \CouchbaseTestCase
         $this->assertSame('testing', $this->store->get('test'));
         $this->store->forget('test');
     }
+
+    public function testShouldBeLockedTheCache()
+    {
+        $this->store->forget('cache:lock');
+        $result = $this->store->lock('cache:lock', 600)->get();
+        $this->assertTrue($result);
+        $resultSecond = $this->store->lock('cache:lock', 600)->get();
+        $this->assertFalse($resultSecond);
+
+        $this->store->lock('cache:lock:two', 600)->get(function () {});
+        $this->assertNull($this->store->get('cache:lock:two'));
+    }
 }
