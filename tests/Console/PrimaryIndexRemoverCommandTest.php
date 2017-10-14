@@ -22,13 +22,9 @@ class PrimaryIndexRemoverCommandTest extends \CouchbaseTestCase
 
     public function testDropPrimaryIndex()
     {
-        $cluster = new \CouchbaseCluster('127.0.0.1');
-        $clusterManager = $cluster->manager('Administrator', 'Administrator');
-        $clusterManager->createBucket($this->bucket,
-            ['bucketType' => 'couchbase', 'saslPassword' => '', 'flushEnabled' => true]);
-        sleep(5);
         /** @var \Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->databaseManager->connection('couchbase');
+        $connection->manager();
         $bucket = $connection->openBucket($this->bucket);
         $bucket->manager()->createN1qlPrimaryIndex();
         $output = new \Symfony\Component\Console\Output\BufferedOutput();
@@ -41,7 +37,6 @@ class PrimaryIndexRemoverCommandTest extends \CouchbaseTestCase
         $fetch = $output->fetch();
         $this->assertNotNull($fetch);
         $this->assertSame("dropped PRIMARY INDEX [#primary] for [index_testing] bucket.", trim($fetch));
-        $clusterManager->removeBucket($this->bucket);
         sleep(5);
     }
 }

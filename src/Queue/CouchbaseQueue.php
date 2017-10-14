@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -12,10 +13,10 @@
 
 namespace Ytake\LaravelCouchbase\Queue;
 
-use Carbon\Carbon;
 use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Queue\Jobs\DatabaseJob;
-use Ytake\LaravelCouchbase\Query\Builder;
+use Illuminate\Queue\Jobs\DatabaseJobRecord;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
 /**
@@ -41,17 +42,8 @@ class CouchbaseQueue extends DatabaseQueue
     public function pop($queue = null)
     {
         $queue = $this->getQueue($queue);
-
-        if (!is_null($this->expire)) {
-            $this->releaseJobsThatHaveBeenReservedTooLong($queue);
-        }
-
         if ($job = $this->getNextAvailableJob($queue)) {
-            $this->markJobAsReserved($job->id);
-            $bucket = $this->table;
-            return new DatabaseJob(
-                $this->container, $this, $job->$bucket, $queue
-            );
+            return $this->marshalJob($queue, $job);
         }
 
         return null;
@@ -60,38 +52,13 @@ class CouchbaseQueue extends DatabaseQueue
     /**
      * {@inheritdoc}
      */
-    protected function releaseJobsThatHaveBeenReservedTooLong($queue)
+    protected function marshalJob($queue, $job)
     {
-        $bucket = $this->table;
-        $expired = Carbon::now()->subSeconds($this->expire)->getTimestamp();
+        $job = $this->markJobAsReserved($job);
 
-        $first = $this->buildQueueQuery($queue, $expired)
-            ->first(['*', 'meta().id']);
-        if ($first) {
-            $attempts = (isset($first->$bucket->attempts)) ? $first->$bucket->attempts : 1;
-            $identifier = $first->id;
-            $this->buildQueueQuery($queue, $expired)
-                ->key($identifier)
-                ->update([
-                    'reserved'    => 0,
-                    'reserved_at' => null,
-                    'attempts'    => $attempts,
-                ]);
-        }
-    }
-
-    /**
-     * @param $queue
-     * @param $expired
-     *
-     * @return Builder
-     */
-    protected function buildQueueQuery($queue, $expired)
-    {
-        return $this->database->table($this->table)
-            ->where('queue', $this->getQueue($queue))
-            ->where('reserved', 1)
-            ->where('reserved_at', '<=', $expired);
+        return new DatabaseJob(
+            $this->container, $this, $job, $this->connectionName, $queue
+        );
     }
 
     /**
@@ -101,27 +68,29 @@ class CouchbaseQueue extends DatabaseQueue
     {
         $job = $this->database->table($this->table)
             ->where('queue', $this->getQueue($queue))
-            ->where('reserved', 0)
-            ->where('available_at', '<=', $this->getTime())
+            ->where(function (Builder $query) {
+                $this->isAvailable($query);
+                $this->isReservedButExpired($query);
+            })
             ->orderBy('id', 'asc')
             ->first(['*', 'meta().id']);
 
-        return $job ? (object)$job : null;
+        return $job ? new DatabaseJobRecord((object)$job) : null;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function markJobAsReserved($id)
+    protected function markJobAsReserved($job)
     {
         $bucket = $this->table;
-        /** @var \CouchbaseBucket $openBucket */
+        /** @var \Couchbase\Bucket $openBucket */
         $openBucket = $this->database->openBucket($bucket);
         // lock bucket
-        $meta = $openBucket->getAndLock($id, 10);
-        $meta->value->reserved = 1;
-        $meta->value->reserved_at = $this->getTime();
-        $openBucket->replace($id, $meta->value, ['cas' => $meta->cas]);
+        $meta = $openBucket->getAndLock($job->id, 10);
+        $meta->value->attempts = $job->$bucket->attempts + 1;
+        $meta->value->reserved_at = $job->touch();
+        $openBucket->replace($job->id, $meta->value, ['cas' => $meta->cas]);
 
         return $meta->value;
     }
@@ -131,20 +100,8 @@ class CouchbaseQueue extends DatabaseQueue
      */
     public function bulk($jobs, $data = '', $queue = null)
     {
-        $queue = $this->getQueue($queue);
-
-        $availableAt = $this->getAvailableAt(0);
-
-        $records = array_map(function ($job) use ($queue, $data, $availableAt) {
-            return $this->buildDatabaseRecord(
-                $queue, $this->createPayload($job, $data), $availableAt
-            );
-        }, (array)$jobs);
-        foreach ($records as $record) {
-            $increment = $this->incrementKey();
-            $record['id'] = $increment;
-            $this->database->table($this->table)
-                ->key($this->uniqueKey($record))->insert($record);
+        foreach ((array)$jobs as $job) {
+            $this->push($job, $data, $queue);
         }
     }
 
@@ -159,10 +116,10 @@ class CouchbaseQueue extends DatabaseQueue
     /**
      * {@inheritdoc}
      */
-    protected function pushToDatabase($delay, $queue, $payload, $attempts = 0)
+    protected function pushToDatabase($queue, $payload, $delay = 0, $attempts = 0)
     {
         $attributes = $this->buildDatabaseRecord(
-            $this->getQueue($queue), $payload, $this->getAvailableAt($delay), $attempts
+            $this->getQueue($queue), $payload, $this->availableAt($delay), $attempts
         );
         $increment = $this->incrementKey();
         $attributes['id'] = $increment;
@@ -195,7 +152,7 @@ class CouchbaseQueue extends DatabaseQueue
      *
      * @return string
      */
-    protected function uniqueKey(array $attributes)
+    protected function uniqueKey(array $attributes): string
     {
         $array = array_only($attributes, ['queue', 'attempts', 'id']);
 
@@ -205,7 +162,7 @@ class CouchbaseQueue extends DatabaseQueue
     /**
      * @return string
      */
-    protected function identifier()
+    protected function identifier(): string
     {
         return __CLASS__ . ':sequence';
     }

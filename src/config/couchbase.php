@@ -8,26 +8,23 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
-
-namespace Ytake\LaravelCouchbase\Cache\Legacy;
-
-use Illuminate\Cache\TaggedCache;
-
-/**
- * Class CouchbaseTaggedCache.
  *
- * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the MIT license.
+ *
+ * Copyright (c) 2015-2017 Yuuki Takezawa
  */
-class CouchbaseTaggedCache extends TaggedCache
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function flush()
-    {
-        foreach ($this->tags->getNames() as $name) {
-            $this->store->forget($this->tags->tagKey($name));
-        }
-    }
-}
+
+return [
+    'design' => [
+        /*
+        'Your Design Document Name' => [
+            'views' => [
+                'Your View Name' => [
+                    'map' => file_get_contents(__DIR__ . '/../resources/sample.ddoc'),
+                ],
+            ],
+        ],
+        */
+    ]
+];

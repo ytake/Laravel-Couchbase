@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -14,49 +15,40 @@ namespace Ytake\LaravelCouchbase\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\DatabaseManager;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
 
 /**
- * Class IndexFinderCommand
- *
- * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
+ * Class DesignCreatorCommand
  */
-class IndexFinderCommand extends Command
+final class DesignCreatorCommand extends Command
 {
     /** @var string */
-    protected $name = 'couchbase:indexes';
+    protected $name = 'couchbase:create-design';
 
     /** @var string */
-    protected $description = 'List all N1QL indexes that are registered for the current bucket.';
+    protected $description = 'Inserts design document and fails if it is exist already.';
 
     /** @var DatabaseManager */
-    protected $databaseManager;
+    private $databaseManager;
 
     /** @var string */
-    protected $defaultDatabase = 'couchbase';
+    private $defaultDatabase = 'couchbase';
 
-    /** @var string[] */
-    private $headers = [
-        "name",
-        "isPrimary",
-        "type",
-        "state",
-        "keyspace",
-        "namespace",
-        "fields",
-        "condition",
-    ];
+    /** @var array<string, string> */
+    private $config = [];
 
     /**
-     * IndexFinderCommand constructor.
+     * DesignCreatorCommand constructor.
      *
      * @param DatabaseManager $databaseManager
+     * @param array           $config
      */
-    public function __construct(DatabaseManager $databaseManager)
+    public function __construct(DatabaseManager $databaseManager, array $config = [])
     {
         $this->databaseManager = $databaseManager;
+        $this->config = $config;
         parent::__construct();
     }
 
@@ -87,23 +79,15 @@ class IndexFinderCommand extends Command
      */
     public function handle()
     {
-        $row = [];
-        $tableRows = [];
         /** @var \Illuminate\Database\Connection|CouchbaseConnection $connection */
         $connection = $this->databaseManager->connection($this->option('database'));
         if ($connection instanceof CouchbaseConnection) {
-            $bucket = $connection->getCouchbase()->openBucket($this->argument('bucket'));
-            $indexes = $bucket->manager()->listN1qlIndexes();
-            foreach ($indexes as $index) {
-                foreach ($index as $key => $value) {
-                    if (array_search($key, $this->headers) !== false) {
-                        $row[] = (!is_array($value)) ? $value : implode(",", $value);
-                    }
-                }
-                $tableRows[] = $row;
-                $row = [];
+            /** @var \Couchbase\Bucket $bucket */
+            $bucket = $connection->openBucket($this->argument('bucket'));
+            foreach ($this->config as $name => $document) {
+                $bucket->manager()->insertDesignDocument($name, $document);
+                $this->comment("created view name [{$name}]");
             }
-            $this->table($this->headers, $tableRows);
         }
 
         return;

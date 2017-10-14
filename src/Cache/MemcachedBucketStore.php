@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -18,6 +19,7 @@ use Illuminate\Cache\MemcachedStore;
  * Class MemcachedBucketStore.
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
+ * @deprecated
  */
 class MemcachedBucketStore extends MemcachedStore
 {
@@ -33,7 +35,7 @@ class MemcachedBucketStore extends MemcachedStore
     /** @var int */
     protected $port = 8091;
 
-    /** @var int  */
+    /** @var int */
     protected $timeout = 1;
 
     /** @var string */
@@ -46,7 +48,7 @@ class MemcachedBucketStore extends MemcachedStore
      * @param string     $prefix
      * @param array      $servers
      */
-    public function __construct($memcached, $prefix = '', array $servers)
+    public function __construct(\Memcached $memcached, string $prefix = '', array $servers)
     {
         parent::__construct($memcached, $prefix);
         $this->servers = $servers;
@@ -111,7 +113,7 @@ class MemcachedBucketStore extends MemcachedStore
 
             $options = array_replace($this->options, [
                 CURLOPT_POST => true,
-                CURLOPT_URL => $server['host'].sprintf($this->flushEndpoint, $this->port, $server['bucket']),
+                CURLOPT_URL  => $server['host'] . sprintf($this->flushEndpoint, $this->port, $server['bucket']),
             ], $configureOption);
             curl_setopt_array($initialize, $options);
             curl_multi_add_handle($handler, $initialize);
@@ -160,7 +162,7 @@ class MemcachedBucketStore extends MemcachedStore
     /**
      * @param int $second
      */
-    public function timeout($second)
+    public function timeout(int $second)
     {
         $this->timeout = $second;
     }
@@ -168,7 +170,7 @@ class MemcachedBucketStore extends MemcachedStore
     /**
      * @param int $port
      */
-    public function port($port)
+    public function port(int $port)
     {
         $this->port = $port;
     }

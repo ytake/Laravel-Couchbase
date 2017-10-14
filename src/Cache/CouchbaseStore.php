@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -12,41 +13,49 @@
 
 namespace Ytake\LaravelCouchbase\Cache;
 
-use CouchbaseBucket;
-use CouchbaseCluster;
-use CouchbaseException;
+use Couchbase\Bucket;
+use Couchbase\Cluster;
+use Couchbase\Exception as CouchbaseException;
+use Illuminate\Cache\RetrievesMultipleKeys;
+use Illuminate\Cache\TaggableStore;
+use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Contracts\Cache\Store;
 use Ytake\LaravelCouchbase\Exceptions\FlushException;
-use Ytake\LaravelCouchbase\Cache\Legacy\CouchbaseTaggableStore;
 
 /**
- * Class LegacyCouchbaseStore.
+ * Class CouchbaseStore.
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
- * @codeCoverageIgnore
  */
-class LegacyCouchbaseStore extends CouchbaseTaggableStore implements Store
+class CouchbaseStore extends TaggableStore implements Store
 {
+    use RetrievesMultipleKeys;
+
     /** @var string */
     protected $prefix;
 
-    /** @var CouchbaseBucket */
+    /** @var Bucket */
     protected $bucket;
 
-    /** @var CouchbaseCluster */
+    /** @var Cluster */
     protected $cluster;
 
     /**
-     * LegacyCouchbaseStore constructor.
+     * CouchbaseStore constructor.
      *
-     * @param CouchbaseCluster $cluster
-     * @param                  $bucket
-     * @param string           $password
-     * @param null             $prefix
-     * @param string           $serialize
+     * @param Cluster     $cluster
+     * @param string      $bucket
+     * @param string      $password
+     * @param string|null $prefix
+     * @param string      $serialize
      */
-    public function __construct(CouchbaseCluster $cluster, $bucket, $password = '', $prefix = null, $serialize = 'php')
-    {
+    public function __construct(
+        Cluster $cluster,
+        string $bucket,
+        string $password = '',
+        string $prefix = null,
+        string $serialize = 'php'
+    ) {
         $this->cluster = $cluster;
         $this->setBucket($bucket, $password, $serialize);
         $this->setPrefix($prefix);
@@ -75,7 +84,7 @@ class LegacyCouchbaseStore extends CouchbaseTaggableStore implements Store
      *
      * @return bool
      */
-    public function add($key, $value, $minutes = 0)
+    public function add($key, $value, $minutes = 0): bool
     {
         $options = ($minutes === 0) ? [] : ['expiry' => ($minutes * 60)];
         try {
@@ -121,7 +130,8 @@ class LegacyCouchbaseStore extends CouchbaseTaggableStore implements Store
         try {
             $this->bucket->insert($this->resolveKey($key), $value);
         } catch (CouchbaseException $e) {
-            // bucket->insert when called from resetTag in TagSet can throw CAS exceptions, ignore.
+            // bucket->insert when called from resetTag in TagSet can throw CAS exceptions, ignore.\
+            $this->bucket->upsert($this->resolveKey($key), $value);
         }
     }
 
@@ -164,19 +174,19 @@ class LegacyCouchbaseStore extends CouchbaseTaggableStore implements Store
      *
      * @param string $prefix
      */
-    public function setPrefix($prefix)
+    public function setPrefix(string $prefix)
     {
-        $this->prefix = !empty($prefix) ? $prefix.':' : '';
+        $this->prefix = !empty($prefix) ? $prefix . ':' : '';
     }
 
     /**
-     * @param        $bucket
+     * @param string $bucket
      * @param string $password
      * @param string $serialize
      *
-     * @return $this
+     * @return CouchbaseStore
      */
-    public function setBucket($bucket, $password = '', $serialize = 'php')
+    public function setBucket(string $bucket, string $password = '', string $serialize = 'php'): CouchbaseStore
     {
         $this->bucket = $this->cluster->openBucket($bucket, $password);
         if ($serialize === 'php') {
@@ -196,13 +206,13 @@ class LegacyCouchbaseStore extends CouchbaseTaggableStore implements Store
         if (is_array($keys)) {
             $result = [];
             foreach ($keys as $key) {
-                $result[] = $this->prefix.$key;
+                $result[] = $this->prefix . $key;
             }
 
             return $result;
         }
 
-        return $this->prefix.$keys;
+        return $this->prefix . $keys;
     }
 
     /**
@@ -212,7 +222,7 @@ class LegacyCouchbaseStore extends CouchbaseTaggableStore implements Store
      */
     protected function getMetaDoc($meta)
     {
-        if ($meta instanceof \CouchbaseMetaDoc) {
+        if ($meta instanceof \Couchbase\Document) {
             return $meta->value;
         }
         if (is_array($meta)) {
@@ -224,6 +234,18 @@ class LegacyCouchbaseStore extends CouchbaseTaggableStore implements Store
             return $result;
         }
 
-        return;
+        return null;
+    }
+
+    /**
+     * Get a lock instance.
+     *
+     * @param  string  $name
+     * @param  int  $seconds
+     * @return \Illuminate\Contracts\Cache\Lock
+     */
+    public function lock(string $name, int $seconds = 0): Lock
+    {
+        return new CouchbaseLock($this->bucket, $this->prefix.$name, $seconds);
     }
 }

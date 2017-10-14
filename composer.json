@@ -17,25 +17,29 @@
   ],
   "license": "MIT",
   "require": {
-    "php": ">=5.5.9",
-    "ext-couchbase": "^2.2.2",
-    "illuminate/support": "5.1.*",
-    "illuminate/config": "5.1.*",
-    "illuminate/console": "5.1.*",
-    "illuminate/events": "5.1.*",
-    "illuminate/cache": "5.1.*",
-    "illuminate/session": "5.1.*",
-    "illuminate/database": "5.1.*",
-    "illuminate/encryption": "5.1.*",
-    "illuminate/queue": "5.1.*"
+    "php": ">=7.0.0",
+    "ext-couchbase": ">=2.3.2",
+    "illuminate/support": "5.5.*",
+    "illuminate/config": "5.5.*",
+    "illuminate/console": "5.5.*",
+    "illuminate/events": "5.5.*",
+    "illuminate/cache": "5.5.*",
+    "illuminate/session": "5.5.*",
+    "illuminate/database": "5.5.*",
+    "illuminate/encryption": "5.5.*",
+    "illuminate/queue": "5.5.*",
+    "illuminate/contracts": "5.5.*",
+    "illuminate/container": "5.5.*"
   },
   "require-dev": {
-    "symfony/framework-bundle": "~2.0|~3.0",
-    "symfony/console": "~2.0|~3.0",
-    "phpunit/phpunit": "~4.0|~5.0",
+    "symfony/framework-bundle": "~3.0",
+    "symfony/console": "~3.0",
+    "phpunit/phpunit": "^6.0",
     "satooshi/php-coveralls": "*",
-    "phing/phing": "~2.0",
-    "friendsofphp/php-cs-fixer": "~1.0"
+    "phploc/phploc": "*",
+    "pdepend/pdepend" : "^2.2.4",
+    "phpmd/phpmd": "@stable",
+    "friendsofphp/php-cs-fixer": "^2.0"
   },
   "autoload": {
     "psr-4": {
@@ -59,5 +63,13 @@
       "php vendor/bin/php-cs-fixer fix"
     ]
   },
-  "minimum-stability": "stable"
+  "minimum-stability": "stable",
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Ytake\\LaravelCouchbase\\CouchbaseServiceProvider",
+        "Ytake\\LaravelCouchbase\\ConsoleServiceProvider"
+      ]
+    }
+  }
 }

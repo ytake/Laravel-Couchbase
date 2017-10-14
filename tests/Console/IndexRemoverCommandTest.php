@@ -22,11 +22,6 @@ class IndexRemoverCommandTest extends \CouchbaseTestCase
 
     public function testDropSecondaryIndex()
     {
-        $cluster = new \CouchbaseCluster('127.0.0.1');
-        $clusterManager = $cluster->manager('Administrator', 'Administrator');
-        $clusterManager->createBucket($this->bucket,
-            ['bucketType' => 'couchbase', 'saslPassword' => '', 'flushEnabled' => true]);
-        sleep(5);
         /** @var \Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->databaseManager->connection('couchbase');
         $bucket = $connection->openBucket($this->bucket);
@@ -42,6 +37,6 @@ class IndexRemoverCommandTest extends \CouchbaseTestCase
         );
         $fetch = $output->fetch();
         $this->assertSame("dropped SECONDARY INDEX [testing_gsi] for [index_testing] bucket.", trim($fetch));
-        $clusterManager->removeBucket($this->bucket);
+        sleep(5);
     }
 }

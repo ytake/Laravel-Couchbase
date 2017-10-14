@@ -41,7 +41,7 @@ class QueueCreatorCommand extends Command
 
     const PRIMARY_KEY = '#job_queue_primary';
 
-    /** @var string[] */
+    /** @var array<string, string[]> */
     protected $secondaryIndexes = [
         'idx_job_queue'       => [ // index name
             'queue', // fields
@@ -51,7 +51,6 @@ class QueueCreatorCommand extends Command
         ],
         'idx_job_queue_cover' => [
             'queue',
-            'reserved',
             'reserved_at',
             'available_at',
             'id',
@@ -106,7 +105,7 @@ class QueueCreatorCommand extends Command
     /**
      * Execute the console command
      */
-    public function fire()
+    public function handle()
     {
         /** @var \Illuminate\Database\Connection|CouchbaseConnection $connection */
         $connection = $this->databaseManager->connection($this->option('database'));

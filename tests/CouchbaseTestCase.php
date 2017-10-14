@@ -7,7 +7,7 @@ use Illuminate\Database\Connectors\ConnectionFactory;
 /**
  * Class CouchbaseTestCase
  */
-class CouchbaseTestCase extends \PHPUnit_Framework_TestCase
+class CouchbaseTestCase extends \PHPUnit\Framework\TestCase
 {
     /** @var \Illuminate\Container\Container $app */
     protected $app;
@@ -41,8 +41,8 @@ class CouchbaseTestCase extends \PHPUnit_Framework_TestCase
             $filesystem->getRequire(__DIR__ . '/config/queue.php')
         );
         $this->app['config']->set(
-            "app",
-            $filesystem->getRequire(__DIR__ . '/config/app.php')
+            'couchbase',
+            $filesystem->getRequire(__DIR__ . '/config/couchbase.php')
         );
         $this->app['files'] = $filesystem;
     }
@@ -83,17 +83,13 @@ class CouchbaseTestCase extends \PHPUnit_Framework_TestCase
             return new \Illuminate\Config\Repository;
         });
         $this->registerConfigure();
-        $eventServiceProvider = new \Illuminate\Encryption\EncryptionServiceProvider($this->app);
-        $eventServiceProvider->register();
-        $eventServiceProvider = new \Illuminate\Events\EventServiceProvider($this->app);
-        $eventServiceProvider->register();
         $queueProvider = new \Illuminate\Queue\QueueServiceProvider($this->app);
         $queueProvider->register();
         $sessionProvider = new \Illuminate\Session\SessionServiceProvider($this->app);
         $sessionProvider->register();
         $this->registerDatabase();
         $this->registerCache();
-        $couchbaseProvider = new \Ytake\LaravelCouchbase\CouchbaseServiceProvider($this->app);
+        $couchbaseProvider = new ServiceProvider($this->app);
         $couchbaseProvider->register();
         $couchbaseProvider->boot();
         $this->app->bind(
@@ -114,11 +110,11 @@ class CouchbaseTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @param string $bucket
      *
-     * @return CouchbaseClusterManager
+     * @return Couchbase\ClusterManager
      */
     protected function createBucket($bucket)
     {
-        $cluster = new \CouchbaseCluster('127.0.0.1');
+        $cluster = new \Couchbase\Cluster('127.0.0.1');
         $clusterManager = $cluster->manager('Administrator', 'Administrator');
         $clusterManager->createBucket($bucket,
             ['bucketType' => 'couchbase', 'saslPassword' => '', 'flushEnabled' => true]);
@@ -140,6 +136,14 @@ class TestContainer extends \Illuminate\Container\Container
 {
     public function version()
     {
-        return '5.2.1';
+        return '5.5.1';
+    }
+}
+
+class ServiceProvider extends \Ytake\LaravelCouchbase\CouchbaseServiceProvider
+{
+    public function register()
+    {
+        $this->registerCouchbaseComponent();
     }
 }

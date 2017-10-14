@@ -13,14 +13,16 @@
 namespace Ytake\LaravelCouchbase;
 
 use Illuminate\Cache\Repository;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Queue\QueueManager;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Session\CacheBasedSessionHandler;
-use Ytake\LaravelCouchbase\Database\Connectable;
-use Ytake\LaravelCouchbase\Cache\LegacyCouchbaseStore;
+use Illuminate\Support\ServiceProvider;
+use Ytake\LaravelCouchbase\Cache\CouchbaseStore;
 use Ytake\LaravelCouchbase\Cache\MemcachedBucketStore;
-use Ytake\LaravelCouchbase\Database\CouchbaseConnector;
+use Ytake\LaravelCouchbase\Database\Connectable;
 use Ytake\LaravelCouchbase\Database\CouchbaseConnection;
+use Ytake\LaravelCouchbase\Database\CouchbaseConnector;
+use Ytake\LaravelCouchbase\Queue\CouchbaseConnector as QueueConnector;
 
 /**
  * Class CouchbaseServiceProvider.
@@ -46,6 +48,14 @@ class CouchbaseServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $configPath = __DIR__ . '/config/couchbase.php';
+        $this->mergeConfigFrom($configPath, 'couchbase');
+        $this->publishes([$configPath => config_path('couchbase.php')], 'couchbase');
+        $this->registerCouchbaseComponent();
+    }
+
+    protected function registerCouchbaseComponent()
+    {
         $this->app->singleton(Connectable::class, function () {
             return new CouchbaseConnector();
         });
@@ -69,7 +79,8 @@ class CouchbaseServiceProvider extends ServiceProvider
         });
 
         // add couchbase extension
-        $this->app['db']->extend('couchbase', function ($config, $name) {
+        $this->app['db']->extend('couchbase', function (array $config, $name) {
+            /* @var \Couchbase\Cluster $cluster */
             return new CouchbaseConnection($config, $name);
         });
     }
@@ -81,15 +92,17 @@ class CouchbaseServiceProvider extends ServiceProvider
     protected function registerCouchbaseBucketCacheDriver()
     {
         $this->app['cache']->extend('couchbase', function ($app, $config) {
-            /** @var \CouchbaseCluster $cluster */
+            /** @var \Couchbase\Cluster $cluster */
             $cluster = $app['db']->connection($config['driver'])->getCouchbase();
             $password = (isset($config['bucket_password'])) ? $config['bucket_password'] : '';
+
             return new Repository(
-                new LegacyCouchbaseStore(
+                new CouchbaseStore(
                     $cluster,
                     $config['bucket'],
                     $password,
-                    $app['config']->get('cache.prefix'))
+                    $app['config']->get('cache.prefix')
+                )
             );
         });
     }
@@ -105,7 +118,7 @@ class CouchbaseServiceProvider extends ServiceProvider
             $memcachedBucket = $this->app['couchbase.memcached.connector']->connect($config['servers']);
 
             return new Repository(
-                new MemcachedBucketStore($memcachedBucket, $prefix, $config['servers'])
+                new MemcachedBucketStore($memcachedBucket, strval($prefix), $config['servers'])
             );
         });
     }
@@ -115,7 +128,10 @@ class CouchbaseServiceProvider extends ServiceProvider
         /** @var QueueManager $queueManager */
         $queueManager = $this->app['queue'];
         $queueManager->addConnector('couchbase', function () {
-            return new \Ytake\LaravelCouchbase\Queue\CouchbaseConnector($this->app['db']);
+            /** @var DatabaseManager $databaseManager */
+            $databaseManager = $this->app['db'];
+
+            return new QueueConnector($databaseManager);
         });
     }
 }

@@ -20,11 +20,13 @@ namespace Ytake\LaravelCouchbase\Exceptions;
 class FlushException extends \Exception
 {
     /**
+     * FlushException constructor.
+     *
      * @param array           $message
      * @param int             $code
-     * @param \Exception|null $previous
+     * @param \Throwable|null $previous
      */
-    public function __construct(array $message, $code = 0, \Exception $previous = null)
+    public function __construct(array $message, $code = 0, \Throwable $previous = null)
     {
         parent::__construct($message['_'], $code, $previous);
     }

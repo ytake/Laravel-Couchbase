@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -13,16 +14,19 @@
 namespace Ytake\LaravelCouchbase\Database;
 
 use Closure;
-use CouchbaseBucket;
+use Couchbase\Bucket;
+use Couchbase\Cluster;
+use Couchbase\ClusterManager;
+use Couchbase\N1qlQuery;
 use Illuminate\Database\Connection;
-use Ytake\LaravelCouchbase\Query\View;
-use Ytake\LaravelCouchbase\Schema\Builder;
-use Ytake\LaravelCouchbase\Query\Grammar;
-use Ytake\LaravelCouchbase\Query\Processor;
 use Ytake\LaravelCouchbase\Events\QueryPrepared;
 use Ytake\LaravelCouchbase\Events\ResultReturning;
-use Ytake\LaravelCouchbase\Query\Builder as QueryBuilder;
 use Ytake\LaravelCouchbase\Exceptions\NotSupportedException;
+use Ytake\LaravelCouchbase\Query\Builder as QueryBuilder;
+use Ytake\LaravelCouchbase\Query\Grammar;
+use Ytake\LaravelCouchbase\Query\Processor;
+use Ytake\LaravelCouchbase\Query\View;
+use Ytake\LaravelCouchbase\Schema\Builder;
 
 /**
  * Class CouchbaseConnection.
@@ -34,7 +38,7 @@ class CouchbaseConnection extends Connection
     /** @var string */
     protected $bucket;
 
-    /** @var \CouchbaseCluster */
+    /** @var Cluster */
     protected $connection;
 
     /** @var */
@@ -59,7 +63,7 @@ class CouchbaseConnection extends Connection
     protected $metrics;
 
     /** @var int  default consistency */
-    protected $consistency = \CouchbaseN1qlQuery::NOT_BOUNDED;
+    protected $consistency = N1qlQuery::NOT_BOUNDED;
 
     /** @var string[]  function to handle the retrieval of various properties. */
     private $properties = [
@@ -78,7 +82,10 @@ class CouchbaseConnection extends Connection
     protected $config = [];
 
     /** @var string */
-    protected $name;
+    private $name;
+
+    /** @var bool */
+    private $crossBucket = true;
 
     /**
      * @param array  $config
@@ -96,11 +103,11 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @param $password
+     * @param string $password
      *
-     * @return $this
+     * @return CouchbaseConnection
      */
-    public function setBucketPassword($password)
+    public function setBucketPassword(string $password): CouchbaseConnection
     {
         $this->bucketPassword = $password;
 
@@ -110,29 +117,27 @@ class CouchbaseConnection extends Connection
     /**
      * @param string $name
      *
-     * @return \CouchbaseBucket
-     *
-     * @throws \CouchbaseException
+     * @return Bucket
      */
-    public function openBucket($name)
+    public function openBucket(string $name): Bucket
     {
         return $this->getCouchbase()->openBucket($name, $this->bucketPassword);
     }
 
     /**
-     * @return \CouchbaseClusterManager
+     * @return ClusterManager
      */
-    public function manager()
+    public function manager(): ClusterManager
     {
         return $this->getCouchbase()->manager($this->managerUser, $this->managerPassword);
     }
 
     /**
-     * @param CouchbaseBucket $bucket
+     * @param Bucket $bucket
      *
      * @return string[]
      */
-    public function getOptions(\CouchbaseBucket $bucket)
+    public function getOptions(Bucket $bucket): array
     {
         $options = [];
         foreach ($this->properties as $property) {
@@ -143,9 +148,9 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @param CouchbaseBucket $bucket
+     * @param Bucket $bucket
      */
-    protected function registerOption(\CouchbaseBucket $bucket)
+    protected function registerOption(Bucket $bucket)
     {
         if (count($this->options)) {
             foreach ($this->options as $option => $value) {
@@ -179,7 +184,6 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     *
      * @param array $config enable(array), options(array), administrator(array), bucket_password(string)
      */
     protected function getManagedConfigure(array $config)
@@ -205,9 +209,9 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @return \CouchbaseCluster
+     * @return \Couchbase\Cluster
      */
-    protected function createConnection()
+    protected function createConnection(): Cluster
     {
         $this->setReconnector(function () {
             $this->connection = (new CouchbaseConnector)->connect($this->config);
@@ -227,9 +231,9 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @return \CouchbaseCluster
+     * @return Cluster
      */
-    public function getCouchbase()
+    public function getCouchbase(): Cluster
     {
         if (is_null($this->connection)) {
             $this->connection = $this->createConnection();
@@ -254,7 +258,7 @@ class CouchbaseConnection extends Connection
      *
      * @return mixed
      */
-    public function callableConsistency($consistency, callable $callback)
+    public function callableConsistency(int $consistency, callable $callback)
     {
         $clone = clone $this;
         $clone->consistency = $consistency;
@@ -265,9 +269,9 @@ class CouchbaseConnection extends Connection
     /**
      * @param int $consistency
      *
-     * @return $this
+     * @return CouchbaseConnection
      */
-    public function consistency($consistency)
+    public function consistency(int $consistency): CouchbaseConnection
     {
         $this->consistency = $consistency;
 
@@ -275,11 +279,19 @@ class CouchbaseConnection extends Connection
     }
 
     /**
+     * @param bool $cross
+     */
+    public function crossBucket(bool $cross)
+    {
+        $this->crossBucket = $cross;
+    }
+
+    /**
      * @param string $bucket
      *
      * @return $this
      */
-    public function bucket($bucket)
+    public function bucket(string $bucket)
     {
         $this->bucket = $bucket;
 
@@ -287,11 +299,11 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @param \CouchbaseN1qlQuery $query
+     * @param N1qlQuery $query
      *
      * @return mixed
      */
-    protected function executeQuery(\CouchbaseN1qlQuery $query)
+    protected function executeQuery(N1qlQuery $query)
     {
         $bucket = $this->openBucket($this->bucket);
         $this->registerOption($bucket);
@@ -303,21 +315,64 @@ class CouchbaseConnection extends Connection
     }
 
     /**
+     * @param string $query
+     * @param array  $bindings
+     *
+     * @return \stdClass
+     */
+    protected function execute(string $query, array $bindings = []): \stdClass
+    {
+        $query = N1qlQuery::fromString($query);
+        $query->consistency($this->consistency);
+        $query->crossBucket($this->crossBucket);
+        $query->positionalParams($bindings);
+        $result = $this->executeQuery($query);
+        $this->metrics = $result->metrics ?? [];
+
+        return $result;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function select($query, $bindings = [], $useReadPdo = true)
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) {
-            if ($me->pretending()) {
+        return $this->run($query, $bindings, function ($query, $bindings) {
+            if ($this->pretending()) {
                 return [];
             }
-            $query = \CouchbaseN1qlQuery::fromString($query);
-            $query->consistency($this->consistency);
-            $query->positionalParams($bindings);
-            $result = $this->executeQuery($query);
-            $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
 
-            return (isset($result->rows)) ? $result->rows : [];
+            $result = $this->execute($query, $bindings);
+            $returning = [];
+            if (isset($result->rows)) {
+                foreach ($result->rows as $row) {
+                    if (!isset($row->{$this->bucket})) {
+                        return [$row];
+                    }
+                    $returning[] = $row;
+                }
+            }
+
+            return $returning;
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function cursor($query, $bindings = [], $useReadPdo = true)
+    {
+        return $this->run($query, $bindings, function ($query, $bindings) {
+            if ($this->pretending()) {
+                return [];
+            }
+
+            $result = $this->execute($query, $bindings);
+            if (isset($result->rows)) {
+                foreach ($result->rows as $row) {
+                    yield $row->{$this->bucket};
+                }
+            }
         });
     }
 
@@ -337,46 +392,54 @@ class CouchbaseConnection extends Connection
      */
     public function affectingStatement($query, $bindings = [])
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) {
-            if ($me->pretending()) {
+        return $this->run($query, $bindings, function ($query, $bindings) {
+            if ($this->pretending()) {
                 return 0;
             }
-            $query = \CouchbaseN1qlQuery::fromString($query);
+            $query = N1qlQuery::fromString($query);
             $query->consistency($this->consistency);
+            $query->crossBucket($this->crossBucket);
             $query->namedParams(['parameters' => $bindings]);
             $result = $this->executeQuery($query);
-            $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
+            $this->metrics = $result->metrics ?? [];
+            if (!count($result->rows)) {
+                return false;
+            }
 
-            return (isset($result->rows[0])) ? $result->rows[0] : false;
+            return $result->rows[0]->{$this->bucket} ?? $result->rows[0];
         });
     }
 
     /**
-     * @param       $query
-     * @param array $bindings
+     * @param string $query
+     * @param array  $bindings
      *
      * @return mixed
      */
-    public function positionalStatement($query, array $bindings = [])
+    public function positionalStatement(string $query, array $bindings = [])
     {
-        return $this->run($query, $bindings, function ($me, $query, $bindings) {
-            if ($me->pretending()) {
+        return $this->run($query, $bindings, function ($query, $bindings) {
+            if ($this->pretending()) {
                 return 0;
             }
-            $query = \CouchbaseN1qlQuery::fromString($query);
+            $query = N1qlQuery::fromString($query);
             $query->consistency($this->consistency);
+            $query->crossBucket($this->crossBucket);
             $query->positionalParams($bindings);
             $result = $this->executeQuery($query);
-            $this->metrics = (isset($result->metrics)) ? $result->metrics : [];
+            $this->metrics = $result->metrics ?? [];
+            if (!count($result->rows)) {
+                return false;
+            }
 
-            return (isset($result->rows[0])) ? $result->rows[0] : false;
+            return $result->rows[0]->{$this->bucket} ?? $result->rows[0];
         });
     }
 
     /**
      * {@inheritdoc}
      */
-    public function transaction(Closure $callback)
+    public function transaction(Closure $callback, $attempts = 1)
     {
         throw new NotSupportedException(__METHOD__);
     }
@@ -424,21 +487,6 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @param CouchbaseBucket $bucket
-     *
-     * @return CouchbaseBucket
-     */
-    protected function enableN1ql(CouchbaseBucket $bucket)
-    {
-        if (!count($this->enableN1qlServers)) {
-            return $bucket;
-        }
-        $bucket->enableN1ql($this->enableN1qlServers);
-
-        return $bucket;
-    }
-
-    /**
      * N1QL upsert query.
      *
      * @param string $query
@@ -446,7 +494,7 @@ class CouchbaseConnection extends Connection
      *
      * @return int
      */
-    public function upsert($query, $bindings = [])
+    public function upsert(string $query, array $bindings = [])
     {
         return $this->affectingStatement($query, $bindings);
     }
@@ -468,7 +516,7 @@ class CouchbaseConnection extends Connection
      *
      * @return View
      */
-    public function view($bucket = null)
+    public function view(string $bucket = null): View
     {
         $bucket = is_null($bucket) ? $this->bucket : $bucket;
 
@@ -504,18 +552,18 @@ class CouchbaseConnection extends Connection
     /**
      * @return \string[]
      */
-    public function metrics()
+    public function metrics(): array
     {
         return $this->metrics;
     }
 
     /**
-     * @param \CouchbaseN1qlQuery $queryObject
+     * @param N1qlQuery $queryObject
      */
-    protected function firePreparedQuery(\CouchbaseN1qlQuery $queryObject)
+    protected function firePreparedQuery(N1qlQuery $queryObject)
     {
         if (isset($this->events)) {
-            $this->events->fire(new QueryPrepared($queryObject));
+            $this->events->dispatch(new QueryPrepared($queryObject));
         }
     }
 
@@ -525,7 +573,7 @@ class CouchbaseConnection extends Connection
     protected function fireReturning($returning)
     {
         if (isset($this->events)) {
-            $this->events->fire(new ResultReturning($returning));
+            $this->events->dispatch(new ResultReturning($returning));
         }
     }
 
@@ -536,10 +584,11 @@ class CouchbaseConnection extends Connection
      */
     public function setPdo($pdo)
     {
-        $this->connection = $this->createConnection($this->config);
+        $this->connection = $this->createConnection();
         $this->getManagedConfigure($this->config);
         $this->useDefaultQueryGrammar();
         $this->useDefaultPostProcessor();
+
         return $this;
     }
 }

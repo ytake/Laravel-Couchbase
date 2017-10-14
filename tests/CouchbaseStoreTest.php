@@ -2,14 +2,14 @@
 
 class CouchbaseStoreTest extends \CouchbaseTestCase
 {
-    /** @var \Ytake\LaravelCouchbase\Cache\LegacyCouchbaseStore */
+    /** @var \Ytake\LaravelCouchbase\Cache\CouchbaseStore */
     protected $store;
 
     protected function setUp()
     {
         parent::setUp();
         $cluster = $this->app['db']->connection('couchbase')->getCouchbase();
-        $this->store = new \Ytake\LaravelCouchbase\Cache\LegacyCouchbaseStore(
+        $this->store = new \Ytake\LaravelCouchbase\Cache\CouchbaseStore(
             $cluster, 'testing', '', 'testing'
         );
     }
@@ -83,5 +83,17 @@ class CouchbaseStoreTest extends \CouchbaseTestCase
         $cache->add('test', 'testing', 400);
         $this->assertSame('testing', $this->store->get('test'));
         $this->store->forget('test');
+    }
+
+    public function testShouldBeLockedTheCache()
+    {
+        $this->store->forget('cache:lock');
+        $result = $this->store->lock('cache:lock', 600)->get();
+        $this->assertTrue($result);
+        $resultSecond = $this->store->lock('cache:lock', 600)->get();
+        $this->assertFalse($resultSecond);
+
+        $this->store->lock('cache:lock:two', 600)->get(function () {});
+        $this->assertNull($this->store->get('cache:lock:two'));
     }
 }

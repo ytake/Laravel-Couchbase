@@ -15,6 +15,7 @@ namespace Ytake\LaravelCouchbase;
 /**
  * Class MemcachedConnector.
  * for couchbase memcached bucket.
+ *
  * @codeCoverageIgnore
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
@@ -22,11 +23,24 @@ namespace Ytake\LaravelCouchbase;
 class MemcachedConnector extends \Illuminate\Cache\MemcachedConnector
 {
     /**
-     * {@inheritdoc}
+     * Create a new Memcached connection.
+     *
+     * @param  array       $servers
+     * @param  string|null $connectionId
+     * @param  array       $options
+     * @param  array       $credentials
+     *
+     * @return \Memcached
+     *
+     * @throws \RuntimeException
      */
-    public function connect(array $servers)
-    {
-        $memcached = $this->getMemcached();
+    public function connect(
+        array $servers,
+        $connectionId = null,
+        array $options = [],
+        array $credentials = []
+    ) {
+        $memcached = $this->getMemcached($connectionId, [], []);
 
         foreach ($servers as $server) {
             $memcached->addServer(
@@ -35,5 +49,13 @@ class MemcachedConnector extends \Illuminate\Cache\MemcachedConnector
         }
 
         return $memcached;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getMemcached($connectionId, array $credentials, array $options)
+    {
+        return $this->createMemcachedInstance($connectionId);
     }
 }

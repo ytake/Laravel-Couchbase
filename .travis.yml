@@ -1,0 +1,39 @@
+sudo: required
+language: php
+
+php:
+  - 7
+
+addons:
+  apt:
+    packages:
+      - python
+      
+before_script:
+  - chmod -R 755 tests/bin/memcached.sh
+  - tests/bin/memcached.sh
+  - wget http://packages.couchbase.com/releases/4.6.2/couchbase-server-enterprise_4.6.2-ubuntu14.04_amd64.deb
+  - sudo dpkg -i couchbase-server-enterprise_4.6.2-ubuntu14.04_amd64.deb
+  - wget http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-2-amd64.deb
+  - sudo dpkg -i couchbase-release-1.0-2-amd64.deb
+  - sudo apt-get -y update
+  - sudo apt-get -y install libcouchbase-dev build-essential zlib1g-dev
+  - pecl install pcs-1.3.3
+  - pecl install igbinary
+  - pecl install couchbase 
+  - cd $home/opt/couchbase
+  - ./bin/couchbase-cli cluster-init -c 127.0.0.1:8091  --cluster-username=Administrator --cluster-password=Administrator --cluster-port=8091 --cluster-init-ramsize=2048 --cluster-index-ramsize=512 --services=data,query,index --wait
+  - ./bin/couchbase-cli rebalance -c 127.0.0.1:8091 -u Administrator -p Administrator
+  - ./bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=testing --bucket-type=couchbase --bucket-ramsize=128 --enable-flush=1 --bucket-replica=1 -u Administrator -p Administrator --wait
+  - ./bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=index_testing --bucket-type=couchbase --bucket-ramsize=128 --enable-flush=1 --bucket-replica=1 -u Administrator -p Administrator --wait
+  - ./bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=memcache-couch --bucket-type=memcached --bucket-port=11255 --bucket-ramsize=128 --enable-flush=1 -u Administrator -p Administrator --wait
+  - ./bin/cbq -e http://127.0.0.1:8091 --script "CREATE PRIMARY INDEX ON \`testing\`"
+  - cd $TRAVIS_BUILD_DIR
+  - composer self-update
+  - composer install --prefer-source
+script:
+    - chmod -R 777 tests/logs
+    - ./vendor/bin/phpunit
+    - chmod 777 tests/logs/clover.xml
+after_success:
+    - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7" ]]; then travis_retry php vendor/bin/coveralls; fi

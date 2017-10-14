@@ -84,7 +84,7 @@ class IndexCreatorCommand extends Command
             ],
             [
                 'defer',
-                'd',
+                null,
                 InputOption::VALUE_NONE,
                 'true to defer building of the index until buildN1qlDeferredIndexes()}is called (or a direct call to the corresponding query service API)',
             ],
@@ -94,7 +94,7 @@ class IndexCreatorCommand extends Command
     /**
      * Execute the console command
      */
-    public function fire()
+    public function handle()
     {
         /** @var \Illuminate\Database\Connection|CouchbaseConnection $connection */
         $connection = $this->databaseManager->connection($this->option('database'));

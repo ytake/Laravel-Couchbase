@@ -22,13 +22,9 @@ class IndexCreatorCommandTest extends \CouchbaseTestCase
 
     public function testCreateSecondaryIndex()
     {
-        $cluster = new \CouchbaseCluster('127.0.0.1');
-        $clusterManager = $cluster->manager('Administrator', 'Administrator');
-        $clusterManager->createBucket($this->bucket,
-            ['bucketType' => 'couchbase', 'saslPassword' => '', 'flushEnabled' => true]);
-        sleep(5);
         /** @var \Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->databaseManager->connection('couchbase');
+        $connection->manager();
         $bucket = $connection->openBucket($this->bucket);
         $bucket->manager()->createN1qlPrimaryIndex();
         sleep(4);
@@ -55,6 +51,6 @@ class IndexCreatorCommandTest extends \CouchbaseTestCase
         }
         $bucket->manager()->dropN1qlPrimaryIndex();
         $bucket->manager()->dropN1qlIndex('testing_gsi');
-        $clusterManager->removeBucket($this->bucket);
+        sleep(5);
     }
 }
