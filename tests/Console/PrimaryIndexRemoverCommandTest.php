@@ -26,6 +26,8 @@ class PrimaryIndexRemoverCommandTest extends \CouchbaseTestCase
         $connection = $this->databaseManager->connection('couchbase');
         $connection->manager();
         $bucket = $connection->openBucket($this->bucket);
+        $bucket->manager()->dropN1qlPrimaryIndex();
+        sleep(5);
         $bucket->manager()->createN1qlPrimaryIndex();
         $output = new \Symfony\Component\Console\Output\BufferedOutput();
         $this->command->run(

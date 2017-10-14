@@ -52,7 +52,6 @@ class DesignCreatorCommandTest extends \CouchbaseTestCase
         $documents = [];
         foreach ($lists['rows'] as $row) {
             $documents[] = $row['doc']['meta']['id'];
-            $bucket->manager()->removeDesignDocument($row['doc']['meta']['id']);
         }
         $this->assertContains('_design/dev_testing_name', $documents);
         $this->assertContains('_design/dev_testing', $documents);
