@@ -50,6 +50,9 @@ class QueueCouchbaseConnectorTest extends CouchbaseTestCase
         $databaseJob->delete();
         sleep(1);
         $this->assertSame(1, $connection->table(self::BUCKET)->where('queue', 'default')->count());
+        /** @var CouchbaseConnection $database */
+        $database = $connect->getDatabase();
+        $database->openBucket(self::BUCKET)->manager()->flush();
     }
 
     public function tearDown()
