@@ -24,5 +24,12 @@ return [
                 ],
             ],
         ],
+        'dev_testing' => [
+            'views' => [
+                'testing' => [
+                    'map' => file_get_contents(__DIR__ . '/../resources/sample.ddoc'),
+                ],
+            ],
+        ],
     ],
 ];

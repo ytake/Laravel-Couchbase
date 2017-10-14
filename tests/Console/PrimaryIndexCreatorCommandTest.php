@@ -22,6 +22,9 @@ class PrimaryIndexCreatorCommandTest extends \CouchbaseTestCase
 
     public function testCreatePrimaryIndex()
     {
+        /** @var \Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
+        $connection = $this->databaseManager->connection('couchbase');
+        $bucket = $connection->openBucket($this->bucket);
         $output = new \Symfony\Component\Console\Output\BufferedOutput();
         $this->command->run(
             new \Symfony\Component\Console\Input\ArrayInput([
@@ -33,9 +36,7 @@ class PrimaryIndexCreatorCommandTest extends \CouchbaseTestCase
         $fetch = $output->fetch();
         $this->assertNotNull($fetch);
         $this->assertSame("created PRIMARY INDEX [#primary] for [index_testing] bucket.", trim($fetch));
-        /** @var \Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
-        $connection = $this->databaseManager->connection('couchbase');
-        $bucket = $connection->openBucket($this->bucket);
         $bucket->manager()->dropN1qlPrimaryIndex();
+        sleep(5);
     }
 }

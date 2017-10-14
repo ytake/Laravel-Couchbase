@@ -17,8 +17,12 @@ class IndexFinderCommandTest extends \CouchbaseTestCase
         $this->command->setLaravel(new MockApplication());
     }
 
+    /**
+     *
+     */
     public function testShouldReturnDatabaseInformation()
     {
+        $this->markTestIncomplete('under construction');
         $output = new \Symfony\Component\Console\Output\BufferedOutput();
         $this->command->run(
             new \Symfony\Component\Console\Input\ArrayInput([

@@ -38,6 +38,10 @@ class QueueCouchbaseConnectorTest extends CouchbaseTestCase
         $queue = $this->app['queue'];
         /** @var \Ytake\LaravelCouchbase\Queue\CouchbaseQueue $connect */
         $connect = $queue->connection('couchbase');
+        /** @var CouchbaseConnection $database */
+        $database = $connect->getDatabase();
+        $database->openBucket(self::BUCKET)->manager()->flush();
+        sleep(4);
         $this->assertNull($connect->pop());
         $connect->bulk(['testing:queue1', 'testing:queue2']);
         sleep(5);

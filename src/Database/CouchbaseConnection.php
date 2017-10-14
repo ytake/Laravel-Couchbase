@@ -103,11 +103,11 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     * @param $password
+     * @param string $password
      *
-     * @return $this
+     * @return CouchbaseConnection
      */
-    public function setBucketPassword($password)
+    public function setBucketPassword(string $password): CouchbaseConnection
     {
         $this->bucketPassword = $password;
 
@@ -121,9 +121,7 @@ class CouchbaseConnection extends Connection
      */
     public function openBucket(string $name): Bucket
     {
-        $couchbase = $this->getCouchbase();
-
-        return $couchbase->openBucket($name, $this->bucketPassword);
+        return $this->getCouchbase()->openBucket($name, $this->bucketPassword);
     }
 
     /**
@@ -186,7 +184,6 @@ class CouchbaseConnection extends Connection
     }
 
     /**
-     *
      * @param array $config enable(array), options(array), administrator(array), bucket_password(string)
      */
     protected function getManagedConfigure(array $config)
@@ -272,9 +269,9 @@ class CouchbaseConnection extends Connection
     /**
      * @param int $consistency
      *
-     * @return $this
+     * @return CouchbaseConnection
      */
-    public function consistency(int $consistency)
+    public function consistency(int $consistency): CouchbaseConnection
     {
         $this->consistency = $consistency;
 
@@ -497,7 +494,7 @@ class CouchbaseConnection extends Connection
      *
      * @return int
      */
-    public function upsert(string $query, $bindings = [])
+    public function upsert(string $query, array $bindings = [])
     {
         return $this->affectingStatement($query, $bindings);
     }

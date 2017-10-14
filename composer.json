@@ -18,7 +18,7 @@
   "license": "MIT",
   "require": {
     "php": ">=7.0.0",
-    "ext-couchbase": "^2.3.2",
+    "ext-couchbase": ">=2.3.2",
     "illuminate/support": "5.5.*",
     "illuminate/config": "5.5.*",
     "illuminate/console": "5.5.*",
@@ -36,7 +36,6 @@
     "symfony/console": "~3.0",
     "phpunit/phpunit": "^6.0",
     "satooshi/php-coveralls": "*",
-    "phing/phing": "~2.0",
     "phploc/phploc": "*",
     "pdepend/pdepend" : "^2.2.4",
     "phpmd/phpmd": "@stable",
@@ -64,5 +63,13 @@
       "php vendor/bin/php-cs-fixer fix"
     ]
   },
-  "minimum-stability": "stable"
+  "minimum-stability": "stable",
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Ytake\\LaravelCouchbase\\CouchbaseServiceProvider",
+        "Ytake\\LaravelCouchbase\\ConsoleServiceProvider"
+      ]
+    }
+  }
 }

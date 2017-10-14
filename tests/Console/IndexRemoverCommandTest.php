@@ -37,5 +37,6 @@ class IndexRemoverCommandTest extends \CouchbaseTestCase
         );
         $fetch = $output->fetch();
         $this->assertSame("dropped SECONDARY INDEX [testing_gsi] for [index_testing] bucket.", trim($fetch));
+        sleep(5);
     }
 }

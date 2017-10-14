@@ -19,6 +19,7 @@ use Illuminate\Cache\MemcachedStore;
  * Class MemcachedBucketStore.
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
+ * @deprecated
  */
 class MemcachedBucketStore extends MemcachedStore
 {
