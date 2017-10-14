@@ -4,7 +4,7 @@ for Laravel 5.1.*(higher)
 cache, session, database, queue extension package
 *required ext-couchbase*
 
-[![Build Status](https://img.shields.io/scrutinizer/build/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/build-status/develop)
+[![Build Status](http://img.shields.io/travis/ytake/Laravel-Couchbase/master.svg?style=flat-square)](https://travis-ci.org/ytake/Laravel-Couchbase)
 [![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/?branch=develop)
 [![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/?branch=develop)
 [![StyleCI](https://styleci.io/repos/45177780/shield)](https://styleci.io/repos/45177780)
@@ -15,13 +15,28 @@ cache, session, database, queue extension package
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/944f9bc0-7ee6-4f5f-b371-8ec216ea317e/mini.png)](https://insight.sensiolabs.com/projects/944f9bc0-7ee6-4f5f-b371-8ec216ea317e)
 
+## Notice 
+Supported Auto-Discovery, Design Document, Cache Lock (Laravel5.5)
+
+| Laravel version | Laravel-Couchbase version | ext-couchbase |
+| ------------- | ------------- | ------------------|
+| Laravel 5.5 | ^1.0 | >=2.3.2 |
+| Laravel 5.4 | ^0.7 | ^2.2.2 |
+| Laravel 5.3 | ^0.6 | ^2.2.2 |
+| Laravel 5.2 | ^0.5 | ^2.2.2 |
+| Laravel 5.1 | ^0.4 | ^2.2.2 |
+
+### Deprecated
+
+*not recommended* couchbase-memcached driver `couchbase session driver`
+
 ## install
 
 ```bash
 $ composer require ytake/laravel-couchbase
 ```
 
-your config/app.php
+or your config/app.php
 
 ```php
 'providers' => [
