@@ -26,8 +26,6 @@ class IndexCreatorCommandTest extends \CouchbaseTestCase
         $connection = $this->databaseManager->connection('couchbase');
         $connection->manager();
         $bucket = $connection->openBucket($this->bucket);
-        $bucket->manager()->dropN1qlPrimaryIndex();
-        sleep(5);
         $bucket->manager()->createN1qlPrimaryIndex();
         sleep(4);
         $output = new \Symfony\Component\Console\Output\BufferedOutput();
@@ -53,5 +51,6 @@ class IndexCreatorCommandTest extends \CouchbaseTestCase
         }
         $bucket->manager()->dropN1qlPrimaryIndex();
         $bucket->manager()->dropN1qlIndex('testing_gsi');
+        sleep(5);
     }
 }

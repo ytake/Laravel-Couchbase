@@ -25,8 +25,6 @@ class IndexRemoverCommandTest extends \CouchbaseTestCase
         /** @var \Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
         $connection = $this->databaseManager->connection('couchbase');
         $bucket = $connection->openBucket($this->bucket);
-        $bucket->manager()->dropN1qlPrimaryIndex();
-        sleep(5);
         $bucket->manager()->createN1qlPrimaryIndex();
         $bucket->manager()->createN1qlIndex('testing_gsi', ['params1', 'params2']);
         $output = new \Symfony\Component\Console\Output\BufferedOutput();
@@ -39,5 +37,6 @@ class IndexRemoverCommandTest extends \CouchbaseTestCase
         );
         $fetch = $output->fetch();
         $this->assertSame("dropped SECONDARY INDEX [testing_gsi] for [index_testing] bucket.", trim($fetch));
+        sleep(5);
     }
 }
