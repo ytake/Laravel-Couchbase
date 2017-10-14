@@ -2,14 +2,14 @@
 
 class CouchbaseStoreTest extends \CouchbaseTestCase
 {
-    /** @var \Ytake\LaravelCouchbase\Cache\LegacyCouchbaseStore */
+    /** @var \Ytake\LaravelCouchbase\Cache\CouchbaseStore */
     protected $store;
 
     protected function setUp()
     {
         parent::setUp();
         $cluster = $this->app['db']->connection('couchbase')->getCouchbase();
-        $this->store = new \Ytake\LaravelCouchbase\Cache\LegacyCouchbaseStore(
+        $this->store = new \Ytake\LaravelCouchbase\Cache\CouchbaseStore(
             $cluster, 'testing', '', 'testing'
         );
     }
