@@ -349,7 +349,7 @@ class CouchbaseConnection extends Connection
                     if (!isset($row->{$this->bucket})) {
                         return [$row];
                     }
-                    $returning[] = $row->{$this->bucket};
+                    $returning[] = $row;
                 }
             }
 
