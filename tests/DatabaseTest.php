@@ -19,7 +19,7 @@ class DatabaseTest extends CouchbaseTestCase
      */
     public function testNotSupportedRollback()
     {
-        $this->connection->rollBack();
+        $this->connection->rollBack(1);
     }
 
     /**

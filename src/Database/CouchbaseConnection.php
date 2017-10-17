@@ -320,7 +320,7 @@ class CouchbaseConnection extends Connection
      *
      * @return \stdClass
      */
-    protected function execute(string $query, array $bindings = []): \stdClass
+    protected function execute(string $query, array $bindings = [])
     {
         $query = N1qlQuery::fromString($query);
         $query->consistency($this->consistency);
@@ -463,7 +463,7 @@ class CouchbaseConnection extends Connection
     /**
      * {@inheritdoc}
      */
-    public function rollBack()
+    public function rollBack($toLevel = null)
     {
         throw new NotSupportedException(__METHOD__);
     }
