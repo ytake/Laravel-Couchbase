@@ -3,12 +3,7 @@ language: php
 
 php:
   - 7.1
-  - 7.2
-addons:
-  apt:
-    packages:
-      - python
-      
+
 before_script:
   - chmod -R 755 tests/bin/memcached.sh
   - tests/bin/memcached.sh
@@ -16,8 +11,7 @@ before_script:
   - sudo dpkg -i couchbase-release-1.0-4-amd64.deb
 # Will install or upgrade packages
   - sudo apt-get update
-  - ls -ltr
-  - sudo apt-get install ./couchbase-server.deb
+  - sudo apt-get install ./couchbase-release-1.0-4-amd64.deb
   - sudo apt-get install libcouchbase-dev libcouchbase2-bin build-essential
   - pecl install pcs-beta
   - pecl install igbinary
