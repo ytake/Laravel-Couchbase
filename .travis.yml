@@ -20,7 +20,6 @@ before_script:
   - pecl install pcs-beta
   - pecl install igbinary
   - pecl install couchbase 
-  - cd $home/opt/couchbase
   - ./bin/couchbase-cli cluster-init -c 127.0.0.1:8091  --cluster-username=Administrator --cluster-password=Administrator --cluster-port=8091 --cluster-init-ramsize=2048 --cluster-index-ramsize=512 --services=data,query,index --wait
   - ./bin/couchbase-cli rebalance -c 127.0.0.1:8091 -u Administrator -p Administrator
   - ./bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=testing --bucket-type=couchbase --bucket-ramsize=128 --enable-flush=1 --bucket-replica=1 -u Administrator -p Administrator --wait
