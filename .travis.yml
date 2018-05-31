@@ -16,7 +16,7 @@ before_script:
   - sudo dpkg -i couchbase-server-enterprise_4.6.2-ubuntu14.04_amd64.deb
   - wget http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-2-amd64.deb
   - sudo dpkg -i couchbase-release-1.0-2-amd64.deb
-  - sudo apt-get -y update
+  # - sudo apt-get -y update
   - sudo apt-get -y install libcouchbase-dev build-essential zlib1g-dev
   - pecl install pcs-1.3.3
   - pecl install igbinary
