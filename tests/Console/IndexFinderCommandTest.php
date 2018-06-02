@@ -22,7 +22,6 @@ class IndexFinderCommandTest extends \CouchbaseTestCase
      */
     public function testShouldReturnDatabaseInformation()
     {
-        $this->markTestIncomplete('under construction');
         $output = new \Symfony\Component\Console\Output\BufferedOutput();
         $this->command->run(
             new \Symfony\Component\Console\Input\ArrayInput([
@@ -32,5 +31,6 @@ class IndexFinderCommandTest extends \CouchbaseTestCase
         );
         $fetch = $output->fetch();
         $this->assertNotNull($fetch);
+        $this->assertContains('primary_index', $fetch);
     }
 }

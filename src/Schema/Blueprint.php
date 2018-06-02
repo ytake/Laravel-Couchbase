@@ -106,7 +106,7 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
     {
         $this->connection->openBucket($this->getTable())
             ->manager()->createN1qlPrimaryIndex(
-                $index = $this->detectIndexName($name),
+                $this->detectIndexName($name),
                 $ignoreIfExist,
                 $defer
             );

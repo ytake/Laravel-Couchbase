@@ -19,7 +19,7 @@ use Couchbase\ViewQuery;
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
-class ViewQuerying
+final class ViewQuerying
 {
     /** @var ViewQuery */
     private $viewQuery;

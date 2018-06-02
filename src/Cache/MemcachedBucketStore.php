@@ -118,7 +118,6 @@ class MemcachedBucketStore extends MemcachedStore
             curl_setopt_array($initialize, $options);
             curl_multi_add_handle($handler, $initialize);
         }
-
         $this->callMulti($handler);
     }
 

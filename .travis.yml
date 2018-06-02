@@ -26,7 +26,7 @@ before_script:
   - sleep 10
   - ./bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=index_testing --bucket-type=couchbase --bucket-ramsize=128 --enable-flush=1 --bucket-replica=1 -u Administrator -p Administrator 
   - sleep 10
-  - ./bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket=memcache-couch --bucket-type=memcached --bucket-port=11255 --bucket-ramsize=128 --enable-flush=1 -u Administrator -p Administrator
+  - curl -u Administrator:Administrator -v -X POST 'http://127.0.0.1:8091/pools/default/buckets' -d name=memcache-couch -d ramQuotaMB=128 -d bucketType=memcached -d flushEnabled=1 -d evictionPolicy=fullEviction -d authType=none -d proxyPort=11255 -d saslPassword=
   - sleep 10
   - ./bin/cbq -e http://127.0.0.1:8091 --script "CREATE PRIMARY INDEX ON \`testing\`"
   - cd $TRAVIS_BUILD_DIR

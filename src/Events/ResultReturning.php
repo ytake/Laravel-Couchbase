@@ -17,7 +17,7 @@ namespace Ytake\LaravelCouchbase\Events;
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
-class ResultReturning
+final class ResultReturning
 {
     /** @var mixed */
     private $returning;

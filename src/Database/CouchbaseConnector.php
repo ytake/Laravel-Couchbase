@@ -13,7 +13,6 @@
 namespace Ytake\LaravelCouchbase\Database;
 
 use Couchbase\Cluster;
-use Couchbase\PasswordAuthenticator;
 
 /**
  * Class CouchbaseConnector.
@@ -39,10 +38,7 @@ class CouchbaseConnector implements Connectable
         $configure = array_merge($this->configure, $servers);
         $cluster = new Cluster($configure['host']);
         if (!empty($configure['user']) && !empty($configure['password'])) {
-            $authenticator = new PasswordAuthenticator();
-            $authenticator->username(strval($configure['user']))
-                ->password(strval($configure['password']));
-            $cluster->authenticate($authenticator);
+            $cluster->authenticateAs(strval($configure['user']), strval($configure['password']));
         }
 
         return $cluster;

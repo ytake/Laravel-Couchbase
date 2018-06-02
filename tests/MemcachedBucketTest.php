@@ -19,6 +19,7 @@ class MemcachedBucketTest extends CouchbaseTestCase
 
     public function testShouldReturnSameCacheAccess()
     {
+        $this->markTestSkipped("couchbase >= 5.0, Broken API operations on Memcached Buckets");
         $this->repository->add('memcached-testing', 'couchbase', 60);
         $this->assertSame('couchbase', $this->repository->get('memcached-testing'));
         $this->repository->forget('memcached-testing');
@@ -27,6 +28,7 @@ class MemcachedBucketTest extends CouchbaseTestCase
 
     public function testShouldReturnIncrementalValues()
     {
+        $this->markTestSkipped("couchbase >= 5.0, Broken API operations on Memcached Buckets");
         $this->repository->increment('memcached-testing');
         $this->assertSame(1, $this->repository->get('memcached-testing'));
 
@@ -45,6 +47,7 @@ class MemcachedBucketTest extends CouchbaseTestCase
 
     public function testShouldReturnNullFlushRecord()
     {
+        $this->markTestSkipped("couchbase >= 5.0, Broken API operations on Memcached Buckets");
         $this->repository->add('memcached-testing', 'couchbase', 60);
         $this->repository->decrement('memcached-testing-decrement', 100);
         $this->repository->increment('memcached-testing-increment', 100);

@@ -98,7 +98,7 @@ class View
     /**
      * @param int $consistency
      */
-    public function consistency(int $consistency)
+    public function consistency(int $consistency): void
     {
         $this->consistency = $consistency;
     }
