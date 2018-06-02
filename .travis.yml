@@ -23,7 +23,8 @@ before_script:
   - cd $home/opt/couchbase
   - ./bin/couchbase-server -- -noinput -detached
   - sleep 20
-  - ./bin/couchbase-cli cluster-init -c 127.0.0.1:8091  --cluster-username=Administrator --cluster-password=Administrator --cluster-port=8091 --cluster-index-ramsize=512 --cluster-ramsize=512 --services=data,query,index
+  - ./bin/couchbase-cli cluster-init -c 127.0.0.1:8091  --cluster-username=Administrator --cluster-password=Administrator --cluster-port=8091 --cluster-index-ramsize=512 --cluster-ramsize=512
+  #--services=data,query,index
   - ./bin/couchbase-cli rebalance -c 127.0.0.1:8091 -u Administrator -p Administrator
   - curl -u Administrator:Administrator -v -X POST 'http://127.0.0.1:8091/pools/default/buckets' -d name=testing -d ramQuotaMB=128 -d bucketType=couchbase -d flushEnabled=1 -d evictionPolicy=fullEviction -d authType=none -d saslPassword=none
   - sleep 10
