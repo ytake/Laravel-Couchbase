@@ -8,12 +8,12 @@ php:
 before_script:
   - chmod -R 755 tests/bin/memcached.sh
   - tests/bin/memcached.sh
-  - wget http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-4-amd64.deb
-  - sudo dpkg -i couchbase-release-1.0-4-amd64.deb
+  - wget http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-3-amd64.deb
+  - sudo dpkg -i couchbase-release-1.0-3-amd64.deb
 # Will install or upgrade packages
   - sudo apt-get update
   - sudo apt-get install couchbase-server
-  - sudo apt-get install libcouchbase-dev libcouchbase2-bin build-essential
+  - sudo apt-get install libcouchbase-dev libcouchbase2-bin build-essential libssl-dev
   - pecl install pcs-beta
   - pecl install igbinary
   - pecl install couchbase 
