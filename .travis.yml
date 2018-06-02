@@ -14,8 +14,6 @@ before_script:
   - sudo apt-get update
   - sudo apt-get install couchbase-server
   - sudo apt-get install libcouchbase-dev libcouchbase2-bin build-essential
-  #- sudo service enable couchbase-server
-  - sudo service start couchbase-server
   - pecl install pcs-beta
   - pecl install igbinary
   - pecl install couchbase 
@@ -30,7 +28,7 @@ before_script:
   - sleep 10
   - curl -u Administrator:Administrator -v -X POST 'http://127.0.0.1:8091/pools/default/buckets' -d name=memcache-couch -d ramQuotaMB=128 -d bucketType=memcached -d flushEnabled=1 -d evictionPolicy=fullEviction -d authType=none -d proxyPort=11255 -d saslPassword=
   - sleep 10
-  - ./bin/cbq -e http://127.0.0.1:8091 --script "CREATE PRIMARY INDEX ON \`testing\`"
+  - ./bin/cbq -e http://127.0.0.1:8091 --script "CREATE PRIMARY INDEX ON \`testing\`" -u=Administrator -p=Administrator
   - cd $TRAVIS_BUILD_DIR
   - composer self-update
   - composer install --prefer-source
