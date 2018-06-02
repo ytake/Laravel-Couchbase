@@ -14,8 +14,8 @@ before_script:
   - sudo apt-get update
   - sudo apt-get install couchbase-server
   - sudo apt-get install libcouchbase-dev libcouchbase2-bin build-essential
-  - sudo systemctl enable couchbase-server
-  - sudo systemctl start couchbase-server
+  - sudo service enable couchbase-server
+  - sudo service start couchbase-server
   - pecl install pcs-beta
   - pecl install igbinary
   - pecl install couchbase 
