@@ -36,7 +36,7 @@ class Builder extends \Illuminate\Database\Schema\Builder
     public function hasTable($table)
     {
         try {
-            $bucketInfo = $this->connection->openBucket($table)->manager()->info();
+            $bucketInfo = $this->connection->managedOpenBucket($table)->manager()->info();
             if (!is_null($bucketInfo['name'])) {
                 return true;
             }

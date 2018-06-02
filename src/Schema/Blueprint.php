@@ -75,7 +75,7 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
      */
     public function dropPrimary($index = null, $ignoreIfNotExist = false)
     {
-        $this->connection->openBucket($this->getTable())
+        $this->connection->managedOpenBucket($this->getTable())
             ->manager()->dropN1qlPrimaryIndex($this->detectIndexName($index), $ignoreIfNotExist);
     }
 
@@ -89,7 +89,7 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
      */
     public function dropIndex($index, $ignoreIfNotExist = false)
     {
-        $this->connection->openBucket($this->getTable())
+        $this->connection->managedOpenBucket($this->getTable())
             ->manager()->dropN1qlIndex($index, $ignoreIfNotExist);
     }
 
@@ -104,7 +104,7 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
      */
     public function primaryIndex($name = null, $ignoreIfExist = false, $defer = false)
     {
-        $this->connection->openBucket($this->getTable())
+        $this->connection->managedOpenBucket($this->getTable())
             ->manager()->createN1qlPrimaryIndex(
                 $this->detectIndexName($name),
                 $ignoreIfExist,
@@ -129,7 +129,7 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint
     {
         $name = (is_null($name)) ? $this->getTable() . "_secondary_index" : $name;
 
-        return $this->connection->openBucket($this->getTable())
+        return $this->connection->managedOpenBucket($this->getTable())
             ->manager()->createN1qlIndex(
                 $name,
                 $columns,

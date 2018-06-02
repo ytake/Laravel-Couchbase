@@ -122,11 +122,22 @@ class CouchbaseConnection extends Connection
     public function openBucket(string $name): Bucket
     {
         $couchbase = $this->getCouchbase();
-        if ($this->bucketPassword === '') {
+        if($this->bucketPassword === '') {
             return $couchbase->openBucket($name);
         }
-
         return $couchbase->openBucket($name, $this->bucketPassword);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Bucket
+     */
+    public function managedOpenBucket(string $name): Bucket
+    {
+        $couchbase = $this->getCouchbase();
+
+        return $couchbase->openBucket($name);
     }
 
     /**

@@ -52,7 +52,7 @@ class ViewTest extends \CouchbaseTestCase
         $bucket = $connection->openBucket($this->bucket);
         $bucket->manager()->removeDesignDocument('dev_testing');
         $bucket->manager()->removeDesignDocument('dev_testing_name');
-        sleep(4);
+        sleep(6);
         $output = new BufferedOutput();
         $this->command->run(
             new ArrayInput([
