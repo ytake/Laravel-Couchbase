@@ -12,7 +12,10 @@ before_script:
   - sudo dpkg -i couchbase-release-1.0-3-amd64.deb
 # Will install or upgrade packages
   - sudo apt-get update
-  - sudo apt-get install couchbase-server
+  - sudo apt-get install debian-archive-keyring
+  - sudo apt-get update
+  - sudo apt-get upgrade
+  - sudo apt-get install couchbase-server-community
   - sudo apt-get install libcouchbase-dev libcouchbase2-bin build-essential libssl-dev
   - pecl install pcs-beta
   - pecl install igbinary
