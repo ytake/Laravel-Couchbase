@@ -26,6 +26,11 @@ class IndexCreatorCommandTest extends \CouchbaseTestCase
         $connection = $this->databaseManager->connection('couchbase');
         $connection->manager();
         $bucket = $connection->openBucket($this->bucket);
+        try {
+            $bucket->manager()->dropN1qlPrimaryIndex('#primary');
+        } catch (\Couchbase\Exception $e) {
+            // none
+        }
         $bucket->manager()->createN1qlPrimaryIndex();
         sleep(4);
         $output = new \Symfony\Component\Console\Output\BufferedOutput();

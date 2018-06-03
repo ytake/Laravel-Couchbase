@@ -41,17 +41,26 @@ class MemcachedBucketStore extends MemcachedStore
     /** @var string */
     protected $flushEndpoint = ':%s/pools/default/buckets/%s/controller/doFlush';
 
+    /** @var array */
+    protected $sasl = [];
+
     /**
      * MemcachedBucketStore constructor.
      *
      * @param \Memcached $memcached
      * @param string     $prefix
      * @param array      $servers
+     * @param array      $sasl
      */
-    public function __construct(\Memcached $memcached, string $prefix = '', array $servers)
-    {
+    public function __construct(
+        \Memcached $memcached,
+        string $prefix = '',
+        array $servers,
+        array $sasl = []
+    ) {
         parent::__construct($memcached, $prefix);
         $this->servers = $servers;
+        $this->sasl = $sasl;
     }
 
     /**
@@ -106,6 +115,7 @@ class MemcachedBucketStore extends MemcachedStore
      */
     public function flush()
     {
+        $this->sasl;
         $handler = curl_multi_init();
         foreach ($this->servers as $server) {
             $initialize = curl_init();
@@ -114,11 +124,25 @@ class MemcachedBucketStore extends MemcachedStore
             $options = array_replace($this->options, [
                 CURLOPT_POST => true,
                 CURLOPT_URL  => $server['host'] . sprintf($this->flushEndpoint, $this->port, $server['bucket']),
-            ], $configureOption);
+            ], $configureOption, $this->setCredential());
             curl_setopt_array($initialize, $options);
             curl_multi_add_handle($handler, $initialize);
         }
         $this->callMulti($handler);
+    }
+
+    /**
+     * @return array
+     */
+    protected function setCredential(): array
+    {
+        if (count($this->sasl) === 2) {
+            list($username, $password) = $this->sasl;
+
+            return [CURLOPT_USERPWD => "{$username}:{$password}"];
+        }
+
+        return [];
     }
 
     /**

@@ -31,6 +31,6 @@ class IndexFinderCommandTest extends \CouchbaseTestCase
         );
         $fetch = $output->fetch();
         $this->assertNotNull($fetch);
-        $this->assertContains('primary_index', $fetch);
+        $this->assertContains('primary', $fetch);
     }
 }

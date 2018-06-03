@@ -17,7 +17,6 @@ class MemcachedConnectorTest extends \CouchbaseTestCase
 
     public function testShouldReturnMemcachedInstanceForBucket()
     {
-        $this->markTestSkipped("couchbase >= 5.0, Broken API operations on Memcached Buckets");
         /** @var \Illuminate\Cache\Repository $cache */
         $cache = $this->app['cache']->driver('couchbase-memcached');
         $this->assertInstanceOf('Illuminate\Cache\Repository', $cache);

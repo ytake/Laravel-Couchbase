@@ -1,6 +1,10 @@
 <?php
+declare(strict_types=1);
 
-class UpdateQueryTest extends CouchbaseTestCase
+use Ytake\LaravelCouchbase\Events\ResultReturning;
+use Ytake\LaravelCouchbase\Events\QueryPrepared;
+
+final class UpdateQueryTest extends CouchbaseTestCase
 {
     /** @var Ytake\LaravelCouchbase\Database\CouchbaseConnection */
     protected $connection;
@@ -58,11 +62,15 @@ class UpdateQueryTest extends CouchbaseTestCase
         sleep(1);
         /** @var Illuminate\Events\Dispatcher $dispatcher */
         $dispatcher = $this->app['events'];
-        $dispatcher->listen(\Ytake\LaravelCouchbase\Events\QueryPrepared::class, function ($instance) {
-            static::assertInstanceOf(Ytake\LaravelCouchbase\Events\QueryPrepared::class, $instance);
+        $dispatcher->listen(QueryPrepared::class, function ($instance) {
+            /** @var QueryPrepared $instance */
+            static::assertInstanceOf(QueryPrepared::class, $instance);
+            static::assertInstanceOf(\Couchbase\N1qlQuery::class, $instance->getQuery());
         });
-        $dispatcher->listen(\Ytake\LaravelCouchbase\Events\ResultReturning::class, function ($instance) {
-            static::assertInstanceOf(\Ytake\LaravelCouchbase\Events\ResultReturning::class, $instance);
+        $dispatcher->listen(ResultReturning::class, function ($instance) {
+            /** @var ResultReturning $instance */
+            static::assertInstanceOf(ResultReturning::class, $instance);
+            static::assertInstanceOf(\stdClass::class, $instance->returning());
         });
         $this->assertSame(null, $connection->table('testing')->key($key)->where('clicking', 'to edit')->first());
         $connection->openBucket('testing')->manager()->flush();

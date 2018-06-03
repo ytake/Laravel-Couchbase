@@ -10,14 +10,14 @@ before_script:
   - tests/bin/memcached.sh
   - wget http://packages.couchbase.com/releases/4.6.2/couchbase-server-enterprise_4.6.2-ubuntu14.04_amd64.deb
   - sudo dpkg -i couchbase-server-enterprise_4.6.2-ubuntu14.04_amd64.deb
-  - wget http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-2-amd64.deb
-  - sudo dpkg -i couchbase-release-1.0-2-amd64.deb
+  - wget http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-4-amd64.deb
+  - sudo dpkg -i couchbase-release-1.0-4-amd64.deb
 # Will install or upgrade packages
   - sudo apt-get update
   - sudo apt-get install debian-archive-keyring
   - sudo apt-get update
   #- sudo apt-get upgrade
-  #- sudo apt-get install couchbase-server-community --allow-unauthenticated
+  - sudo apt-get install couchbase-server-community --allow-unauthenticated
   - sudo apt-get install libcouchbase-dev libcouchbase2-bin build-essential libssl-dev
   - pecl install pcs-beta
   - pecl install igbinary
@@ -25,8 +25,7 @@ before_script:
   - cd $home/opt/couchbase
   - ./bin/couchbase-server -- -noinput -detached
   - sleep 20
-  - ./bin/couchbase-cli cluster-init -c 127.0.0.1:8091  --cluster-username=Administrator --cluster-password=Administrator --cluster-port=8091 --cluster-index-ramsize=512 --cluster-ramsize=512
-  #--services=data,query,index
+  - ./bin/couchbase-cli cluster-init -c 127.0.0.1:8091 --cluster-username=Administrator --cluster-password=Administrator --cluster-port=8091 --cluster-index-ramsize=512 --cluster-ramsize=512
   - ./bin/couchbase-cli rebalance -c 127.0.0.1:8091 -u Administrator -p Administrator
   - curl -u Administrator:Administrator -v -X POST 'http://127.0.0.1:8091/pools/default/buckets' -d name=testing -d ramQuotaMB=128 -d bucketType=couchbase -d flushEnabled=1 -d evictionPolicy=fullEviction -d authType=none -d saslPassword=none
   - sleep 10
@@ -34,6 +33,7 @@ before_script:
   - sleep 10
   - curl -u Administrator:Administrator -v -X POST 'http://127.0.0.1:8091/pools/default/buckets' -d name=memcache-couch -d ramQuotaMB=128 -d bucketType=memcached -d flushEnabled=1 -d evictionPolicy=fullEviction -d authType=none -d proxyPort=11255 -d saslPassword=none
   - sleep 10
+  - ./bin/couchbase-cli user-manage -c localhost -u Administrator -p Administrator --set --rbac-username Administrator --rbac-password Administrator --rbac-name "Administrator" --roles bucket_full_access[*],ro_admin --auth-domain local
   - ./bin/cbq -e http://127.0.0.1:8091 --script "CREATE PRIMARY INDEX ON \`testing\`" -u=Administrator -p=Administrator
   - cd $TRAVIS_BUILD_DIR
   - composer self-update

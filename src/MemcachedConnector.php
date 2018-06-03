@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -40,7 +41,7 @@ class MemcachedConnector extends \Illuminate\Cache\MemcachedConnector
         array $options = [],
         array $credentials = []
     ) {
-        $memcached = $this->getMemcached($connectionId, [], []);
+        $memcached = $this->getMemcached($connectionId, $credentials, []);
 
         foreach ($servers as $server) {
             $memcached->addServer(

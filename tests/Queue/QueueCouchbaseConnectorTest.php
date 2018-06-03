@@ -21,7 +21,7 @@ class QueueCouchbaseConnectorTest extends CouchbaseTestCase
         $schema->create('jobs', function (\Ytake\LaravelCouchbase\Schema\Blueprint $blueprint) {
             $blueprint->primaryIndex();
         });
-        $connection->managedOpenBucket(self::BUCKET)->manager()->flush();
+        $connection->openBucket(self::BUCKET)->manager()->flush();
     }
 
     public function testQueueConnect()
@@ -40,7 +40,7 @@ class QueueCouchbaseConnectorTest extends CouchbaseTestCase
         $connect = $queue->connection('couchbase');
         /** @var CouchbaseConnection $database */
         $database = $connect->getDatabase();
-        $database->managedOpenBucket(self::BUCKET)->manager()->flush();
+        $database->openBucket(self::BUCKET)->manager()->flush();
         sleep(4);
         $database->openBucket(self::BUCKET);
         $this->assertNull($connect->pop());

@@ -33,7 +33,7 @@ class BlueprintTest extends \CouchbaseTestCase
             $blueprint->primaryIndex();
             $blueprint->index(["message"], "secondary");
         });
-        $indexes = $this->connection->managedOpenBucket('sample')->manager()->listN1qlIndexes();
+        $indexes = $this->connection->openBucket('sample')->manager()->listN1qlIndexes();
         $this->assertNotCount(0, $indexes);
         $this->removeBucket($this->connection->manager(), 'sample');
         sleep(5);
@@ -58,7 +58,7 @@ class BlueprintTest extends \CouchbaseTestCase
             $blueprint->dropPrimary();
             $blueprint->dropIndex("secondary");
         });
-        $indexes = $this->connection->managedOpenBucket('sample')->manager()->listN1qlIndexes();
+        $indexes = $this->connection->openBucket('sample')->manager()->listN1qlIndexes();
         $this->assertCount(0, $indexes);
         $this->removeBucket($this->connection->manager(), 'sample');
         sleep(5);

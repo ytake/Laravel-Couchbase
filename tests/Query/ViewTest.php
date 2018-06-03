@@ -60,7 +60,7 @@ class ViewTest extends \CouchbaseTestCase
             ]),
             $output
         );
-
+        sleep(4);
         /** @var Illuminate\Events\Dispatcher $dispatcher */
         $dispatcher = $this->app['events'];
         $dispatcher->listen(\Ytake\LaravelCouchbase\Events\ViewQuerying::class, function ($instance) {
