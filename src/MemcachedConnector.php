@@ -45,7 +45,7 @@ class MemcachedConnector extends \Illuminate\Cache\MemcachedConnector
 
         foreach ($servers as $server) {
             $memcached->addServer(
-                $server['host'], $server['port'], $server['weight']
+                $server['host'], intval($server['port']), $server['weight']
             );
         }
 

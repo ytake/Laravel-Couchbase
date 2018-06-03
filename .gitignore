@@ -1,3 +1,5 @@
 vendor
 composer.lock
 composer.phar
+ocular.phar
+coverage.clover

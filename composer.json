@@ -61,6 +61,11 @@
     ],
     "cs": [
       "php vendor/bin/php-cs-fixer fix"
+    ],
+    "scrutinizer_test": [
+      "php vendor/bin/phpunit --coverage-clover=coverage.clover",
+      "wget https://scrutinizer-ci.com/ocular.phar",
+      "php ocular.phar code-coverage:upload --format=php-clover coverage.clover"
     ]
   },
   "minimum-stability": "stable",
