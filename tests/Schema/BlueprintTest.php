@@ -20,10 +20,21 @@ class BlueprintTest extends \CouchbaseTestCase
     {
         $schema = $this->connection->getSchemaBuilder();
         $schema->create('sample', function (\Ytake\LaravelCouchbase\Schema\Blueprint $blueprint) {
+            try {
+                $blueprint->dropPrimary();
+            }catch (\Exception $e) {
+
+            }
+            try {
+                $blueprint->dropIndex("secondary");
+            }catch (\Exception $e) {
+
+            }
             $blueprint->primaryIndex();
             $blueprint->index(["message"], "secondary");
         });
-        $this->assertCount(0, $this->connection->table('sample')->get());
+        $indexes = $this->connection->openBucket('sample')->manager()->listN1qlIndexes();
+        $this->assertNotCount(0, $indexes);
         $this->removeBucket($this->connection->manager(), 'sample');
         sleep(5);
     }
@@ -32,6 +43,16 @@ class BlueprintTest extends \CouchbaseTestCase
     {
         $schema = $this->connection->getSchemaBuilder();
         $schema->create('sample', function (\Ytake\LaravelCouchbase\Schema\Blueprint $blueprint) {
+            try {
+                $blueprint->dropPrimary();
+            }catch (\Exception $e) {
+
+            }
+            try {
+                $blueprint->dropIndex("secondary");
+            }catch (\Exception $e) {
+
+            }
             $blueprint->primaryIndex();
             $blueprint->index(["message"], "secondary");
             $blueprint->dropPrimary();

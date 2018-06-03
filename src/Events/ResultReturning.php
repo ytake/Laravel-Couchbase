@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -17,7 +18,7 @@ namespace Ytake\LaravelCouchbase\Events;
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
-class ResultReturning
+final class ResultReturning
 {
     /** @var mixed */
     private $returning;

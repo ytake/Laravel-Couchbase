@@ -42,6 +42,7 @@ class QueueCouchbaseConnectorTest extends CouchbaseTestCase
         $database = $connect->getDatabase();
         $database->openBucket(self::BUCKET)->manager()->flush();
         sleep(4);
+        $database->openBucket(self::BUCKET);
         $this->assertNull($connect->pop());
         $connect->bulk(['testing:queue1', 'testing:queue2']);
         sleep(5);

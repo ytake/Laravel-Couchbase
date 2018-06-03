@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -54,7 +55,7 @@ class ConsoleServiceProvider extends ServiceProvider
     /**
      * register laravel-couchbase commands
      */
-    protected function registerCommands()
+    protected function registerCommands(): void
     {
         $this->app->singleton('command.couchbase.indexes', function ($app) {
             return new IndexFinderCommand($app['Illuminate\Database\DatabaseManager']);

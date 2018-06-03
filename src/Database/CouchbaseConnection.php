@@ -121,7 +121,12 @@ class CouchbaseConnection extends Connection
      */
     public function openBucket(string $name): Bucket
     {
-        return $this->getCouchbase()->openBucket($name, $this->bucketPassword);
+        $couchbase = $this->getCouchbase();
+        if ($this->bucketPassword === '') {
+            return $couchbase->openBucket($name);
+        }
+
+        return $couchbase->openBucket($name, $this->bucketPassword);
     }
 
     /**
@@ -281,7 +286,7 @@ class CouchbaseConnection extends Connection
     /**
      * @param bool $cross
      */
-    public function crossBucket(bool $cross)
+    public function crossBucket(bool $cross): void
     {
         $this->crossBucket = $cross;
     }
@@ -291,7 +296,7 @@ class CouchbaseConnection extends Connection
      *
      * @return $this
      */
-    public function bucket(string $bucket)
+    public function bucket(string $bucket): CouchbaseConnection
     {
         $this->bucket = $bucket;
 

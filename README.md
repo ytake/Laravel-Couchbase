@@ -20,6 +20,7 @@ Supported Auto-Discovery, Design Document, Cache Lock (Laravel5.5)
 
 | Laravel version | Laravel-Couchbase version | ext-couchbase |
 | ------------- | ------------- | ------------------|
+| Laravel 5.6 | ^1.1 | >=2.3.2 |
 | Laravel 5.5 | ^1.0 | >=2.3.2 |
 | Laravel 5.4 | ^0.7 | ^2.2.2 |
 | Laravel 5.3 | ^0.6 | ^2.2.2 |
@@ -335,3 +336,10 @@ Also tests are expecting regular Memcached daemon listening on port 11255.
 ## soon
  - authintication driver
  - Eloquent support
+
+## Couchbase Document
+
+[REST API / Creating and Editing Buckets](https://developer.couchbase.com/documentation/server/current/rest-api/rest-bucket-create.html)  
+[couchbase-cli / user-manage](https://developer.couchbase.com/documentation/server/5.1/cli/cbcli/couchbase-cli-user-manage.html)  
+[Authentication](https://developer.couchbase.com/documentation/server/5.1/security/security-authentication.html)  
+[Authorization API](https://developer.couchbase.com/documentation/server/5.1/rest-api/rest-authorization.html)  

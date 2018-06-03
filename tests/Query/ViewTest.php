@@ -47,6 +47,12 @@ class ViewTest extends \CouchbaseTestCase
      */
     public function testItShouldBeStdClass()
     {
+        /** @var \Ytake\LaravelCouchbase\Database\CouchbaseConnection $connection */
+        $connection = $this->databaseManager->connection('couchbase');
+        $bucket = $connection->openBucket($this->bucket);
+        $bucket->manager()->removeDesignDocument('dev_testing');
+        $bucket->manager()->removeDesignDocument('dev_testing_name');
+        sleep(6);
         $output = new BufferedOutput();
         $this->command->run(
             new ArrayInput([
@@ -54,7 +60,7 @@ class ViewTest extends \CouchbaseTestCase
             ]),
             $output
         );
-
+        sleep(4);
         /** @var Illuminate\Events\Dispatcher $dispatcher */
         $dispatcher = $this->app['events'];
         $dispatcher->listen(\Ytake\LaravelCouchbase\Events\ViewQuerying::class, function ($instance) {

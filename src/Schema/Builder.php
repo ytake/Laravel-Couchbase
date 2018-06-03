@@ -75,7 +75,7 @@ class Builder extends \Illuminate\Database\Schema\Builder
     {
         $blueprint = $this->createBlueprint($collection);
         $blueprint->create();
-        sleep(5);
+        sleep(10);
         if ($callback) {
             $callback($blueprint);
         }
@@ -88,7 +88,7 @@ class Builder extends \Illuminate\Database\Schema\Builder
     {
         $blueprint = $this->createBlueprint($collection);
         $blueprint->drop();
-        sleep(5);
+        sleep(10);
 
         return true;
     }
@@ -96,7 +96,7 @@ class Builder extends \Illuminate\Database\Schema\Builder
     /**
      * {@inheritdoc}
      */
-    protected function createBlueprint($table, Closure $callback = null)
+    protected function createBlueprint($table, Closure $callback = null): Blueprint
     {
         $blueprint = new Blueprint($table, $callback);
         $blueprint->connector($this->connection);

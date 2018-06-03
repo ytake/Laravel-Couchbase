@@ -22,8 +22,8 @@ use Couchbase\N1qlQuery;
  */
 final class QueryPrepared
 {
-    /** @var array */
-    public $object = [];
+    /** @var N1qlQuery */
+    private $object;
 
     /**
      * QueryPrepared constructor.
@@ -42,12 +42,20 @@ final class QueryPrepared
      *
      * @return bool
      */
-    protected function isN1ql($queryObject): bool
+    private function isN1ql($queryObject): bool
     {
         if ($queryObject instanceof N1qlQuery) {
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * @return N1qlQuery|null
+     */
+    public function getQuery(): ?N1qlQuery
+    {
+        return $this->object;
     }
 }

@@ -16,6 +16,9 @@ tools:
             standard: "PSR2"
     php_cs_fixer:
         config: { level: psr2 }
+    external_code_coverage:
+        timeout: 600    # Timeout in seconds.
+        runs: 2
 checks:
     php:
         code_rating: true

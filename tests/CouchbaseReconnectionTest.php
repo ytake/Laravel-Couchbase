@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * Class CouchbaseReconnectionTest
@@ -7,7 +8,7 @@
  */
 class CouchbaseReconnectionTest extends \CouchbaseTestCase
 {
-    public function testPattern()
+    public function testPattern(): void
     {
         /** @var \Illuminate\Database\DatabaseManager $database */
         $database = $this->app['db'];
@@ -43,9 +44,10 @@ class CouchbaseReconnectionTest extends \CouchbaseTestCase
      * @param $class
      * @param $name
      *
-     * @return \ReflectionProperty
+     * @return ReflectionProperty
+     * @throws ReflectionException
      */
-    protected function getProtectProperty($class, $name)
+    protected function getProtectProperty($class, $name): \ReflectionProperty
     {
         $class = new \ReflectionClass($class);
         $property = $class->getProperty($name);

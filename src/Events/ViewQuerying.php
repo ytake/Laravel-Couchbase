@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -19,7 +20,7 @@ use Couchbase\ViewQuery;
  *
  * @author Yuuki Takezawa<yuuki.takezawa@comnect.jp.net>
  */
-class ViewQuerying
+final class ViewQuerying
 {
     /** @var ViewQuery */
     private $viewQuery;

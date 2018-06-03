@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -89,7 +90,7 @@ class CouchbaseServiceProvider extends ServiceProvider
      * register 'couchbase' cache driver.
      * for bucket type couchbase.
      */
-    protected function registerCouchbaseBucketCacheDriver()
+    protected function registerCouchbaseBucketCacheDriver(): void
     {
         $this->app['cache']->extend('couchbase', function ($app, $config) {
             /** @var \Couchbase\Cluster $cluster */
@@ -111,19 +112,29 @@ class CouchbaseServiceProvider extends ServiceProvider
      * register 'couchbase' cache driver.
      * for bucket type memcached.
      */
-    protected function registerMemcachedBucketCacheDriver()
+    protected function registerMemcachedBucketCacheDriver(): void
     {
         $this->app['cache']->extend('couchbase-memcached', function ($app, $config) {
             $prefix = $app['config']['cache.prefix'];
-            $memcachedBucket = $this->app['couchbase.memcached.connector']->connect($config['servers']);
+            $credential = $config['sasl'] ?? [];
+            $memcachedBucket = $this->app['couchbase.memcached.connector']
+                ->connect($config['servers']);
 
             return new Repository(
-                new MemcachedBucketStore($memcachedBucket, strval($prefix), $config['servers'])
+                new MemcachedBucketStore(
+                    $memcachedBucket,
+                    strval($prefix),
+                    $config['servers'],
+                    $credential
+                )
             );
         });
     }
 
-    protected function registerCouchbaseQueueDriver()
+    /**
+     * register custom queue 'couchbase' driver
+     */
+    protected function registerCouchbaseQueueDriver(): void
     {
         /** @var QueueManager $queueManager */
         $queueManager = $this->app['queue'];
