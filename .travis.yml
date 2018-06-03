@@ -5,11 +5,6 @@ dist: trusty
 php:
   - 7.1
 
-addons:
-  apt:
-    packages:
-      - python
-
 before_script:
   - chmod -R 755 tests/bin/memcached.sh
   - tests/bin/memcached.sh
