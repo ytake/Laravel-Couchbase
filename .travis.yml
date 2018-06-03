@@ -13,14 +13,13 @@ addons:
 before_script:
   - chmod -R 755 tests/bin/memcached.sh
   - tests/bin/memcached.sh
-  - wget http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-4-amd64.deb
-  - sudo dpkg -i couchbase-release-1.0-4-amd64.deb
+  - wget https://packages.couchbase.com/releases/5.0.1/couchbase-server-community_5.0.1-ubuntu14.04_amd64.deb
+  - sudo dpkg -i couchbase-server-community_5.0.1-ubuntu14.04_amd64.deb
 # Will install or upgrade packages
   - sudo apt-get update
   - sudo apt-get install debian-archive-keyring
   - sudo apt-get update
   #- sudo apt-get upgrade
-  - sudo apt-get install couchbase-server-community --allow-unauthenticated
   - sudo apt-get install libcouchbase-dev libcouchbase2-bin build-essential libssl-dev
   - pecl install pcs-beta
   - pecl install igbinary
