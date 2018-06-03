@@ -8,6 +8,8 @@ php:
 before_script:
   - chmod -R 755 tests/bin/memcached.sh
   - tests/bin/memcached.sh
+  - wget http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-4-amd64.deb
+  - sudo dpkg -i couchbase-release-1.0-4-amd64.deb
   - wget https://packages.couchbase.com/releases/5.0.1/couchbase-server-community_5.0.1-ubuntu14.04_amd64.deb
   - sudo dpkg -i couchbase-server-community_5.0.1-ubuntu14.04_amd64.deb
 # Will install or upgrade packages
