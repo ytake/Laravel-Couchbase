@@ -4,14 +4,15 @@ for Laravel 5.1.*(higher)
 cache, session, database, queue extension package
 *required ext-couchbase*
 
-[![Build Status](http://img.shields.io/travis/ytake/Laravel-Couchbase/master.svg?style=flat-square)](https://travis-ci.org/ytake/Laravel-Couchbase)
-[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/?branch=develop)
-[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/ytake/Laravel-Couchbase/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/?branch=develop)
+[![Build Status](https://img.shields.io/scrutinizer/build/g/ytake/Laravel-Couchbase/master.svg?style=flat-square)](https://travis-ci.org/ytake/Laravel-Couchbase)
+[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/ytake/Laravel-Couchbase/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/?branch=master)
+[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/ytake/Laravel-Couchbase/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/ytake/Laravel-Couchbase/?branch=masnter)
 [![StyleCI](https://styleci.io/repos/45177780/shield)](https://styleci.io/repos/45177780)
 
 [![Packagist](https://img.shields.io/packagist/dt/ytake/laravel-couchbase.svg?style=flat-square)](https://packagist.org/packages/ytake/laravel-couchbase)
 [![Packagist](https://img.shields.io/packagist/v/ytake/laravel-couchbase.svg?style=flat-square)](https://packagist.org/packages/ytake/laravel-couchbase)
 [![Packagist](https://img.shields.io/packagist/l/ytake/laravel-couchbase.svg?style=flat-square)](https://packagist.org/packages/ytake/laravel-couchbase)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e775c5758be749868fcd8ac6680dfc69)](https://www.codacy.com/app/yuuki-takezawa/Laravel-Couchbase?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ytake/Laravel-Couchbase&amp;utm_campaign=Badge_Grade)
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/944f9bc0-7ee6-4f5f-b371-8ec216ea317e/mini.png)](https://insight.sensiolabs.com/projects/944f9bc0-7ee6-4f5f-b371-8ec216ea317e)
 
