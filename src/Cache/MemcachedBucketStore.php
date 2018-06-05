@@ -115,7 +115,6 @@ class MemcachedBucketStore extends MemcachedStore
      */
     public function flush()
     {
-        $this->sasl;
         $handler = curl_multi_init();
         foreach ($this->servers as $server) {
             $initialize = curl_init();
